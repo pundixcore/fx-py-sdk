@@ -1,0 +1,10 @@
+confio/
+cosmos/
+cosmos_proto/
+dex/
+gogoproto/
+google/
+ibc/
+tendermint/
+venv/
+__pycache__
