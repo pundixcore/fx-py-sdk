@@ -8,7 +8,7 @@ class MyTestCase(unittest.TestCase):
         priv_key = wallet.seed_to_privkey(
             'lonely trumpet tiny soccer brief holiday eye warm credit focus correct april between '
             'armed spoon dice save visit endorse wonder record swim course field')
-        self.assertEqual(wallet.privkey_to_address(priv_key), 'fx12fv300avzf266qp930ur4g50agajuz6jcsj5tz')
+        self.assertEqual(priv_key.to_address(), 'fx12fv300avzf266qp930ur4g50agajuz6jcsj5tz')
 
 
 if __name__ == '__main__':

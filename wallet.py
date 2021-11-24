@@ -10,10 +10,31 @@ DEFAULT_DERIVATION_PATH = "m/44'/118'/0'/0/0"
 DEFAULT_BECH32_HRP = "fx"
 
 
+class PrivateKey:
+
+    def __init__(self, key: bytes) -> None:
+        self._privkey = key
+
+    def to_public_key(self) -> bytes:
+        privkey_obj = ecdsa.SigningKey.from_string(self._privkey, curve=ecdsa.SECP256k1)
+        pubkey_obj = privkey_obj.get_verifying_key()
+        return pubkey_obj.to_string("compressed")
+
+    def to_address(self, hrp: str = DEFAULT_BECH32_HRP) -> str:
+        return pubkey_to_address(self.to_public_key(), hrp=hrp)
+
+    def sign(self, message_bytes: bytes) -> bytes:
+        privkey = ecdsa.SigningKey.from_string(self._privkey, curve=ecdsa.SECP256k1)
+        signature_compact = privkey.sign_deterministic(
+            message_bytes, hashfunc=hashlib.sha256, sigencode=ecdsa.util.sigencode_string_canonize
+        )
+        return signature_compact
+
+
 class Wallet(TypedDict):
     seed: str
     derivation_path: str
-    private_key: bytes
+    private_key: PrivateKey
     public_key: bytes
     address: str
 
@@ -28,7 +49,7 @@ def generate_wallet(
             break
         except BIP32DerivationError:
             pass
-    pubkey = privkey_to_pubkey(privkey)
+    pubkey = privkey.to_public_key()
     address = pubkey_to_address(pubkey, hrp=hrp)
     return {
         "seed": phrase,
@@ -39,7 +60,7 @@ def generate_wallet(
     }
 
 
-def seed_to_privkey(seed: str, path: str = DEFAULT_DERIVATION_PATH) -> bytes:
+def seed_to_privkey(seed: str, path: str = DEFAULT_DERIVATION_PATH) -> PrivateKey:
     """Get a private key from a mnemonic seed and a derivation path.
 
     Assumes a BIP39 mnemonic seed with no passphrase. Raises
@@ -52,13 +73,7 @@ def seed_to_privkey(seed: str, path: str = DEFAULT_DERIVATION_PATH) -> bytes:
     # that the same exception type is also in the `cosmospy` namespace).
     derived_privkey = hd_wallet.get_privkey_from_path(path)
 
-    return derived_privkey
-
-
-def privkey_to_pubkey(privkey: bytes) -> bytes:
-    privkey_obj = ecdsa.SigningKey.from_string(privkey, curve=ecdsa.SECP256k1)
-    pubkey_obj = privkey_obj.get_verifying_key()
-    return pubkey_obj.to_string("compressed")
+    return PrivateKey(derived_privkey)
 
 
 def pubkey_to_address(pubkey: bytes, *, hrp: str = DEFAULT_BECH32_HRP) -> str:
@@ -67,8 +82,3 @@ def pubkey_to_address(pubkey: bytes, *, hrp: str = DEFAULT_BECH32_HRP) -> str:
     five_bit_r = bech32.convertbits(r, 8, 5)
     assert five_bit_r is not None, "Unsuccessful bech32.convertbits call"
     return bech32.bech32_encode(hrp, five_bit_r)
-
-
-def privkey_to_address(privkey: bytes, *, hrp: str = DEFAULT_BECH32_HRP) -> str:
-    pubkey = privkey_to_pubkey(privkey)
-    return pubkey_to_address(pubkey, hrp=hrp)
