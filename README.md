@@ -48,7 +48,7 @@ pip install -r requirements.txt -i https://mirrors.cloud.tencent.com/pypi/simple
 
 ### 5.跑个Demo~
 ```
-python main.py
+python grpc_client_test.py
 
 ```
 

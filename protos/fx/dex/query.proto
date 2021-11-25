@@ -2,15 +2,15 @@ syntax = "proto3";
 package fx.dex;
 
 import "google/api/annotations.proto";
-import "dex/order.proto";
-import "dex/match.proto";
-import "dex/position.proto";
-import "dex/params.proto";
-import "dex/funding.proto";
-import "dex/margin.proto";
+import "fx/dex/order.proto";
+import "fx/dex/match.proto";
+import "fx/dex/position.proto";
+import "fx/dex/params.proto";
+import "fx/dex/funding.proto";
+import "fx/dex/margin.proto";
 import "gogoproto/gogo.proto";
 
-option go_package = "git.wokoworks.com/blockchain/fx-chain/x/dex/types";
+option go_package = "github.com/functionx/fx-dex/x/dex/types";
 
 // Query defines the gRPC querier service.
 service Query {

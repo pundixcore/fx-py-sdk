@@ -2,14 +2,14 @@ syntax = "proto3";
 package fx.dex;
 
 // this line is used by starport scaffolding # genesis/proto/import
-import "dex/order.proto";
-import "dex/position.proto";
-import "dex/funding.proto";
-import "dex/margin.proto";
+import "fx/dex/order.proto";
+import "fx/dex/position.proto";
+import "fx/dex/funding.proto";
+import "fx/dex/margin.proto";
 import "gogoproto/gogo.proto";
-import "dex/params.proto";
-import "dex/match.proto";
-option go_package = "git.wokoworks.com/blockchain/fx-chain/x/dex/types";
+import "fx/dex/params.proto";
+import "fx/dex/match.proto";
+option go_package = "github.com/functionx/fx-dex/x/dex/types";
 
 // GenesisState defines the capability module's genesis state.
 message GenesisState {

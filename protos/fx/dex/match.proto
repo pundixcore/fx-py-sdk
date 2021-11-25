@@ -2,9 +2,9 @@ syntax = "proto3";
 package fx.dex;
 
 import "gogoproto/gogo.proto";
-import "dex/order.proto";
+import "fx/dex/order.proto";
 
-option go_package = "git.wokoworks.com/blockchain/fx-chain/x/dex/types";
+option go_package = "github.com/functionx/fx-dex/x/dex/types";
 
 //订单匹配结果（部分匹配和全匹配）
 message OrderFill {
