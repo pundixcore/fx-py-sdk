@@ -1,0 +1,29 @@
+syntax = "proto3";
+package fx.dex;
+
+// this line is used by starport scaffolding # genesis/proto/import
+import "dex/order.proto";
+import "dex/position.proto";
+import "dex/funding.proto";
+import "dex/margin.proto";
+import "gogoproto/gogo.proto";
+import "dex/params.proto";
+import "dex/match.proto";
+option go_package = "git.wokoworks.com/blockchain/fx-chain/x/dex/types";
+
+// GenesisState defines the capability module's genesis state.
+message GenesisState {
+    Params params = 1 [(gogoproto.nullable) = false];
+    Positions positions = 2 [(gogoproto.nullable) = false];
+    PositionID position_id = 3 [(gogoproto.nullable) = false];
+    repeated PairFundingRates pair_funding_rates = 4 [(gogoproto.nullable) = false];
+    PremiumIndexConf premium_index_config = 5 [(gogoproto.nullable) = false];
+    repeated MarginRate margin_rate_tables = 6 [(gogoproto.nullable) = false];
+    repeated InitMarginRate init_margin_rate_tables = 7 [(gogoproto.nullable) = false];
+    Funding funding_info = 8 [(gogoproto.nullable) = false];
+    repeated DealPrice deal_price = 9 [(gogoproto.nullable) = false];
+    FundingTime funding_time = 10 [(gogoproto.nullable) = false];
+}
+
+
+

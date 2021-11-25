@@ -1,0 +1,33 @@
+syntax = "proto3";
+package fx.dex;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "git.wokoworks.com/blockchain/fx-chain/x/dex/types";
+
+message Params {
+  string fee_rate = 1 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+  string accumulative_fee = 2 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+  string risk_reserve = 3 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+  string lock_capital = 4 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+  string forced_liquidation_order_price_rate = 5 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+  int64 force_liquidation_margin_rate_threshold = 6;
+  int64 order_expire_blocks = 7;
+  int64 max_deals_per_block = 8;
+}
+

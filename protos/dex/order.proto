@@ -1,0 +1,96 @@
+syntax = "proto3";
+package fx.dex;
+
+import "gogoproto/gogo.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "git.wokoworks.com/blockchain/fx-chain/x/dex/types";
+
+//BOTH for query
+enum Direction {
+    option (gogoproto.goproto_enum_stringer) = true;
+    option (gogoproto.goproto_enum_prefix)   = false;
+
+    BUY = 0 [(gogoproto.enumvalue_customname) = "BID"];
+    SELL  = 1 [(gogoproto.enumvalue_customname) = "ASK"];
+    BOTH  = 2 [(gogoproto.enumvalue_customname) = "BOTH"];
+}
+
+enum OrderStatus {
+    option (gogoproto.goproto_enum_stringer) = true;
+    option (gogoproto.goproto_enum_prefix)   = false;
+
+    ORDER_PENDING = 0 [(gogoproto.enumvalue_customname) = "ORDER_PENDING"];
+    ORDER_FILLED  = 1 [(gogoproto.enumvalue_customname) = "ORDER_FILLED"];
+    ORDER_PARTIAL_FILLED  = 2 [(gogoproto.enumvalue_customname) = "ORDER_PARTIAL_FILLED"];
+    ORDER_CANCELLED  = 3 [(gogoproto.enumvalue_customname) = "ORDER_CANCELLED"];
+    ORDER_PARTIAL_FILLED_CANCELLED  = 4 [(gogoproto.enumvalue_customname) = "ORDER_PARTIAL_FILLED_CANCELLED"];
+    ORDER_PARTIAL_FILLED_EXPIRED  = 5 [(gogoproto.enumvalue_customname) = "ORDER_PARTIAL_FILLED_EXPIRED"];
+    ORDER_EXPIRED  = 6 [(gogoproto.enumvalue_customname) = "ORDER_EXPIRED"];
+}
+
+enum OrderType {
+    option (gogoproto.goproto_enum_stringer) = true;
+    option (gogoproto.goproto_enum_prefix)   = false;
+
+    ORDER_TYPE_OPEN_POSITION = 0 [(gogoproto.enumvalue_customname) = "ORDER_TYPE_OPEN_POSITION"];
+    ORDER_TYPE_CLOSE_LONG = 1 [(gogoproto.enumvalue_customname) = "ORDER_TYPE_CLOSE_LONG"];
+    ORDER_TYPE_CLOSE_SHORT = 2 [(gogoproto.enumvalue_customname) = "ORDER_TYPE_CLOSE_SHORT"];
+    ORDER_TYPE_LIQUIDATION = 3 [(gogoproto.enumvalue_customname) = "ORDER_TYPE_LIQUIDATION"];
+}
+
+message OrderIDs {
+    repeated string ids = 1;
+}
+
+message Order {
+    string tx_hash = 1;
+    string id = 2 ;
+    bytes owner = 3 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
+    string pair_id = 4;
+    Direction direction = 5;
+    string price = 6 [
+        (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+        (gogoproto.nullable) = false
+    ];
+    string base_quantity = 7 [
+        (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+        (gogoproto.nullable) = false
+    ];
+    string quote_quantity = 8 [
+        (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+        (gogoproto.nullable) = false
+    ];
+    string filled_quantity = 9 [
+        (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+        (gogoproto.nullable) = false
+    ];
+    string filled_avg_price = 10 [
+        (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+        (gogoproto.nullable) = false
+    ];
+    string remain_locked = 11 [
+        (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+        (gogoproto.nullable) = false
+    ];
+    google.protobuf.Timestamp created_at = 12
+    [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+    int64 leverage = 13;
+    OrderStatus status = 14;
+    OrderType order_type = 15;
+    string cost_fee = 16 [
+        (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+        (gogoproto.nullable) = false
+    ];
+    string locked_fee = 17 [
+        (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+        (gogoproto.nullable) = false
+    ];
+    int64 ttl = 18;
+}
+
+message Orders {
+    repeated Order orders = 1 [(gogoproto.nullable) = false];
+}
+
+
