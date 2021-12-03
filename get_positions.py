@@ -16,7 +16,7 @@ account = grpc_client.query_account_info(channel=channel, address="dex1v0zwwfe3g
 print(account)
 
 priv_key = wallet.seed_to_privkey(seed)
-AccAddress = priv_key.to_address()
+accAddress = priv_key.to_address()
 print(accAddress)
 print(address)
 

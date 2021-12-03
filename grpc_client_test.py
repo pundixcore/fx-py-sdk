@@ -14,7 +14,7 @@ class MyTestCase(unittest.TestCase):
         balances = grpc_client.query_all_balances(channel=channel, address="dex1v0zwwfe3gw2fqdhdnx0hcurh2gzz98z8dagewy")
         print(balances)
 
-        account = grpc_client×.query_account_info(channel=channel, address="dex1v0zwwfe3gw2fqdhdnx0hcurh2gzz98z8dagewy")
+        account = grpc_client.query_account_info(channel=channel, address="dex1v0zwwfe3gw2fqdhdnx0hcurh2gzz98z8dagewy")
         print(account)
 
 if __name__ == '__main__':
