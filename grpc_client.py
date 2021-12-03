@@ -13,7 +13,7 @@ from fx.other.query_pb2 import GasPriceRequest
 from fx.other.query_pb2_grpc import QueryStub as OtherQuery
 
 from fx.dex.query_pb2_grpc import QueryStub as DexQuery
-from fx.dex.query_pb2 import QueryPositionsReq
+from fx.dex.query_pb2 import *
 
 
 def query_account_info(channel: grpc.Channel, address: str) -> BaseAccount:
@@ -30,7 +30,6 @@ def query_all_balances(channel: grpc.Channel, address: str) -> [Coin]:
     response = BankQuery(channel).AllBalances(QueryAllBalancesRequest(address=address))
     return response.balances
 
-
 def query_balance(channel: grpc.Channel, address: str, denom: str) -> Coin:
     response = BankQuery(channel).Balance(QueryBalanceRequest(address=address, denom=denom))
     return response.balance
@@ -40,11 +39,12 @@ def get_gas_price(channel: grpc.Channel) -> [Coin]:
     response = OtherQuery(channel).GasPrice(GasPriceRequest())
     return response.gas_prices
 
-
 def get_chain_id(channel: grpc.Channel) -> str:
     response = TendermintClient(channel).GetLatestBlock(GetBlockByHeightRequest())
     return response.block.header.chain_id
 
-def query_all_positions(channel: grpc.Channel, owner: str):
-    response = DexQuery(channel).QueryPositions(QueryPositionsReq(owner = owner))
+def query_all_positions(channel: grpc.Channel, owner, pair_id):
+    response = DexQuery(channel).QueryPosition(QueryPositionReq(owner=owner, pair_id=pair_id))
     return response
+
+

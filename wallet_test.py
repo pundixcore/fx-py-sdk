@@ -10,6 +10,5 @@ class MyTestCase(unittest.TestCase):
             'armed spoon dice save visit endorse wonder record swim course field')
         self.assertEqual(priv_key.to_address(), 'fx12fv300avzf266qp930ur4g50agajuz6jcsj5tz')
 
-
 if __name__ == '__main__':
     unittest.main()
