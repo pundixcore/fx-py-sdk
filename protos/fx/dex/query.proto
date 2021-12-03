@@ -32,11 +32,11 @@ service Query {
     }
 
     // positions query
-    rpc QueryPositions(QueryPositonsReq) returns (QueryPositonsResp) {
+    rpc QueryPositions(QueryPositionsReq) returns (QueryPositionsResp) {
         option (google.api.http).get = "/dex/positions";
     }
 
-    rpc QueryPosition(QueryPositonReq) returns (QueryPositonResp) {
+    rpc QueryPosition(QueryPositionReq) returns (QueryPositionResp) {
         option (google.api.http).get = "/dex/position";
     }
 
@@ -177,7 +177,7 @@ message QueryOrderbookResp {
 }
 
 ///////////////////// positions query ///////////////////////////
-message QueryPositonsReq {
+message QueryPositionsReq {
     bytes owner = 1 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
     PosDirection direction = 2;
     string pair_id = 3;
@@ -191,16 +191,16 @@ message QueryPositonsReq {
     ];
 }
 
-message QueryPositonsResp {
+message QueryPositionsResp {
     Positions positions = 1 [(gogoproto.nullable) = false];
 }
 
-message QueryPositonReq {
+message QueryPositionReq {
     bytes owner = 1 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
     string pair_id = 2;
 }
 
-message QueryPositonResp {
+message QueryPositionResp {
     Positions positions = 1 [(gogoproto.nullable) = false];
 }
 

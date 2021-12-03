@@ -25,6 +25,7 @@ python3 -m venv venv
 ```
 source ./venv/bin/activate
 ```
+Windows: venv\Scripts\activate
 
 ### 3. 安装项目依赖
 
@@ -44,6 +45,7 @@ pip install -r requirements.txt -i https://mirrors.cloud.tencent.com/pypi/simple
 ```
 ./gen-proto.sh
 ```
+Windows: wsl ./gen-proto.sh
 
 
 ### 5.跑个Demo~

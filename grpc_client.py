@@ -12,6 +12,9 @@ from cosmos.base.v1beta1.coin_pb2 import Coin
 from fx.other.query_pb2 import GasPriceRequest
 from fx.other.query_pb2_grpc import QueryStub as OtherQuery
 
+from fx.dex.query_pb2_grpc import QueryStub as DexQuery
+from fx.dex.query_pb2 import QueryPositionsReq
+
 
 def query_account_info(channel: grpc.Channel, address: str) -> BaseAccount:
     """查询用户信息"""
@@ -41,3 +44,7 @@ def get_gas_price(channel: grpc.Channel) -> [Coin]:
 def get_chain_id(channel: grpc.Channel) -> str:
     response = TendermintClient(channel).GetLatestBlock(GetBlockByHeightRequest())
     return response.block.header.chain_id
+
+def query_all_positions(channel: grpc.Channel, owner: str):
+    response = DexQuery(channel).QueryPositions(QueryPositionsReq(owner = owner))
+    return response

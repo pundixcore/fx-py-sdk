@@ -7,7 +7,7 @@ from hdwallets import BIP32DerivationError as BIP32DerivationError
 from typing import TypedDict
 
 DEFAULT_DERIVATION_PATH = "m/44'/118'/0'/0/0"
-DEFAULT_BECH32_HRP = "fx"
+DEFAULT_BECH32_HRP = "dex"
 
 
 class PrivateKey:
