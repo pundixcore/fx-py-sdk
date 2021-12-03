@@ -15,9 +15,10 @@ print(balances)
 account = grpc_client.query_account_info(channel=channel, address="dex1v0zwwfe3gw2fqdhdnx0hcurh2gzz98z8dagewy")
 print(account)
 
-#position = grpc_client.QueryPositionsReq(channel=channel, owner=address)
-
 priv_key = wallet.seed_to_privkey(seed)
 AccAddress = priv_key.to_address()
-print(AccAddress)
+print(accAddress)
 print(address)
+
+#position = grpc_client.QueryPositionsReq(channel=channel, owner=address)
+position = grpc_client.QueryPositionsReq(channel=channel, owner=accAddress)
