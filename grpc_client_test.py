@@ -20,7 +20,7 @@ class MyTestCase(unittest.TestCase):
         hrp, data = bech32.bech32_decode('dex1v0zwwfe3gw2fqdhdnx0hcurh2gzz98z8dagewy')
         converted = bech32.convertbits(data, 5, 8, False)
         print(bytes(converted))
-        positions = grpc_client.query_all_positions(channel=channel, owner=bytes(converted), pair_id="tsla:usdt")
+        positions = grpc_client.query_positions(channel=channel, owner=bytes(converted), pair_id="tsla:usdt")
         print(positions)
 
 if __name__ == '__main__':
