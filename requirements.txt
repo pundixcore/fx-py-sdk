@@ -5,3 +5,4 @@ ecdsa
 hdwallets
 mnemonic
 hdwallets
+pytest

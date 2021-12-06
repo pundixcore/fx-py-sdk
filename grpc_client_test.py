@@ -3,17 +3,18 @@ import wallet
 import grpc
 import grpc_client
 import bech32
+from grpc_client import GRPCClient
+
 
 class MyTestCase(unittest.TestCase):
-    def test_grpc(self):
-        channel = grpc.insecure_channel('44.196.199.119:9090')
+    def test_grpc_query(self):
+        client = GRPCClient('localhost:9090')
 
-        mnemonic_list = "crime indicate code innocent brush loud among labor girl print solar flower visit ridge garage scan visual finger gaze rack toy road mimic divorce"
-
-        balances = grpc_client.query_all_balances(channel=channel, address="dex1v0zwwfe3gw2fqdhdnx0hcurh2gzz98z8dagewy")
+        balances = client.query_all_balances(address="fx1yt8navfnvwe9k7qcp96fueamj8u5z8hz2y4th7")
         print(balances)
 
-        account = grpc_client.query_account_info(channel=channel, address="dex1v0zwwfe3gw2fqdhdnx0hcurh2gzz98z8dagewy")
+        account = client.query_account_info(address="fx1yt8navfnvwe9k7qcp96fueamj8u5z8hz2y4th7")
+
         print(account)
 
         hrp, data = bech32.bech32_decode('dex1v0zwwfe3gw2fqdhdnx0hcurh2gzz98z8dagewy')
