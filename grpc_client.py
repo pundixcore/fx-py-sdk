@@ -24,6 +24,9 @@ from fx.other.query_pb2_grpc import QueryStub as OtherQuery
 from google.protobuf.any_pb2 import Any
 from builder import TxBuilder
 
+from fx.dex.query_pb2_grpc import QueryStub as DexQuery
+from fx.dex.query_pb2 import *
+
 
 class GRPCClient:
     def __init__(self, url: str = 'localhost:9090'):

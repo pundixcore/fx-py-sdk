@@ -9,7 +9,7 @@ from cosmos.crypto.secp256k1.keys_pb2 import PubKey
 from google.protobuf.any_pb2 import Any
 
 DEFAULT_DERIVATION_PATH = "m/44'/118'/0'/0/0"
-DEFAULT_BECH32_HRP = "fx"
+DEFAULT_BECH32_HRP = "dex"
 
 
 class PublicKey:
@@ -92,3 +92,27 @@ def generate_wallet(
         "public_key": pubkey,
         "address": address,
     }
+
+def seed_to_privkey(seed: str, path: str = DEFAULT_DERIVATION_PATH) -> PrivateKey:
+    """Get a private key from a mnemonic seed and a derivation path.
+
+    Assumes a BIP39 mnemonic seed with no passphrase. Raises
+    `cosmospy.BIP32DerivationError` if the resulting private key is
+    invalid.
+    """
+    seed_bytes = mnemonic.Mnemonic.to_seed(seed, passphrase="")
+    hd_wallet = hdwallets.BIP32.from_seed(seed_bytes)
+    # This can raise a `hdwallets.BIP32DerivationError` (which we alias so
+    # that the same exception type is also in the `cosmospy` namespace).
+    derived_privkey = hd_wallet.get_privkey_from_path(path)
+
+    return PrivateKey(derived_privkey)
+
+
+def pubkey_to_address(pubkey: bytes, *, hrp: str = DEFAULT_BECH32_HRP) -> str:
+    s = hashlib.new("sha256", pubkey).digest()
+    r = hashlib.new("ripemd160", s).digest()
+    five_bit_r = bech32.convertbits(r, 8, 5)
+    assert five_bit_r is not None, "Unsuccessful bech32.convertbits call"
+    return bech32.bech32_encode(hrp, five_bit_r)
+
