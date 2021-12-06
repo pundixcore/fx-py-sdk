@@ -103,16 +103,17 @@ class GRPCClient:
         return response
 
 
-    def create_order(self, cli, priv_key, account_number, account_seq, chain_id,
+    def create_order(self, priv_key, account_number, account_seq, chain_id,
                      owner, pair_id, direction, price, base_quantity, leverage):
         msg = MsgCreateOrder(owner=owner, pair_id=pair_id, direction=direction, price=price, base_quantity=base_quantity,
                                   ttl=1000, leverage=leverage)
-
+        print("msg: ", msg)
         msg_any = Any(type_url='/fx.dex.MsgCreateOrder', value=msg.SerializeToString())
         tx_builder = TxBuilder(priv_key, chain_id, account_number)
         tx = tx_builder.sign(account_seq, [msg_any])
-        tx = cli.build_tx(tx_builder, [msg_any])
-        tx_response = cli.broadcast_tx(tx)
+        tx = self.build_tx(tx_builder, [msg_any])
+        print('====', tx)
+        tx_response = self.broadcast_tx(tx)
         print(tx_response)
         return tx_response
 
@@ -122,8 +123,8 @@ class GRPCClient:
         msg_any = Any(type_url='/fx.dex.MsgCancelOrder', value=msg.SerializeToString())
         tx_builder = TxBuilder(priv_key, chain_id, account_number)
         tx = tx_builder.sign(account_seq, [msg_any])
-        tx = cli.build_tx(tx_builder, [msg_any])
-        tx_response = cli.broadcast_tx(tx)
+        tx = self.build_tx(tx_builder, [msg_any])
+        tx_response = self.broadcast_tx(tx)
         print(tx_response)
         return tx_response
 
@@ -133,7 +134,7 @@ class GRPCClient:
         msg_any = Any(type_url='/fx.dex.MsgClosePosition', value=msg.SerializeToString())
         tx_builder = TxBuilder(priv_key, chain_id, account_number)
         tx = tx_builder.sign(account_seq, [msg_any])
-        tx = cli.build_tx(tx_builder, [msg_any])
+        tx = self.build_tx(tx_builder, [msg_any])
         tx_response = cli.broadcast_tx(tx)
         print(tx_response)
         return tx_response

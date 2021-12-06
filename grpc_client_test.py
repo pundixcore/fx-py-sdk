@@ -25,5 +25,25 @@ class MyTestCase(unittest.TestCase):
         a = "c\304\347\'1C\224\2206\355\231\237|pwR\004\"\234G"
         print(a)
 
+    def test_create_order(self):
+        priv_key = wallet.seed_to_privkey(
+            "dune antenna hood magic kit blouse film video another pioneer dilemma hobby message rug sail gas culture upgrade twin flag joke people general aunt")
+
+        address = priv_key.to_address()
+        print('address:', address)
+
+        cli = GRPCClient('44.196.199.119:9090')
+        chain_id = cli.query_chain_id()
+        print('chain_id:', chain_id)
+
+        account = cli.query_account_info(address)
+        print('account, number:', account.account_number, 'sequence:', account.sequence)
+
+        hrp, data = bech32.bech32_decode(address)
+        converted = bech32.convertbits(data, 5, 8, False)
+
+        cli.create_order(priv_key, account.account_number, account.sequence, chain_id,
+                         bytes(converted), "tsla:usdt", 'BUY', b"100000000000000000".decode('utf-8'), b"100000000000000000000000000000000".decode('utf-8'), 10)
+
 if __name__ == '__main__':
     unittest.main()
