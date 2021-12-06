@@ -20,5 +20,10 @@ class MyTestCase(unittest.TestCase):
         positions = client.query_positions(owner='dex1v0zwwfe3gw2fqdhdnx0hcurh2gzz98z8dagewy', pair_id="tsla:usdt")
         print(positions)
 
+        print(positions['positions'])
+
+        a = "c\304\347\'1C\224\2206\355\231\237|pwR\004\"\234G"
+        print(a)
+
 if __name__ == '__main__':
     unittest.main()

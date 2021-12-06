@@ -8,12 +8,12 @@ from google.protobuf.any_pb2 import Any
 
 def test_send_tx():
     priv_key = wallet.seed_to_privkey(
-        'lonely trumpet tiny soccer brief holiday eye warm credit focus correct april between '
-        'armed spoon dice save visit endorse wonder record swim course field')
+        "dune antenna hood magic kit blouse film video another pioneer dilemma hobby message rug sail gas culture upgrade twin flag joke people general aunt")
+
     address = priv_key.to_address()
     print('address:', address)
 
-    cli = GRPCClient('127.0.0.1:9090')
+    cli = GRPCClient('44.196.199.119:9090')
     chain_id = cli.query_chain_id()
     print('chain_id:', chain_id)
 

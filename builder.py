@@ -17,12 +17,13 @@ class TxBuilder:
     def __init__(self, private_key: PrivateKey,
                  chain_id: str = '',
                  account_number: int = -1,
-                 gas_price: Coin = Coin(amount='0', denom=DEFAULT_DENOM)):
+                 gas_price: Coin = Coin(amount='3000000000', denom=DEFAULT_DENOM)):
         self.chain_id = chain_id
         self.account_number = account_number
         if gas_price.denom == '':
             raise Exception('gas price denom can not be empty')
         self.gas_price = gas_price
+        self.fees = '300000000000000FX'
         self._private_key = private_key
         self._memo = ''
 
@@ -33,7 +34,7 @@ class TxBuilder:
         return self._private_key.to_address()
 
     def sign(self, sequence: int, msgs: [Any],
-             fee: Fee = Fee(amount=[Coin(amount='0', denom=DEFAULT_DENOM)]),
+             fee: Fee = Fee(amount=[Coin(amount='300000000000000', denom=DEFAULT_DENOM)]),
              timeout_height: int = 0) -> Tx:
         tx_body = TxBody(messages=msgs, memo=self._memo, timeout_height=timeout_height)
         tx_body_bytes = tx_body.SerializeToString()
@@ -44,6 +45,7 @@ class TxBuilder:
 
         signer_info = SignerInfo(public_key=pub_key_any, mode_info=mode_info, sequence=sequence)
         auth_info = AuthInfo(signer_infos=[signer_info], fee=fee)
+        print("----", auth_info)
         auth_info_bytes = auth_info.SerializeToString()
 
         sign_doc = SignDoc(body_bytes=tx_body_bytes,
