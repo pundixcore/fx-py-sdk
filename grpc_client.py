@@ -26,7 +26,7 @@ from builder import TxBuilder
 
 from fx.dex.query_pb2_grpc import QueryStub as DexQuery
 from fx.dex.query_pb2 import *
-
+import bech32
 
 class GRPCClient:
     def __init__(self, url: str = 'localhost:9090'):
@@ -59,6 +59,60 @@ class GRPCClient:
         """查询 chain id"""
         response = TendermintClient(self.channel).GetLatestBlock(GetBlockByHeightRequest())
         return response.block.header.chain_id
+
+    # 查询仓位
+    #   owner: 仓位持有人
+    #   pair_id: 交易对
+    def query_positions(self, owner, pair_id):
+        hrp, data = bech32.bech32_decode(owner)
+        converted = bech32.convertbits(data, 5, 8, False)
+        response = DexQuery(self.channel).QueryPosition(QueryPositionReq(owner=bytes(converted), pair_id=pair_id))
+        return response
+
+    # 查询订单
+    #   owner: 仓位持有地址
+    #   pair_id: 交易对
+    def query_order(self,order_id):
+        response = DexQuery(self.channel).QueryOrder(QueryOrderRequest(order_id=order_id))
+        return response
+
+    # 根据地址和交易对查询订单
+    #   owner: 仓位持有地址
+    #   pair_id: 交易对
+    def query_orders(self, owner, pair_id, page, limit):
+        hrp, data = bech32.bech32_decode(owner)
+        converted = bech32.convertbits(data, 5, 8, False)
+        response = DexQuery(self.channel).QueryOrders(QueryOrdersRequest(
+            owner=converted, pair_id=pair_id, page=page, limit=limit))
+        return response
+
+    # 查询资金费率
+    #   无需传参
+    def query_funding(self):
+        response = DexQuery(self.channel).QueryFunding(QueryFundingReq())
+        return response
+
+    # 查询标记价格
+    #   pair_id: 交易对
+    #   query_all: 是否查询全部
+    def query_mark_price(self, pair_id, query_all):
+        response = DexQuery(self.channel).QueryMarkPrice(QueryMarkPriceReq(pair_id=pair_id, query_all=query_all))
+        return response
+
+
+    # def create_order(self, pair_id, query_all):
+    #     msg =  [
+    #         MsgCreateOrder(
+    #             owner=sdk.wallet.address,
+    #             pair_id=uuid,
+    #             key="firstKey",
+    #             value="firstValue".encode("utf-8"),
+    #             lease=Lease(hours=1),
+    #         ),
+    #     ],
+    #
+    #     return response
+
 
     def build_tx(self, tx_builder: TxBuilder, msg: [Any], gas_limit: int = 0) -> Tx:
         if tx_builder.chain_id == '':
