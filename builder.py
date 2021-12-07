@@ -35,7 +35,8 @@ class TxBuilder:
 
     def acc_address(self):
         hrp, data = bech32.bech32_decode(self.address())
-        return bech32.convertbits(data, 5, 8, False)
+        return bytes(bech32.convertbits(data, 5, 8, False))
+
 
     def sign(self, sequence: int, msgs: [Any],
              fee: Fee = Fee(amount=[Coin(amount='300000000000000', denom=DEFAULT_DENOM)], gas_limit=100000),
