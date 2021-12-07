@@ -26,10 +26,10 @@ from builder import TxBuilder
 
 from fx.dex.query_pb2_grpc import QueryStub as DexQuery
 from fx.dex.query_pb2 import *
-from fx.dex.tx_pb2_grpc import MsgStub
 from fx.dex.tx_pb2 import *
 
 import bech32
+
 
 class GRPCClient:
     def __init__(self, url: str = 'localhost:9090'):
@@ -63,6 +63,8 @@ class GRPCClient:
         response = TendermintClient(self.channel).GetLatestBlock(GetBlockByHeightRequest())
         return response.block.header.chain_id
 
+    """fx dex api"""
+
     # 查询仓位
     #   owner: 仓位持有人
     #   pair_id: 交易对
@@ -70,12 +72,12 @@ class GRPCClient:
         hrp, data = bech32.bech32_decode(owner)
         converted = bech32.convertbits(data, 5, 8, False)
         response = DexQuery(self.channel).QueryPosition(QueryPositionReq(owner=bytes(converted), pair_id=pair_id))
-        return response
+        return response.positions
 
     # 查询订单
     #   owner: 仓位持有地址
     #   pair_id: 交易对
-    def query_order(self,order_id):
+    def query_order(self, order_id):
         response = DexQuery(self.channel).QueryOrder(QueryOrderRequest(order_id=order_id))
         return response
 
@@ -102,45 +104,33 @@ class GRPCClient:
         response = DexQuery(self.channel).QueryMarkPrice(QueryMarkPriceReq(pair_id=pair_id, query_all=query_all))
         return response
 
-
-    def create_order(self, priv_key, account_number, account_seq, chain_id,
-                     owner, pair_id, direction, price, base_quantity, leverage):
-        msg = MsgCreateOrder(owner=owner, pair_id=pair_id, direction=direction, price=price, base_quantity=base_quantity,
-                                  ttl=1000, leverage=leverage)
-        print("msg: ", msg)
+    def create_order(self, tx_builder: TxBuilder, pair_id, direction, price, base_quantity, leverage):
+        """创建订单"""
+        msg = MsgCreateOrder(owner=tx_builder.acc_address(), pair_id=pair_id, direction=direction, price=price,
+                             base_quantity=base_quantity,
+                             ttl=1000, leverage=leverage)
         msg_any = Any(type_url='/fx.dex.MsgCreateOrder', value=msg.SerializeToString())
-        tx_builder = TxBuilder(priv_key, chain_id, account_number)
-        tx = tx_builder.sign(account_seq, [msg_any])
         tx = self.build_tx(tx_builder, [msg_any])
-        print('====', tx)
         tx_response = self.broadcast_tx(tx)
-        print(tx_response)
         return tx_response
 
-    def cancel_order(self, cli, priv_key, account_number, account_seq, chain_id,
-                     owner, order_id):
-        msg = MsgCancelOrder(owner=owner, pair_id=order_id)
+    def cancel_order(self, tx_builder: TxBuilder, order_id):
+        """取消订单"""
+        msg = MsgCancelOrder(owner=tx_builder.acc_address(), pair_id=order_id)
         msg_any = Any(type_url='/fx.dex.MsgCancelOrder', value=msg.SerializeToString())
-        tx_builder = TxBuilder(priv_key, chain_id, account_number)
-        tx = tx_builder.sign(account_seq, [msg_any])
         tx = self.build_tx(tx_builder, [msg_any])
-        tx_response = self.broadcast_tx(tx)
-        print(tx_response)
-        return tx_response
+        return self.broadcast_tx(tx)
 
-    def close_position(self, cli, priv_key, account_number, account_seq, chain_id,
-                       owner, pair_id, position_id, price, base_quantity):
-        msg = MsgClosePosition(owner=owner, pair_id=pair_id, position_id=position_id, price=price, base_quantity=base_quantity)
+    def close_position(self, tx_builder: TxBuilder, pair_id, position_id, price, base_quantity):
+        msg = MsgClosePosition(owner=tx_builder.acc_address(), pair_id=pair_id, position_id=position_id, price=price,
+                               base_quantity=base_quantity)
         msg_any = Any(type_url='/fx.dex.MsgClosePosition', value=msg.SerializeToString())
-        tx_builder = TxBuilder(priv_key, chain_id, account_number)
-        tx = tx_builder.sign(account_seq, [msg_any])
         tx = self.build_tx(tx_builder, [msg_any])
-        tx_response = cli.broadcast_tx(tx)
-        print(tx_response)
-        return tx_response
+        return self.broadcast_tx(tx)
 
     def build_tx(self, tx_builder: TxBuilder, msg: [Any], gas_limit: int = 0) -> Tx:
-        if tx_builder.chain_id == 'fxdex':
+        """签名交易"""
+        if tx_builder.chain_id == '':
             tx_builder.chain_id = self.query_chain_id()
 
         account = self.query_account_info(tx_builder.address())
@@ -154,17 +144,20 @@ class GRPCClient:
                 if item.denom == fee_denom:
                     gas_price_amount = int(item.amount)
 
-        # fee_amount = Coin(amount=, denom=fee_denom)
-        # fee = Fee(amount=[fee_amount], gas_limit=gas_limit)
-        # tx = tx_builder.sign(account.sequence, msg, fee)
-        # gas_info = self.estimating_gas(tx)
-        # gas_limit = int(float(gas_info.gas_used) * 1.5)
-        fee_amount = Coin(amount='300000000000000', denom=fee_denom)
-        fee = Fee(amount=[fee_amount], gas_limit=200000)
+        if gas_limit <= 0:
+            """估算gas limit并扩大1.5倍"""
+            fee_amount = Coin(amount=str(gas_limit * gas_price_amount), denom=fee_denom)
+            fee = Fee(amount=[fee_amount], gas_limit=gas_limit)
+            tx = tx_builder.sign(account.sequence, msg, fee)
+            gas_info = self.estimating_gas(tx)
+            gas_limit = int(float(gas_info.gas_used) * 1.5)
+
+        fee_amount = Coin(amount=str(gas_limit * gas_price_amount), denom=fee_denom)
+        fee = Fee(amount=[fee_amount], gas_limit=gas_limit)
         return tx_builder.sign(account.sequence, msg, fee)
 
     def estimating_gas(self, tx: Tx) -> GasInfo:
-        """估算交易Gas"""
+        """估算交易Gas limit"""
         response = TxClient(self.channel).Simulate(SimulateRequest(tx=tx))
         return response.gas_info
 

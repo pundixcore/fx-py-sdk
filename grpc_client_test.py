@@ -4,6 +4,7 @@ import grpc
 import grpc_client
 import bech32
 from grpc_client import GRPCClient
+from builder import TxBuilder
 
 
 class MyTestCase(unittest.TestCase):
@@ -16,14 +17,8 @@ class MyTestCase(unittest.TestCase):
         # account = client.query_account_info(address="fx1yt8navfnvwe9k7qcp96fueamj8u5z8hz2y4th7")
         # print(account)
 
-
         positions = client.query_positions(owner='dex1v0zwwfe3gw2fqdhdnx0hcurh2gzz98z8dagewy', pair_id="tsla:usdt")
         print(positions)
-
-        print(positions['positions'])
-
-        a = "c\304\347\'1C\224\2206\355\231\237|pwR\004\"\234G"
-        print(a)
 
     def test_create_order(self):
         priv_key = wallet.seed_to_privkey(
@@ -39,11 +34,12 @@ class MyTestCase(unittest.TestCase):
         account = cli.query_account_info(address)
         print('account, number:', account.account_number, 'sequence:', account.sequence)
 
-        hrp, data = bech32.bech32_decode(address)
-        converted = bech32.convertbits(data, 5, 8, False)
+        tx_builder = TxBuilder(priv_key, chain_id, account.account_number)
 
-        cli.create_order(priv_key, account.account_number, account.sequence, chain_id,
-                         bytes(converted), "tsla:usdt", 'BUY', b"100000000000000000".decode('utf-8'), b"100000000000000000000000000000000".decode('utf-8'), 10)
+        tx_response = cli.create_order(tx_builder, 'tsla:usdt', 'BUY', '100000000000000000',
+                                       '100000000000000000000000000000000', 10)
+        print(tx_response)
+
 
 if __name__ == '__main__':
     unittest.main()

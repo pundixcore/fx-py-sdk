@@ -12,6 +12,24 @@ DEFAULT_DERIVATION_PATH = "m/44'/118'/0'/0/0"
 DEFAULT_BECH32_HRP = "dex"
 
 
+class Address:
+    def __init__(self, addr: str):
+        hrp, data = bech32.bech32_decode(addr)
+        self._hrp = hrp
+        self._data = data
+
+    def acc_address(self):
+        return bech32.convertbits(self._data, 5, 8, False)
+
+    def to_string(self, hrp: str = DEFAULT_BECH32_HRP) -> str:
+        if hrp is None:
+            hrp = self._hrp
+        return bech32.bech32_encode(hrp, self._data)
+
+    def to_bytes(self) -> bytes:
+        return bytes(bech32.convertbits(self._data, 5, 8, False))
+
+
 class PublicKey:
     def __init__(self, key: bytes):
         self._pub_key = key
@@ -93,6 +111,7 @@ def generate_wallet(
         "address": address,
     }
 
+
 def seed_to_privkey(seed: str, path: str = DEFAULT_DERIVATION_PATH) -> PrivateKey:
     """Get a private key from a mnemonic seed and a derivation path.
 
@@ -115,4 +134,3 @@ def pubkey_to_address(pubkey: bytes, *, hrp: str = DEFAULT_BECH32_HRP) -> str:
     five_bit_r = bech32.convertbits(r, 8, 5)
     assert five_bit_r is not None, "Unsuccessful bech32.convertbits call"
     return bech32.bech32_encode(hrp, five_bit_r)
-

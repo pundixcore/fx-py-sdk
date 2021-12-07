@@ -9,6 +9,7 @@ from cosmos.base.v1beta1.coin_pb2 import Coin
 from cosmos.tx.signing.v1beta1.signing_pb2 import SIGN_MODE_DIRECT
 from google.protobuf.any_pb2 import Any
 from wallet import PrivateKey
+import bech32
 
 DEFAULT_DENOM = "FX"
 
@@ -23,7 +24,6 @@ class TxBuilder:
         if gas_price.denom == '':
             raise Exception('gas price denom can not be empty')
         self.gas_price = gas_price
-        self.fees = '300000000000000FX'
         self._private_key = private_key
         self._memo = ''
 
@@ -33,8 +33,12 @@ class TxBuilder:
     def address(self) -> str:
         return self._private_key.to_address()
 
+    def acc_address(self):
+        hrp, data = bech32.bech32_decode(self.address())
+        return bech32.convertbits(data, 5, 8, False)
+
     def sign(self, sequence: int, msgs: [Any],
-             fee: Fee = Fee(amount=[Coin(amount='300000000000000', denom=DEFAULT_DENOM)]),
+             fee: Fee = Fee(amount=[Coin(amount='300000000000000', denom=DEFAULT_DENOM)], gas_limit=100000),
              timeout_height: int = 0) -> Tx:
         tx_body = TxBody(messages=msgs, memo=self._memo, timeout_height=timeout_height)
         tx_body_bytes = tx_body.SerializeToString()
@@ -45,7 +49,6 @@ class TxBuilder:
 
         signer_info = SignerInfo(public_key=pub_key_any, mode_info=mode_info, sequence=sequence)
         auth_info = AuthInfo(signer_infos=[signer_info], fee=fee)
-        print("----", auth_info)
         auth_info_bytes = auth_info.SerializeToString()
 
         sign_doc = SignDoc(body_bytes=tx_body_bytes,
