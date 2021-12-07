@@ -269,10 +269,10 @@ class GRPCClient:
             owner=Address(owner).to_bytes(), pair_id=pair_id, page=page, limit=limit))
         return response
 
-    # 查询资金费率
-    #   无需传参
-    def query_funding(self):
+    def query_funding_info(self):
         """查询资金费率.
+            Args:
+                无需传参
             Returns:
                 funding_period：资金费率结算周期
                 next_funding_time：下次资金费率结算时间
@@ -292,6 +292,141 @@ class GRPCClient:
                     }
         """
         response = DexQuery(self.channel).QueryFunding(QueryFundingReq())
+        return response
+
+    def query_funding_rate(self, pair_id, funding_times, query_all):
+        """查询资金费率.
+            Args:
+                pair_id: 交易对
+                funding_times: 结算次数
+                query_all：是否查询该交易对所有的资金费率
+            Returns:
+                pair_id: 交易对
+                funding_rate：资金费率
+                funding_time：资金费率结算时间
+
+                example:
+                    pair_funding_rates {
+                      pair_id: "tsla:usdt"
+                      funding_rate: "100000000000000"
+                      funding_time: 1638306300
+                    }
+        """
+        response = DexQuery(self.channel).QueryPairFundingRates(QueryPairFundingRatesReq(pair_id=pair_id, funding_times=funding_times, query_all=query_all))
+        return response
+
+    def query_orderbook(self, pair_id):
+        """查询资金费率.
+            Args:
+                pair_id: 交易对
+            Returns:
+                Asks：卖单
+                    price：价格
+                    quantity：数量
+                Bids：买单
+
+                Asks {
+                  price: "651.318912692282338620"
+                  quantity: "1775.077576000000000000"
+                }
+                Asks {
+                  price: "971.054271084337349398"
+                  quantity: "1.000000000000000000"
+                }
+                Asks {
+                  price: "1004.760000000000000000"
+                  quantity: "0.379000000000000000"
+                }
+                Asks {
+                  price: "1110.170000000000000000"
+                  quantity: "0.292000000000000000"
+                }
+                Asks {
+                  price: "1113.010000000000000000"
+                  quantity: "0.024000000000000000"
+                }
+                Asks {
+                  price: "1123.240000000000000000"
+                  quantity: "0.109000000000000000"
+                }
+                Asks {
+                  price: "1127.860000000000000000"
+                  quantity: "0.502000000000000000"
+                }
+                Asks {
+                  price: "1128.850000000000000000"
+                  quantity: "0.321000000000000000"
+                }
+                Asks {
+                  price: "1134.630000000000000000"
+                  quantity: "0.178000000000000000"
+                }
+                Asks {
+                  price: "1134.800000000000000000"
+                  quantity: "0.338000000000000000"
+                }
+                Asks {
+                  price: "1136.560000000000000000"
+                  quantity: "0.411000000000000000"
+                }
+                Asks {
+                  price: "1150.900000000000000000"
+                  quantity: "0.373000000000000000"
+                }
+                Asks {
+                  price: "1154.660000000000000000"
+                  quantity: "0.132000000000000000"
+                }
+                Asks {
+                  price: "1181.250000000000000000"
+                  quantity: "0.215000000000000000"
+                }
+                Asks {
+                  price: "1185.150000000000000000"
+                  quantity: "0.510000000000000000"
+                }
+                Asks {
+                  price: "1192.840000000000000000"
+                  quantity: "0.176000000000000000"
+                }
+                Asks {
+                  price: "1193.070000000000000000"
+                  quantity: "0.452000000000000000"
+                }
+                Asks {
+                  price: "1194.450000000000000000"
+                  quantity: "0.271000000000000000"
+                }
+                Asks {
+                  price: "1201.000000000000000000"
+                  quantity: "0.256000000000000000"
+                }
+                Asks {
+                  price: "1214.290000000000000000"
+                  quantity: "0.466000000000000000"
+                }
+                Asks {
+                  price: "1216.100000000000000000"
+                  quantity: "0.306000000000000000"
+                }
+                Asks {
+                  price: "1221.560000000000000000"
+                  quantity: "0.034000000000000000"
+                }
+                Asks {
+                  price: "1221.660000000000000000"
+                  quantity: "0.321000000000000000"
+                }
+                Asks {
+                  price: "1239.740000000000000000"
+                  quantity: "0.277000000000000000"
+                }
+                Bids {
+                  price: "0.100000000000000000"
+                  quantity: "1000000008.413720000000000000"
+                }
+        """
+        response = DexQuery(self.channel).QeuryOrderbook(QueryOrderbookReq(pair_id=pair_id))
         return response
 
     # 查询标记价格

@@ -42,12 +42,20 @@ class MyTestCase(unittest.TestCase):
                                    page=b"1".decode('utf-8'), limit=b"20".decode('utf-8'))
         print(resp)
 
-    def test_query_funding(self):
-        resp = client.query_funding()
+    def test_query_funding_info(self):
+        resp = client.query_funding_info()
+        print(resp)
+
+    def test_query_funding_rates(self):
+        resp = client.query_funding_rate("tsla:usdt", 10, query_all=True)
         print(resp)
 
     def test_mark_price(self):
         resp = client.query_mark_price(pair_id="tsla:usdt", query_all=True)
+        print(resp)
+
+    def test_query_orderbook(self):
+        resp = client.query_orderbook(pair_id="tsla:usdt")
         print(resp)
 
     def test_create_order(self):
