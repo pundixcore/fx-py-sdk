@@ -43,6 +43,8 @@ class GRPCClient:
                 address: 账户地址
 
             Returns:
+                account_number：账户number
+                sequence：账户nonce
                 example:
                     address: "dex1v0zwwfe3gw2fqdhdnx0hcurh2gzz98z8dagewy"
                     pub_key {
@@ -112,6 +114,20 @@ class GRPCClient:
                 owner: 账户地址
                 pair_id：币种名称
             Returns:
+                id	string	仓位ID		
+                owner	string	仓位持有者地址
+                pair_id	string	交易对
+                direction	PosDirection	仓位方向
+                entry_price	string	开仓价格
+                mark_price	string	标记价格
+                liquidation_price	string	强平价格
+                base_quantity	string	持仓数量
+                margin	string	保证金
+                leverage	string	杠杆
+                unrealized_pnl	string	未实现盈亏
+                margin_rate	string	保证金率
+                initial_margin	string	初始保证金
+                funding_times	int64	仓位变动时（开仓/加仓）所处的资金费率周期
                 example:
                     positions {
                       id: "1593"
@@ -155,51 +171,176 @@ class GRPCClient:
             Args:
                 order_id: 订单id
             Returns:
+                tx_hash	string	交易哈希		
+                id	string	订单id	
+                owner	string	订单拥有者地址	
+                pair_id	string	交易对	
+                direction	Direction	订单方向	
+                price	string	开单价格	
+                base_quantity	string	开单数量(挂单数量，成交后减少)	
+                quote_quantity	string	开单占用保证金数量	
+                filled_quantity	string	订单已成交数量	
+                filled_avg_price	string	订单已成交均价	
+                remain_locked	string	订单剩余未成交数量
+                ttl	int64	到期时间（秒）
+                created_at	string	创建时间
+                leverage	int64	杠杆
+                status	OrderStatus	订单状态
+                order_type	OrderType	订单类型
+                cost_fee	string ｜消耗费用
+                locked_fee	string｜ 锁定费用
+
                 example:
-            order {
-              tx_hash: "CCC896186F70C77AF904BC4C713791BFCEFE2691869A05871DB6F0E9076DFCA8"
-              id: "ID-880797-1"
-              owner: "B\005B\237\265\243\365\377\365\037\0247p\304j\215\323l\352n"
-              pair_id: "tsla:usdt"
-              price: "1000400000000000000000"
-              base_quantity: "500000000000000000"
-              quote_quantity: "50020000000000000000"
-              filled_quantity: "0"
-              filled_avg_price: "0"
-              remain_locked: "500200000000000000000"
-              created_at {
-                seconds: 1638844669
-                nanos: 525519069
-              }
-              leverage: 10
-              cost_fee: "0"
-              locked_fee: "200080000000000000"
-              ttl: 86400
-            }
+                    order {
+                      tx_hash: "CCC896186F70C77AF904BC4C713791BFCEFE2691869A05871DB6F0E9076DFCA8"
+                      id: "ID-880797-1"
+                      owner: "B\005B\237\265\243\365\377\365\037\0247p\304j\215\323l\352n"
+                      pair_id: "tsla:usdt"
+                      price: "1000400000000000000000"
+                      base_quantity: "500000000000000000"
+                      quote_quantity: "50020000000000000000"
+                      filled_quantity: "0"
+                      filled_avg_price: "0"
+                      remain_locked: "500200000000000000000"
+                      created_at {
+                        seconds: 1638844669
+                        nanos: 525519069
+                      }
+                      leverage: 10
+                      cost_fee: "0"
+                      locked_fee: "200080000000000000"
+                      ttl: 86400
+                    }
         """
         response = DexQuery(self.channel).QueryOrder(QueryOrderRequest(order_id=order_id))
         return response
 
-    # 根据地址和交易对查询订单
-    #   owner: 仓位持有地址
-    #   pair_id: 交易对
-    def query_orders(self, owner, pair_id, page, limit):
+    def query_orders(self, owner, pair_id, page=0, limit=20):
+        """根据账户和交易对查询订单.
+            Args:
+                owner: 仓位持有地址
+                pair_id: 交易对
+            Returns:
+                orders	Orders	订单列表
+                example:
+                orders {
+                      orders {
+                        tx_hash: "391588EE5E9128FE7862820314EC156D11EC11104F0B5E4AED274A99D647B36B"
+                        id: "ID-806841-1"
+                        owner: "c\304\347\'1C\224\2206\355\231\237|pwR\004\"\234G"
+                        pair_id: "tsla:usdt"
+                        price: "909830000000000000000"
+                        base_quantity: "312000000000000000"
+                        quote_quantity: "28386696000000000000"
+                        filled_quantity: "0"
+                        filled_avg_price: "0"
+                        remain_locked: "283866960000000000000"
+                        created_at {
+                          seconds: 1638768292
+                          nanos: 99804331
+                        }
+                        leverage: 10
+                        cost_fee: "0"
+                        locked_fee: "113546784000000000"
+                        ttl: 86400
+                      }
+                      orders {
+                        tx_hash: "7193993BFED78849B90FE21585D9911361989A80C4318D69844C3A3E3BFEDB2C"
+                        id: "ID-806848-1"
+                        owner: "c\304\347\'1C\224\2206\355\231\237|pwR\004\"\234G"
+                        pair_id: "tsla:usdt"
+                        price: "924530000000000000000"
+                        base_quantity: "442000000000000000"
+                        quote_quantity: "40864226000000000000"
+                        filled_quantity: "0"
+                        filled_avg_price: "0"
+                        remain_locked: "408642260000000000000"
+                        created_at {
+                          seconds: 1638768299
+                          nanos: 280541328
+                        }
+                        leverage: 10
+                        cost_fee: "0"
+                        locked_fee: "163456904000000000"
+                        ttl: 86400
+                      }
+                  }
+        """
         hrp, data = bech32.bech32_decode(owner)
         converted = bech32.convertbits(data, 5, 8, False)
         response = DexQuery(self.channel).QueryOrders(QueryOrdersRequest(
-            owner=converted, pair_id=pair_id, page=page, limit=limit))
+            owner=bytes(converted), pair_id=pair_id, page=page, limit=limit))
         return response
 
     # 查询资金费率
     #   无需传参
     def query_funding(self):
+        """查询资金费率.
+            Args:
+                owner: 仓位持有地址
+                pair_id: 交易对
+            Returns:
+                funding_period：资金费率结算周期
+                next_funding_time：下次资金费率结算时间
+                funding_times：资金费率结算次数
+                next_log_time：下次抛出资金费率日志的时间
+                log_funding_period：资金费率日志的时间周期
+                max_funding_per_block：最大资金费率结算数量
+
+                example:
+                    funding {
+                      funding_period: 14400
+                      next_funding_time: 1638867900
+                      funding_times: 27
+                      next_log_time: 1638845352
+                      log_funding_period: 300
+                      max_funding_per_block: 1000
+                    }
+        """
         response = DexQuery(self.channel).QueryFunding(QueryFundingReq())
         return response
 
     # 查询标记价格
     #   pair_id: 交易对
-    #   query_all: 是否查询全部
+    #   query_all: 否查询全部
     def query_mark_price(self, pair_id, query_all):
+        """
+        查询资金费率.
+            Args:
+                owner: 仓位持有地址
+                pair_id: 交易对
+
+            Returns:
+                pair_mark_price	[]PairPrice	PairPrice的列表
+                pair_id	string		否	btc:usd
+                query_all	bool	一般查链上所有的交易对，也可以单独查某一个交易对
+
+                example:
+                pair_mark_price {
+                      pair_id: "tsla:usdt"
+                      price: "1078550000000000000000"
+                    }
+                    pair_mark_price {
+                      pair_id: "aapl:usdt"
+                      price: "168065000000000000000"
+                    }
+                    pair_mark_price {
+                      pair_id: "tsla:usdc"
+                      price: "981152536500000000000"
+                    }
+                    pair_mark_price {
+                      pair_id: "aapl:usdc"
+                      price: "171420000000000000000"
+                    }
+                    pair_mark_price {
+                      pair_id: "tsla:dai"
+                      price: "820000000000000000000"
+                    }
+                    pair_mark_price {
+                      pair_id: "aapl:dai"
+                      price: "145000000000000000000"
+                    }
+        """
         response = DexQuery(self.channel).QueryMarkPrice(QueryMarkPriceReq(pair_id=pair_id, query_all=query_all))
         return response
 
@@ -217,7 +358,7 @@ class GRPCClient:
 
     def cancel_order(self, tx_builder: TxBuilder, order_id):
         """取消订单"""
-        msg = MsgCancelOrder(owner=tx_builder.acc_address(), pair_id=order_id)
+        msg = MsgCancelOrder(owner=tx_builder.acc_address(), order_id=order_id)
         msg_any = Any(type_url='/fx.dex.MsgCancelOrder', value=msg.SerializeToString())
         # DEX 交易设置固定gas
         tx = self.build_tx(tx_builder, [msg_any], DEFAULT_DEX_GAS)

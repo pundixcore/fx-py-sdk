@@ -12,7 +12,12 @@ from wallet import PrivateKey
 import bech32
 
 DEFAULT_DENOM = "FX"
+DEFAULT_prefix = "dex"
 
+def to_bech32(addr_bytes):
+    five_bit_r = bech32.convertbits(addr_bytes, 8, 5)
+    bech32_addr = bech32.bech32_encode(DEFAULT_prefix, five_bit_r)
+    return bech32_addr
 
 class TxBuilder:
     def __init__(self, private_key: PrivateKey,
