@@ -18,7 +18,7 @@ class TxBuilder:
     def __init__(self, private_key: PrivateKey,
                  chain_id: str = '',
                  account_number: int = -1,
-                 gas_price: Coin = Coin(amount='3000000000', denom=DEFAULT_DENOM)):
+                 gas_price: Coin = Coin(amount='0', denom=DEFAULT_DENOM)):
         self.chain_id = chain_id
         self.account_number = account_number
         if gas_price.denom == '':
@@ -34,11 +34,11 @@ class TxBuilder:
         return self._private_key.to_address()
 
     def acc_address(self):
-        hrp, data = bech32.bech32_decode(self.address())
-        return bech32.convertbits(data, 5, 8, False)
+        _, data = bech32.bech32_decode(self.address())
+        return bytes(bech32.convertbits(data, 5, 8, False))
 
     def sign(self, sequence: int, msgs: [Any],
-             fee: Fee = Fee(amount=[Coin(amount='300000000000000', denom=DEFAULT_DENOM)], gas_limit=100000),
+             fee: Fee = Fee(amount=[Coin(amount='0', denom=DEFAULT_DENOM)], gas_limit=0),
              timeout_height: int = 0) -> Tx:
         tx_body = TxBody(messages=msgs, memo=self._memo, timeout_height=timeout_height)
         tx_body_bytes = tx_body.SerializeToString()

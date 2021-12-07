@@ -30,6 +30,8 @@ from fx.dex.tx_pb2 import *
 
 import bech32
 
+DEFAULT_DEX_GAS = 5000000
+
 
 class GRPCClient:
     def __init__(self, url: str = 'localhost:9090'):
@@ -110,7 +112,7 @@ class GRPCClient:
                              base_quantity=base_quantity,
                              ttl=1000, leverage=leverage)
         msg_any = Any(type_url='/fx.dex.MsgCreateOrder', value=msg.SerializeToString())
-        tx = self.build_tx(tx_builder, [msg_any])
+        tx = self.build_tx(tx_builder, [msg_any], DEFAULT_DEX_GAS)
         tx_response = self.broadcast_tx(tx)
         return tx_response
 
@@ -118,17 +120,17 @@ class GRPCClient:
         """取消订单"""
         msg = MsgCancelOrder(owner=tx_builder.acc_address(), pair_id=order_id)
         msg_any = Any(type_url='/fx.dex.MsgCancelOrder', value=msg.SerializeToString())
-        tx = self.build_tx(tx_builder, [msg_any])
+        tx = self.build_tx(tx_builder, [msg_any], DEFAULT_DEX_GAS)
         return self.broadcast_tx(tx)
 
     def close_position(self, tx_builder: TxBuilder, pair_id, position_id, price, base_quantity):
         msg = MsgClosePosition(owner=tx_builder.acc_address(), pair_id=pair_id, position_id=position_id, price=price,
                                base_quantity=base_quantity)
         msg_any = Any(type_url='/fx.dex.MsgClosePosition', value=msg.SerializeToString())
-        tx = self.build_tx(tx_builder, [msg_any])
+        tx = self.build_tx(tx_builder, [msg_any], DEFAULT_DEX_GAS)
         return self.broadcast_tx(tx)
 
-    def build_tx(self, tx_builder: TxBuilder, msg: [Any], gas_limit: int = 0) -> Tx:
+    def build_tx(self, tx_builder: TxBuilder, msg: [Any], gas_limit: int = 100000) -> Tx:
         """签名交易"""
         if tx_builder.chain_id == '':
             tx_builder.chain_id = self.query_chain_id()
@@ -137,9 +139,9 @@ class GRPCClient:
         if tx_builder.account_number <= -1:
             tx_builder.account_number = account.account_number
 
-        gas_price_amount = 0
+        gas_price_amount = tx_builder.gas_price.amount
         fee_denom = tx_builder.gas_price.denom
-        if int(tx_builder.gas_price.amount) <= 0:
+        if int(gas_price_amount) <= 0:
             for item in self.query_gas_price():
                 if item.denom == fee_denom:
                     gas_price_amount = int(item.amount)
