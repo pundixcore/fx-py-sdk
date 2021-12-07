@@ -13,17 +13,16 @@ DEFAULT_BECH32_HRP = "dex"
 
 
 class Address:
-    def __init__(self, addr: str):
-        hrp, data = bech32.bech32_decode(addr)
-        self._hrp = hrp
-        self._data = data
-
-    def acc_address(self):
-        return bech32.convertbits(self._data, 5, 8, False)
+    def __init__(self, addr):
+        if type(addr) == str:
+            _, data = bech32.bech32_decode(addr)
+            self._data = data
+        elif type(addr) == bytes:
+            self._data = bech32.convertbits(addr, 8, 5)
+        else:
+            raise Exception('invalid address')
 
     def to_string(self, hrp: str = DEFAULT_BECH32_HRP) -> str:
-        if hrp is None:
-            hrp = self._hrp
         return bech32.bech32_encode(hrp, self._data)
 
     def to_bytes(self) -> bytes:
@@ -65,22 +64,6 @@ class PrivateKey:
             message_bytes, hashfunc=hashlib.sha256, sigencode=ecdsa.util.sigencode_string_canonize
         )
         return signature_compact
-
-
-def seed_to_privkey(seed: str, path: str = DEFAULT_DERIVATION_PATH) -> PrivateKey:
-    """Get a private key from a mnemonic seed and a derivation path.
-
-    Assumes a BIP39 mnemonic seed with no passphrase. Raises
-    `cosmospy.BIP32DerivationError` if the resulting private key is
-    invalid.
-    """
-    seed_bytes = mnemonic.Mnemonic.to_seed(seed, passphrase="")
-    hd_wallet = hdwallets.BIP32.from_seed(seed_bytes)
-    # This can raise a `hdwallets.BIP32DerivationError` (which we alias so
-    # that the same exception type is also in the `cosmospy` namespace).
-    derived_privkey = hd_wallet.get_privkey_from_path(path)
-
-    return PrivateKey(derived_privkey)
 
 
 class Wallet(TypedDict):

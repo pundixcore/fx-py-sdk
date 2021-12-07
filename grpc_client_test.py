@@ -1,13 +1,12 @@
 import unittest
 import wallet
-import grpc
-import grpc_client
-import bech32
+from wallet import Address
 from grpc_client import GRPCClient
-from builder import TxBuilder, to_bech32
+from builder import TxBuilder
 from cosmos.base.v1beta1.coin_pb2 import Coin
 
 client = GRPCClient('44.196.199.119:9090')
+
 
 class MyTestCase(unittest.TestCase):
 
@@ -30,16 +29,16 @@ class MyTestCase(unittest.TestCase):
     def test_query_positions(self):
         resp = client.query_positions(owner='dex1v0zwwfe3gw2fqdhdnx0hcurh2gzz98z8dagewy', pair_id="tsla:usdt")
         print(resp)
-        owner = resp.positions[0].owner
-        print(owner)
-        print(to_bech32(owner))
+        owner = Address(resp.positions[0].owner)
+        print(owner.to_string())
 
     def test_query_order(self):
         resp = client.query_order(order_id='ID-880797-1')
         print(resp)
 
     def test_query_orders(self):
-        resp = client.query_orders(owner="dex1v0zwwfe3gw2fqdhdnx0hcurh2gzz98z8dagewy", pair_id="tsla:usdt", page=b"1".decode('utf-8'), limit=b"20".decode('utf-8'))
+        resp = client.query_orders(owner="dex1v0zwwfe3gw2fqdhdnx0hcurh2gzz98z8dagewy", pair_id="tsla:usdt",
+                                   page=b"1".decode('utf-8'), limit=b"20".decode('utf-8'))
         print(resp)
 
     def test_query_funding(self):
@@ -109,6 +108,7 @@ class MyTestCase(unittest.TestCase):
 
         tx_response = cli.close_position(tx_builder, "tsla:usdt", "1593", "100", "1765981856000000000000")
         print(tx_response)
+
 
 if __name__ == '__main__':
     unittest.main()
