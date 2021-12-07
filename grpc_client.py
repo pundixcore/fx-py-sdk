@@ -210,6 +210,7 @@ class GRPCClient:
                              ttl=1000, leverage=leverage)
 
         msg_any = Any(type_url='/fx.dex.MsgCreateOrder', value=msg.SerializeToString())
+        # DEX 交易设置固定gas
         tx = self.build_tx(tx_builder, [msg_any], DEFAULT_DEX_GAS)
         tx_response = self.broadcast_tx(tx)
         return tx_response
@@ -218,6 +219,7 @@ class GRPCClient:
         """取消订单"""
         msg = MsgCancelOrder(owner=tx_builder.acc_address(), pair_id=order_id)
         msg_any = Any(type_url='/fx.dex.MsgCancelOrder', value=msg.SerializeToString())
+        # DEX 交易设置固定gas
         tx = self.build_tx(tx_builder, [msg_any], DEFAULT_DEX_GAS)
         return self.broadcast_tx(tx)
 
@@ -225,30 +227,35 @@ class GRPCClient:
         msg = MsgClosePosition(owner=tx_builder.acc_address(), pair_id=pair_id, position_id=position_id, price=price,
                                base_quantity=base_quantity)
         msg_any = Any(type_url='/fx.dex.MsgClosePosition', value=msg.SerializeToString())
+        # DEX 交易设置固定gas
         tx = self.build_tx(tx_builder, [msg_any], DEFAULT_DEX_GAS)
         return self.broadcast_tx(tx)
 
-    def build_tx(self, tx_builder: TxBuilder, msg: [Any], gas_limit: int = 100000) -> Tx:
+    def build_tx(self, tx_builder: TxBuilder, msg: [Any], gas_limit: int = 0) -> Tx:
         """签名交易"""
         if tx_builder.chain_id == '':
+            # 查询chain_id
             tx_builder.chain_id = self.query_chain_id()
 
         account = self.query_account_info(tx_builder.address())
         if tx_builder.account_number <= -1:
+            # 查询账户信息
             tx_builder.account_number = account.account_number
 
-        gas_price_amount = tx_builder.gas_price.amount
+        gas_price_amount = int(tx_builder.gas_price.amount)
         fee_denom = tx_builder.gas_price.denom
-        if int(gas_price_amount) <= 0:
+        if gas_price_amount <= 0:
+            # 如果未设置gas price 查询链上gas price
             for item in self.query_gas_price():
                 if item.denom == fee_denom:
                     gas_price_amount = int(item.amount)
 
         if gas_limit <= 0:
-            """估算gas limit并扩大1.5倍"""
+            # 计算默认的gas amount
             fee_amount = Coin(amount=str(gas_limit * gas_price_amount), denom=fee_denom)
             fee = Fee(amount=[fee_amount], gas_limit=gas_limit)
             tx = tx_builder.sign(account.sequence, msg, fee)
+            # 估算gas limit
             gas_info = self.estimating_gas(tx)
             gas_limit = int(float(gas_info.gas_used) * 1.5)
 

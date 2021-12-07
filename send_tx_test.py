@@ -21,17 +21,12 @@ def test_send_tx():
     print('account, number:', account.account_number, 'sequence:', account.sequence)
 
     send_msg = MsgSend(from_address=address, to_address=address, amount=[Coin(amount='100', denom='FX')])
-    print(send_msg)
     send_msg_any = Any(type_url='/cosmos.bank.v1beta1.MsgSend', value=send_msg.SerializeToString())
 
-    tx_builder = TxBuilder(priv_key, chain_id, account.account_number)
-    tx = tx_builder.sign(account.sequence, [send_msg_any])
+    tx_builder = TxBuilder(priv_key, chain_id, account.account_number, Coin(amount='60000000', denom='FX'))
+    tx = cli.build_tx(tx_builder, [send_msg_any], 5000000)
     print(tx)
-    print(tx.signatures[0].hex())
 
-    tx = cli.build_tx(tx_builder, [send_msg_any])
-    print(tx)
-    print(tx.signatures[0].hex())
     tx_response = cli.broadcast_tx(tx)
     print(tx_response)
 

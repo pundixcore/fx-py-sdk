@@ -32,9 +32,9 @@ class MyTestCase(unittest.TestCase):
 
     def test_query_positions(self):
         client = GRPCClient('44.196.199.119:9090')
-        resp = client.query_positions(owner='dex1v0zwwfe3gw2fqdhdnx0hcurh2gzz98z8dagewy', pair_id="tsla:usdt")
-        print(resp)
-        owner = resp.positions.positions[0].owner
+        positions = client.query_positions(owner='dex1v0zwwfe3gw2fqdhdnx0hcurh2gzz98z8dagewy', pair_id="tsla:usdt")
+        print(positions)
+        owner = positions.positions[0].owner
         print(owner)
 
     def test_query_order(self):
@@ -65,8 +65,9 @@ class MyTestCase(unittest.TestCase):
         tx_builder = TxBuilder(priv_key, chain_id, account.account_number, Coin(amount='60000000', denom='FX'))
 
         tx_response = cli.create_order(tx_builder, 'tsla:usdt', 'BUY', '100000000000000000',
-                                       '100000000000000000000000000000000', 10)
+                                       '100000000000000000000000000', 10)
         print(tx_response)
+
 
 if __name__ == '__main__':
     unittest.main()

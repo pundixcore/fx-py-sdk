@@ -34,13 +34,10 @@ class TxBuilder:
         return self._private_key.to_address()
 
     def acc_address(self):
-        hrp, data = bech32.bech32_decode(self.address())
+        _, data = bech32.bech32_decode(self.address())
         return bytes(bech32.convertbits(data, 5, 8, False))
 
-
-    def sign(self, sequence: int, msgs: [Any],
-             fee: Fee = Fee(amount=[Coin(amount='0', denom=DEFAULT_DENOM)], gas_limit=0),
-             timeout_height: int = 0) -> Tx:
+    def sign(self, sequence: int, msgs: [Any], fee: Fee, timeout_height: int = 0) -> Tx:
         tx_body = TxBody(messages=msgs, memo=self._memo, timeout_height=timeout_height)
         tx_body_bytes = tx_body.SerializeToString()
 
