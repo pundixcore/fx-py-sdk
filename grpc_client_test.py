@@ -4,6 +4,7 @@ from wallet import Address
 from grpc_client import GRPCClient
 from builder import TxBuilder
 from cosmos.base.v1beta1.coin_pb2 import Coin
+from fx.dex.order_pb2 import *
 
 client = GRPCClient('44.196.199.119:9090')
 
@@ -66,7 +67,7 @@ class MyTestCase(unittest.TestCase):
 
         tx_builder = TxBuilder(priv_key, chain_id, account.account_number, Coin(amount='60000000', denom='FX'))
 
-        tx_response = cli.create_order(tx_builder, 'tsla:usdt', 'BUY', '100000000000000000',
+        tx_response = cli.create_order(tx_builder, 'tsla:usdt', BUY, '100000000000000000',
                                        '100000000000000000000000000', 10)
         print(tx_response)
 

@@ -27,8 +27,8 @@ from builder import TxBuilder
 from fx.dex.query_pb2_grpc import QueryStub as DexQuery
 from fx.dex.query_pb2 import *
 from fx.dex.tx_pb2 import *
-
-import bech32
+from fx.dex.order_pb2 import Direction
+from wallet import Address
 
 DEFAULT_DEX_GAS = 5000000
 
@@ -41,7 +41,6 @@ class GRPCClient:
         """查询账户信息
             Args:
                 address: 账户地址
-
             Returns:
                 account_number：账户number
                 sequence：账户nonce
@@ -64,7 +63,6 @@ class GRPCClient:
         """查询所有余额.
             Args:
                 address: 账户地址
-
             Returns:
                 example:
                     [denom: "FX"
@@ -82,14 +80,14 @@ class GRPCClient:
 
     def query_balance(self, address: str, denom: str) -> Coin:
         """查询Denom对应的余额.
-                    Args:
-                        address: 账户地址
-                        denom：币种名称
-                    Returns:
-                        example:
-                            denom: "FX"
-                            amount: "999999515355700000000000000"
-                    """
+            Args:
+                address: 账户地址
+                denom: 币种名称
+            Returns:
+                example:
+                    denom: "FX"
+                    amount: "999999515355700000000000000"
+        """
         response = BankQuery(self.channel).Balance(QueryBalanceRequest(address=address, denom=denom))
         return response.balance
 
@@ -108,11 +106,11 @@ class GRPCClient:
     # 查询仓位
     #   owner: 仓位持有人
     #   pair_id: 交易对
-    def query_positions(self, owner, pair_id):
+    def query_positions(self, owner: str, pair_id: str):
         """查询仓位.
             Args:
                 owner: 账户地址
-                pair_id：币种名称
+                pair_id: 币种名称
             Returns:
                 id	string	仓位ID		
                 owner	string	仓位持有者地址
@@ -161,12 +159,11 @@ class GRPCClient:
                       pending_order_quantity: "0"
                     }
             """
-        hrp, data = bech32.bech32_decode(owner)
-        converted = bech32.convertbits(data, 5, 8, False)
-        response = DexQuery(self.channel).QueryPosition(QueryPositionReq(owner=bytes(converted), pair_id=pair_id))
+        response = DexQuery(self.channel).QueryPosition(
+            QueryPositionReq(owner=Address(owner).to_bytes(), pair_id=pair_id))
         return response.positions
 
-    def query_order(self, order_id):
+    def query_order(self, order_id: str):
         """根据订单ID查询订单.
             Args:
                 order_id: 订单id
@@ -215,11 +212,13 @@ class GRPCClient:
         response = DexQuery(self.channel).QueryOrder(QueryOrderRequest(order_id=order_id))
         return response
 
-    def query_orders(self, owner, pair_id, page=0, limit=20):
+    def query_orders(self, owner: str, pair_id: str, page: str = 0, limit: str = 20):
         """根据账户和交易对查询订单.
             Args:
                 owner: 仓位持有地址
                 pair_id: 交易对
+                page:
+                limit:
             Returns:
                 orders	Orders	订单列表
                 example:
@@ -266,19 +265,14 @@ class GRPCClient:
                       }
                   }
         """
-        hrp, data = bech32.bech32_decode(owner)
-        converted = bech32.convertbits(data, 5, 8, False)
         response = DexQuery(self.channel).QueryOrders(QueryOrdersRequest(
-            owner=bytes(converted), pair_id=pair_id, page=page, limit=limit))
+            owner=Address(owner).to_bytes(), pair_id=pair_id, page=page, limit=limit))
         return response
 
     # 查询资金费率
     #   无需传参
     def query_funding(self):
         """查询资金费率.
-            Args:
-                owner: 仓位持有地址
-                pair_id: 交易对
             Returns:
                 funding_period：资金费率结算周期
                 next_funding_time：下次资金费率结算时间
@@ -303,13 +297,12 @@ class GRPCClient:
     # 查询标记价格
     #   pair_id: 交易对
     #   query_all: 否查询全部
-    def query_mark_price(self, pair_id, query_all):
+    def query_mark_price(self, pair_id: str, query_all: bool):
         """
-        查询资金费率.
+        查询标记价格.
             Args:
-                owner: 仓位持有地址
                 pair_id: 交易对
-
+                query_all: 否查询全部
             Returns:
                 pair_mark_price	[]PairPrice	PairPrice的列表
                 pair_id	string		否	btc:usd
@@ -344,7 +337,8 @@ class GRPCClient:
         response = DexQuery(self.channel).QueryMarkPrice(QueryMarkPriceReq(pair_id=pair_id, query_all=query_all))
         return response
 
-    def create_order(self, tx_builder: TxBuilder, pair_id, direction, price, base_quantity, leverage):
+    def create_order(self, tx_builder: TxBuilder, pair_id: str, direction: Direction, price: str, base_quantity: str,
+                     leverage: int):
         """创建订单"""
         msg = MsgCreateOrder(owner=tx_builder.acc_address(), pair_id=pair_id, direction=direction, price=price,
                              base_quantity=base_quantity,
@@ -356,7 +350,7 @@ class GRPCClient:
         tx_response = self.broadcast_tx(tx)
         return tx_response
 
-    def cancel_order(self, tx_builder: TxBuilder, order_id):
+    def cancel_order(self, tx_builder: TxBuilder, order_id: str):
         """取消订单"""
         msg = MsgCancelOrder(owner=tx_builder.acc_address(), order_id=order_id)
         msg_any = Any(type_url='/fx.dex.MsgCancelOrder', value=msg.SerializeToString())
@@ -364,7 +358,7 @@ class GRPCClient:
         tx = self.build_tx(tx_builder, [msg_any], DEFAULT_DEX_GAS)
         return self.broadcast_tx(tx)
 
-    def close_position(self, tx_builder: TxBuilder, pair_id, position_id, price, base_quantity):
+    def close_position(self, tx_builder: TxBuilder, pair_id: str, position_id: str, price: str, base_quantity: str):
         msg = MsgClosePosition(owner=tx_builder.acc_address(), pair_id=pair_id, position_id=position_id, price=price,
                                base_quantity=base_quantity)
         msg_any = Any(type_url='/fx.dex.MsgClosePosition', value=msg.SerializeToString())
