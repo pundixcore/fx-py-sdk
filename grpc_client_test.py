@@ -5,6 +5,7 @@ import grpc_client
 import bech32
 from grpc_client import GRPCClient
 from builder import TxBuilder
+from cosmos.base.v1beta1.coin_pb2 import Coin
 
 
 class MyTestCase(unittest.TestCase):
@@ -59,9 +60,9 @@ class MyTestCase(unittest.TestCase):
         print('chain_id:', chain_id)
 
         account = cli.query_account_info(address)
-        print('account, number:', account.account_number, 'sequence:', account.sequence)
+        print('account number:', account.account_number, 'sequence:', account.sequence)
 
-        tx_builder = TxBuilder(priv_key, chain_id, account.account_number)
+        tx_builder = TxBuilder(priv_key, chain_id, account.account_number, Coin(amount='60000000', denom='FX'))
 
         tx_response = cli.create_order(tx_builder, 'tsla:usdt', 'BUY', '100000000000000000',
                                        '100000000000000000000000000000000', 10)

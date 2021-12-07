@@ -18,7 +18,7 @@ class TxBuilder:
     def __init__(self, private_key: PrivateKey,
                  chain_id: str = '',
                  account_number: int = -1,
-                 gas_price: Coin = Coin(amount='3000000000', denom=DEFAULT_DENOM)):
+                 gas_price: Coin = Coin(amount='0', denom=DEFAULT_DENOM)):
         self.chain_id = chain_id
         self.account_number = account_number
         if gas_price.denom == '':
@@ -39,7 +39,7 @@ class TxBuilder:
 
 
     def sign(self, sequence: int, msgs: [Any],
-             fee: Fee = Fee(amount=[Coin(amount='300000000000000', denom=DEFAULT_DENOM)], gas_limit=100000),
+             fee: Fee = Fee(amount=[Coin(amount='0', denom=DEFAULT_DENOM)], gas_limit=0),
              timeout_height: int = 0) -> Tx:
         tx_body = TxBody(messages=msgs, memo=self._memo, timeout_height=timeout_height)
         tx_body_bytes = tx_body.SerializeToString()
