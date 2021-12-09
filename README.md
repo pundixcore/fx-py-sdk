@@ -69,29 +69,17 @@ python grpc_client_test.py
 │   └── ibc
 ```
 
-### 已知问题
+### 7. 安装sdk
 
-1. 不知道为啥 gogoproto proto文件生成出来的python文件一定要放在根目录... ？求解决
-    会生成, 这些目录文件
-    ```
-    ├──── confio
-    │   ├── proofs_pb2.py
-    │   └── proofs_pb2_grpc.py
-    ├── cosmos_proto
-    │   ├── cosmos_pb2.py
-    │   └── cosmos_pb2_grpc.py
-    ├── gen-proto.sh
-    ├── gogoproto
-    │   ├── __pycache__
-    │   ├── gogo_pb2.py
-    │   └── gogo_pb2_grpc.py
-    ├── google
-    │   ├── api
-        ── tendermint
-    │   ├── abci
-    │   ├── crypto
-    │   ├── libs
-    │   ├── p2p
-    │   ├── types
-    │   └── version
-    ```
+```shell
+ python setup.py install
+```
+
+### 8.使用sdk
+
+```shell
+easy_install  --find-links="$Install_PATH/site-packages" fx_py_sdk
+
+from fx_py_sdk.grpc_client import GRPCClient
+
+```
