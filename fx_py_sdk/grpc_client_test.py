@@ -1,5 +1,5 @@
 import unittest
-import fx_py_sdk.wallet
+from fx_py_sdk import wallet
 from fx_py_sdk.wallet import Address
 from fx_py_sdk.grpc_client import GRPCClient
 from fx_py_sdk.builder import TxBuilder

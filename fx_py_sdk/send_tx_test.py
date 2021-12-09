@@ -1,6 +1,6 @@
 from fx_py_sdk.builder import TxBuilder
 from fx_py_sdk.grpc_client import GRPCClient
-import fx_py_sdk.wallet
+from fx_py_sdk import wallet
 from fx_py_sdk.codec.cosmos.bank.v1beta1.tx_pb2 import MsgSend
 from fx_py_sdk.codec.cosmos.base.v1beta1.coin_pb2 import Coin
 from google.protobuf.any_pb2 import Any
