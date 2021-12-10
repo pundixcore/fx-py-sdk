@@ -1,3 +1,5 @@
+import decimal
+
 import grpc
 
 from fx_py_sdk.codec.cosmos.auth.v1beta1.auth_pb2 import BaseAccount
@@ -29,9 +31,12 @@ from fx_py_sdk.codec.fx.dex.query_pb2 import *
 from fx_py_sdk.codec.fx.dex.tx_pb2 import *
 from fx_py_sdk.codec.fx.dex.order_pb2 import Direction
 from fx_py_sdk.wallet import Address
+from fx_py_sdk.constants import *
+import logging
 
 DEFAULT_DEX_GAS = 5000000
-
+DEFAULT_GRPC_NONE = "Not found"
+DEFAULT_DEC = 1000000000000000000
 
 class GRPCClient:
     def __init__(self, url: str = 'localhost:9090'):
@@ -59,37 +64,37 @@ class GRPCClient:
         response.account.Unpack(base_account)
         return base_account
 
-    def query_all_balances(self, address: str) -> [Coin]:
+    def query_all_balances(self, address: str) -> []:
         """查询所有余额.
             Args:
                 address: 账户地址
             Returns:
                 example:
-                    [denom: "FX"
-                    amount: "999999515355700000000000000"
-                    , denom: "dai"
-                    amount: "1000000000000000000000000000"
-                    , denom: "usdc"
-                    amount: "998768279527278811008751747"
-                    , denom: "usdt"
-                    amount: "999993902005180470907691119"
-                    ]
+                    {'FX': 999000000.0, 'dai': 1000000000.0, 'usdc': 1000000000.0, 'usdt': 1000000000.0}
             """
         response = BankQuery(self.channel).AllBalances(QueryAllBalancesRequest(address=address))
-        return response.balances
+        coins = dict()
+        for c in response.balances:
+            balance = decimal.Decimal(c.amount)
+            balance = balance / decimal.Decimal(DEFAULT_DEC)
+            coins[c.denom] = float(str(balance))
+        return coins
 
-    def query_balance(self, address: str, denom: str) -> Coin:
+    def query_balance(self, address: str, denom: str) -> dict:
         """查询Denom对应的余额.
             Args:
                 address: 账户地址
                 denom: 币种名称
             Returns:
                 example:
-                    denom: "FX"
-                    amount: "999999515355700000000000000"
+                    {'FX': 100.0}
         """
         response = BankQuery(self.channel).Balance(QueryBalanceRequest(address=address, denom=denom))
-        return response.balance
+        balance = decimal.Decimal(response.balance.amount)
+        balance = balance / decimal.Decimal(DEFAULT_DEC)
+        coin = dict()
+        coin[denom] = float(str(balance))
+        return coin
 
     def query_gas_price(self) -> [Coin]:
         """查询gas price"""
@@ -106,7 +111,7 @@ class GRPCClient:
     # 查询仓位
     #   owner: 仓位持有人
     #   pair_id: 交易对
-    def query_positions(self, owner: str, pair_id: str):
+    def query_positions(self, owner: str, pair_id: str) -> [dict]:
         """查询仓位.
             Args:
                 owner: 账户地址
@@ -127,41 +132,72 @@ class GRPCClient:
                 initial_margin	string	初始保证金
                 funding_times	int64	仓位变动时（开仓/加仓）所处的资金费率周期
                 example:
-                    positions {
-                      id: "1593"
-                      owner: "c\304\347\'1C\224\2206\355\231\237|pwR\004\"\234G"
-                      pair_id: "tsla:usdt"
-                      entry_price: "718593136493812201276"
-                      mark_price: "1070360000000000000000"
-                      liquidation_price: "654287123015520432741"
-                      base_quantity: "1765981856000000000000"
-                      margin: "126149732730850940373112"
-                      leverage: 10
-                      unrealized_pnl: "621213898493956196275164"
-                      margin_rate: "41420143008527607"
-                      initial_margin: "126902244089420380373112"
-                      pending_order_quantity: "0"
-                    }
-                    positions {
-                      id: "1611"
-                      owner: "c\304\347\'1C\224\2206\355\231\237|pwR\004\"\234G"
-                      pair_id: "tsla:usdt"
-                      direction: SHORT
-                      entry_price: "1041326589769199070774"
-                      mark_price: "1070360000000000000000"
-                      liquidation_price: "1140895666081791810609"
-                      base_quantity: "21837997000000000000"
-                      margin: "2274048694340000000000"
-                      leverage: 10
-                      unrealized_pnl: "-634031525520000000035"
-                      margin_rate: "57010423825594643"
-                      initial_margin: "2274048694340000000000"
-                      pending_order_quantity: "0"
-                    }
+                    [Position(Id='1', Owner='dex1ggz598a4506llaglzsmhp3r23hfke6nw29wans', PairId='tsla:usdt', Direction=1, EntryPrice=1000.4, MarkPrice=820.0, LiquidationPrice=1089.5445544554455, BaseQuantity=0.5, Margin=50.02, Leverage=10, UnrealizedPnl=90.2, MarginRate=0.029239766081871343, InitialMargin=50.02, PendingOrderQuantity=0.0)]
             """
-        response = DexQuery(self.channel).QueryPosition(
-            QueryPositionReq(owner=Address(owner).to_bytes(), pair_id=pair_id))
-        return response.positions
+
+        positions = []
+        try:
+            response = DexQuery(self.channel).QueryPosition(
+                QueryPositionReq(owner=Address(owner).to_bytes(), pair_id=pair_id))
+            for pos in response.positions:
+                entry_price = decimal.Decimal(pos.entry_price)
+                entry_price = entry_price / decimal.Decimal(DEFAULT_DEC)
+                entry_price = float(str(entry_price))
+
+                mark_price = decimal.Decimal(pos.mark_price)
+                mark_price = mark_price / decimal.Decimal(DEFAULT_DEC)
+                mark_price = float(str(mark_price))
+
+                liquidation_price = decimal.Decimal(pos.liquidation_price)
+                liquidation_price = liquidation_price / decimal.Decimal(DEFAULT_DEC)
+                liquidation_price = float(str(liquidation_price))
+
+                base_quantity = decimal.Decimal(pos.base_quantity)
+                base_quantity = base_quantity / decimal.Decimal(DEFAULT_DEC)
+                base_quantity = float(str(base_quantity))
+
+                margin = decimal.Decimal(pos.margin)
+                margin = margin / decimal.Decimal(DEFAULT_DEC)
+                margin = float(str(margin))
+
+                unrealized_pnl = decimal.Decimal(pos.unrealized_pnl)
+                unrealized_pnl = unrealized_pnl / decimal.Decimal(DEFAULT_DEC)
+                unrealized_pnl = float(str(unrealized_pnl))
+
+                margin_rate = decimal.Decimal(pos.margin_rate)
+                margin_rate = margin_rate / decimal.Decimal(DEFAULT_DEC)
+                margin_rate = float(str(margin_rate))
+
+                initial_margin = decimal.Decimal(pos.initial_margin)
+                initial_margin = initial_margin / decimal.Decimal(DEFAULT_DEC)
+                initial_margin = float(str(initial_margin))
+
+                pending_order_quantity = decimal.Decimal(pos.pending_order_quantity)
+                pending_order_quantity = pending_order_quantity / decimal.Decimal(DEFAULT_DEC)
+                pending_order_quantity = float(str(pending_order_quantity))
+
+                position = Position(
+                    pos.id,
+                    Address(pos.owner).to_string(),
+                    pos.pair_id,
+                    pos.direction,
+                    entry_price,
+                    mark_price,
+                    liquidation_price,
+                    base_quantity,
+                    margin,
+                    pos.leverage,
+                    unrealized_pnl,
+                    margin_rate,
+                    initial_margin,
+                    pending_order_quantity)
+                positions.append(position)
+
+        except Exception as e:
+            print("query_position: ", e)
+            return "not found"
+
+        return positions
 
     def query_order(self, order_id: str):
         """根据订单ID查询订单.
@@ -188,31 +224,71 @@ class GRPCClient:
                 locked_fee	string｜ 锁定费用
 
                 example:
-                    order {
-                      tx_hash: "CCC896186F70C77AF904BC4C713791BFCEFE2691869A05871DB6F0E9076DFCA8"
-                      id: "ID-880797-1"
-                      owner: "B\005B\237\265\243\365\377\365\037\0247p\304j\215\323l\352n"
-                      pair_id: "tsla:usdt"
-                      price: "1000400000000000000000"
-                      base_quantity: "500000000000000000"
-                      quote_quantity: "50020000000000000000"
-                      filled_quantity: "0"
-                      filled_avg_price: "0"
-                      remain_locked: "500200000000000000000"
-                      created_at {
-                        seconds: 1638844669
-                        nanos: 525519069
-                      }
-                      leverage: 10
-                      cost_fee: "0"
-                      locked_fee: "200080000000000000"
-                      ttl: 86400
-                    }
+                    Order(TxHash='F6EA065DD58257AE1AB2F22AE45040A1F8E747E5668F3E8DF857CA222B38B85A', Id='ID-706-1', Owner='dex1ggz598a4506llaglzsmhp3r23hfke6nw29wans', PairId='tsla:usdc', Direction=0, Price=1000.4, BaseQuantity=0.5, QuoteQuantity=50.02, FilledQuantity=0.0, FilledAvgPrice=0.0, RemainLocked=500.2, Leverage=10, Status=0, OrderType=0, CostFee=0.0, LockedFee=0.20008, Ttl=86400)
         """
-        response = DexQuery(self.channel).QueryOrder(QueryOrderRequest(order_id=order_id))
-        return response
+        try:
+            response = DexQuery(self.channel).QueryOrder(QueryOrderRequest(order_id=order_id))
+            order = response.order
+            price = decimal.Decimal(order.price)
+            price = price / decimal.Decimal(DEFAULT_DEC)
+            price = float(str(price))
 
-    def query_orders(self, owner: str, pair_id: str, page: str = 0, limit: str = 20):
+            base_quantity = decimal.Decimal(order.base_quantity)
+            base_quantity = base_quantity / decimal.Decimal(DEFAULT_DEC)
+            base_quantity = float(str(base_quantity))
+
+            quote_quantity = decimal.Decimal(order.quote_quantity)
+            quote_quantity = quote_quantity / decimal.Decimal(DEFAULT_DEC)
+            quote_quantity = float(str(quote_quantity))
+
+            filled_quantity = decimal.Decimal(order.filled_quantity)
+            filled_quantity = filled_quantity / decimal.Decimal(DEFAULT_DEC)
+            filled_quantity = float(str(filled_quantity))
+
+            filled_avg_price = decimal.Decimal(order.filled_avg_price)
+            filled_avg_price = filled_avg_price / decimal.Decimal(DEFAULT_DEC)
+            filled_avg_price = float(str(filled_avg_price))
+
+            remain_locked = decimal.Decimal(order.remain_locked)
+            remain_locked = remain_locked / decimal.Decimal(DEFAULT_DEC)
+            remain_locked = float(str(remain_locked))
+
+            cost_fee = decimal.Decimal(order.cost_fee)
+            cost_fee = cost_fee / decimal.Decimal(DEFAULT_DEC)
+            cost_fee = float(str(cost_fee))
+
+            locked_fee = decimal.Decimal(order.locked_fee)
+            locked_fee = locked_fee / decimal.Decimal(DEFAULT_DEC)
+            locked_fee = float(str(locked_fee))
+
+            print(order.created_at)
+
+            new_order = Order(
+                order.tx_hash,
+                order.id,
+                Address(order.owner).to_string(),
+                order.pair_id,
+                order.direction,
+                price,
+                base_quantity,
+                quote_quantity,
+                filled_quantity,
+                filled_avg_price,
+                remain_locked,
+                order.leverage,
+                order.status,
+                order.order_type,
+                cost_fee,
+                locked_fee,
+                order.ttl, )
+            return new_order
+
+        except Exception as e:
+            print("query orders: ", e)
+            return "not found"
+
+
+    def query_orders(self, owner: str, pair_id: str, page=b"1".decode('utf-8'), limit=b"20".decode('utf-8')):
         """根据账户和交易对查询订单.
             Args:
                 owner: 仓位持有地址
@@ -222,52 +298,75 @@ class GRPCClient:
             Returns:
                 orders	Orders	订单列表
                 example:
-                orders {
-                      orders {
-                        tx_hash: "391588EE5E9128FE7862820314EC156D11EC11104F0B5E4AED274A99D647B36B"
-                        id: "ID-806841-1"
-                        owner: "c\304\347\'1C\224\2206\355\231\237|pwR\004\"\234G"
-                        pair_id: "tsla:usdt"
-                        price: "909830000000000000000"
-                        base_quantity: "312000000000000000"
-                        quote_quantity: "28386696000000000000"
-                        filled_quantity: "0"
-                        filled_avg_price: "0"
-                        remain_locked: "283866960000000000000"
-                        created_at {
-                          seconds: 1638768292
-                          nanos: 99804331
-                        }
-                        leverage: 10
-                        cost_fee: "0"
-                        locked_fee: "113546784000000000"
-                        ttl: 86400
-                      }
-                      orders {
-                        tx_hash: "7193993BFED78849B90FE21585D9911361989A80C4318D69844C3A3E3BFEDB2C"
-                        id: "ID-806848-1"
-                        owner: "c\304\347\'1C\224\2206\355\231\237|pwR\004\"\234G"
-                        pair_id: "tsla:usdt"
-                        price: "924530000000000000000"
-                        base_quantity: "442000000000000000"
-                        quote_quantity: "40864226000000000000"
-                        filled_quantity: "0"
-                        filled_avg_price: "0"
-                        remain_locked: "408642260000000000000"
-                        created_at {
-                          seconds: 1638768299
-                          nanos: 280541328
-                        }
-                        leverage: 10
-                        cost_fee: "0"
-                        locked_fee: "163456904000000000"
-                        ttl: 86400
-                      }
-                  }
+            [Order(TxHash='236A2424826BE4C3F75F33B2835E47063F1F7077D8AFC63CFAE73C31A9810BF9', Id='ID-5-1', Owner='dex1ggz598a4506llaglzsmhp3r23hfke6nw29wans', PairId='tsla:usdc', Direction=0, Price=1000.4, BaseQuantity=0.5, QuoteQuantity=50.02, FilledQuantity=0.0, FilledAvgPrice=0.0, RemainLocked=500.2, Leverage=10, Status=0, OrderType=0, CostFee=0.0, LockedFee=0.20008, Ttl=86400),
+            Order(TxHash='3F9656C61695AFCE827ADC19D5B2E51CA9B5682E1EC4020DD091E4C9DD1F83FF', Id='ID-7-1', Owner='dex1ggz598a4506llaglzsmhp3r23hfke6nw29wans', PairId='tsla:usdc', Direction=0, Price=1000.4, BaseQuantity=0.5, QuoteQuantity=50.02, FilledQuantity=0.0, FilledAvgPrice=0.0, RemainLocked=500.2, Leverage=10, Status=0, OrderType=0, CostFee=0.0, LockedFee=0.20008, Ttl=86400)]
         """
-        response = DexQuery(self.channel).QueryOrders(QueryOrdersRequest(
-            owner=Address(owner).to_bytes(), pair_id=pair_id, page=page, limit=limit))
-        return response
+        orders = []
+        try:
+            response = DexQuery(self.channel).QueryOrders(QueryOrdersRequest(
+                owner=Address(owner).to_bytes(), pair_id=pair_id, page=page, limit=limit))
+
+            for order in response.orders:
+                price = decimal.Decimal(order.price)
+                price = price / decimal.Decimal(DEFAULT_DEC)
+                price = float(str(price))
+
+                base_quantity = decimal.Decimal(order.base_quantity)
+                base_quantity = base_quantity / decimal.Decimal(DEFAULT_DEC)
+                base_quantity = float(str(base_quantity))
+
+                quote_quantity = decimal.Decimal(order.quote_quantity)
+                quote_quantity = quote_quantity / decimal.Decimal(DEFAULT_DEC)
+                quote_quantity = float(str(quote_quantity))
+
+                filled_quantity = decimal.Decimal(order.filled_quantity)
+                filled_quantity = filled_quantity / decimal.Decimal(DEFAULT_DEC)
+                filled_quantity = float(str(filled_quantity))
+
+
+                filled_avg_price = decimal.Decimal(order.filled_avg_price)
+                filled_avg_price = filled_avg_price / decimal.Decimal(DEFAULT_DEC)
+                filled_avg_price = float(str(filled_avg_price))
+
+                remain_locked = decimal.Decimal(order.remain_locked)
+                remain_locked = remain_locked / decimal.Decimal(DEFAULT_DEC)
+                remain_locked = float(str(remain_locked))
+
+                cost_fee = decimal.Decimal(order.cost_fee)
+                cost_fee = cost_fee / decimal.Decimal(DEFAULT_DEC)
+                cost_fee = float(str(cost_fee))
+
+                locked_fee = decimal.Decimal(order.locked_fee)
+                locked_fee = locked_fee / decimal.Decimal(DEFAULT_DEC)
+                locked_fee = float(str(locked_fee))
+
+                print(order.created_at)
+
+                new_order = Order(
+                    order.tx_hash,
+                    order.id,
+                    Address(order.owner).to_string(),
+                    order.pair_id,
+                    order.direction,
+                    price,
+                    base_quantity,
+                    quote_quantity,
+                    filled_quantity,
+                    filled_avg_price,
+                    remain_locked,
+                    order.leverage,
+                    order.status,
+                    order.order_type,
+                    cost_fee,
+                    locked_fee,
+                    order.ttl,)
+                orders.append(new_order)
+
+        except Exception as e:
+            print("query orders: ", e)
+            return "not found"
+
+        return orders
 
     def query_funding_info(self):
         """查询资金费率.
@@ -324,99 +423,6 @@ class GRPCClient:
                     price：价格
                     quantity：数量
                 Bids：买单
-
-                Asks {
-                  price: "651.318912692282338620"
-                  quantity: "1775.077576000000000000"
-                }
-                Asks {
-                  price: "971.054271084337349398"
-                  quantity: "1.000000000000000000"
-                }
-                Asks {
-                  price: "1004.760000000000000000"
-                  quantity: "0.379000000000000000"
-                }
-                Asks {
-                  price: "1110.170000000000000000"
-                  quantity: "0.292000000000000000"
-                }
-                Asks {
-                  price: "1113.010000000000000000"
-                  quantity: "0.024000000000000000"
-                }
-                Asks {
-                  price: "1123.240000000000000000"
-                  quantity: "0.109000000000000000"
-                }
-                Asks {
-                  price: "1127.860000000000000000"
-                  quantity: "0.502000000000000000"
-                }
-                Asks {
-                  price: "1128.850000000000000000"
-                  quantity: "0.321000000000000000"
-                }
-                Asks {
-                  price: "1134.630000000000000000"
-                  quantity: "0.178000000000000000"
-                }
-                Asks {
-                  price: "1134.800000000000000000"
-                  quantity: "0.338000000000000000"
-                }
-                Asks {
-                  price: "1136.560000000000000000"
-                  quantity: "0.411000000000000000"
-                }
-                Asks {
-                  price: "1150.900000000000000000"
-                  quantity: "0.373000000000000000"
-                }
-                Asks {
-                  price: "1154.660000000000000000"
-                  quantity: "0.132000000000000000"
-                }
-                Asks {
-                  price: "1181.250000000000000000"
-                  quantity: "0.215000000000000000"
-                }
-                Asks {
-                  price: "1185.150000000000000000"
-                  quantity: "0.510000000000000000"
-                }
-                Asks {
-                  price: "1192.840000000000000000"
-                  quantity: "0.176000000000000000"
-                }
-                Asks {
-                  price: "1193.070000000000000000"
-                  quantity: "0.452000000000000000"
-                }
-                Asks {
-                  price: "1194.450000000000000000"
-                  quantity: "0.271000000000000000"
-                }
-                Asks {
-                  price: "1201.000000000000000000"
-                  quantity: "0.256000000000000000"
-                }
-                Asks {
-                  price: "1214.290000000000000000"
-                  quantity: "0.466000000000000000"
-                }
-                Asks {
-                  price: "1216.100000000000000000"
-                  quantity: "0.306000000000000000"
-                }
-                Asks {
-                  price: "1221.560000000000000000"
-                  quantity: "0.034000000000000000"
-                }
-                Asks {
-                  price: "1221.660000000000000000"
-                  quantity: "0.321000000000000000"
-                }
                 Asks {
                   price: "1239.740000000000000000"
                   quantity: "0.277000000000000000"
@@ -452,29 +458,22 @@ class GRPCClient:
                       pair_id: "aapl:usdt"
                       price: "168065000000000000000"
                     }
-                    pair_mark_price {
-                      pair_id: "tsla:usdc"
-                      price: "981152536500000000000"
-                    }
-                    pair_mark_price {
-                      pair_id: "aapl:usdc"
-                      price: "171420000000000000000"
-                    }
-                    pair_mark_price {
-                      pair_id: "tsla:dai"
-                      price: "820000000000000000000"
-                    }
-                    pair_mark_price {
-                      pair_id: "aapl:dai"
-                      price: "145000000000000000000"
-                    }
         """
         response = DexQuery(self.channel).QueryMarkPrice(QueryMarkPriceReq(pair_id=pair_id, query_all=query_all))
         return response
 
-    def create_order(self, tx_builder: TxBuilder, pair_id: str, direction: Direction, price: str, base_quantity: str,
+    def create_order(self, tx_builder: TxBuilder, pair_id: str, direction: Direction, price: float, base_quantity: float,
                      leverage: int):
         """创建订单"""
+
+        price = decimal.Decimal(str(price))
+        price = price * decimal.Decimal(DEFAULT_DEC)
+        price = str(price)
+
+        base_quantity = decimal.Decimal(str(base_quantity))
+        base_quantity = base_quantity * decimal.Decimal(DEFAULT_DEC)
+        base_quantity = str(base_quantity)
+
         msg = MsgCreateOrder(owner=tx_builder.acc_address(), pair_id=pair_id, direction=direction, price=price,
                              base_quantity=base_quantity,
                              ttl=1000, leverage=leverage)
@@ -496,6 +495,14 @@ class GRPCClient:
     def close_position(self, tx_builder: TxBuilder, pair_id: str, position_id: str, price: str, base_quantity: str):
         msg = MsgClosePosition(owner=tx_builder.acc_address(), pair_id=pair_id, position_id=position_id, price=price,
                                base_quantity=base_quantity)
+        price = decimal.Decimal(str(price))
+        price = price * decimal.Decimal(DEFAULT_DEC)
+        price = str(price)
+
+        base_quantity = decimal.Decimal(str(base_quantity))
+        base_quantity = base_quantity * decimal.Decimal(DEFAULT_DEC)
+        base_quantity = str(base_quantity)
+
         msg_any = Any(type_url='/fx.dex.MsgClosePosition', value=msg.SerializeToString())
         # DEX 交易设置固定gas
         tx = self.build_tx(tx_builder, [msg_any], DEFAULT_DEX_GAS)

@@ -3,7 +3,7 @@ package fx.dex;
 
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/functionx/fx-dex/x/dex/types";
+option go_package = "git.wokoworks.com/blockchain/fx-chain/x/dex/types";
 
 message Params {
   string fee_rate = 1 [

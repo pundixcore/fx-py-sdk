@@ -10,7 +10,7 @@ import "fx/dex/funding.proto";
 import "fx/dex/margin.proto";
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/functionx/fx-dex/x/dex/types";
+option go_package = "git.wokoworks.com/blockchain/fx-chain/x/dex/types";
 
 // Query defines the gRPC querier service.
 service Query {
@@ -47,6 +47,10 @@ service Query {
 
     rpc QueryPairFundingRates(QueryPairFundingRatesReq) returns (QueryPairFundingRatesResp) {
         option (google.api.http).get = "/dex/funding_rates";
+    }
+
+    rpc QueryFundingTime(QueryFundingTimeReq) returns (QueryFundingTimeResp) {
+        option (google.api.http).get = "/dex/funding_time";
     }
 
     // match query
@@ -151,7 +155,7 @@ message QueryOrdersRequest {
 }
 
 message QueryOrdersResponse {
-    Orders orders = 1 [(gogoproto.nullable) = false];
+  repeated Order orders = 1 [(gogoproto.nullable) = false];
 }
 
 message QueryOrderRequest {
@@ -159,7 +163,7 @@ message QueryOrderRequest {
 }
 
 message QueryOrderResponse {
-    Order order = 1 [(gogoproto.nullable) = false];
+  Order order = 1 [(gogoproto.nullable) = false];
 }
 
 message QueryOrderbookReq {
@@ -192,7 +196,7 @@ message QueryPositionsReq {
 }
 
 message QueryPositionsResp {
-    Positions positions = 1 [(gogoproto.nullable) = false];
+  repeated Position positions = 1 [(gogoproto.nullable) = false];
 }
 
 message QueryPositionReq {
@@ -201,7 +205,7 @@ message QueryPositionReq {
 }
 
 message QueryPositionResp {
-    Positions positions = 1 [(gogoproto.nullable) = false];
+  repeated Position positions = 1 [(gogoproto.nullable) = false];
 }
 
 ///////////////////// fundings query ///////////////////////////
@@ -221,6 +225,14 @@ message QueryPairFundingRatesReq {
 
 message QueryPairFundingRatesResp {
     repeated PairFundingRates pair_funding_rates = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryFundingTimeReq {
+
+}
+
+message QueryFundingTimeResp {
+  FundingTime funding_time = 1 [(gogoproto.nullable) = false];;
 }
 
 ///////////////////// match query ///////////////////////////

@@ -4,7 +4,7 @@ package fx.dex;
 import "gogoproto/gogo.proto";
 import "fx/dex/order.proto";
 
-option go_package = "github.com/functionx/fx-dex/x/dex/types";
+option go_package = "git.wokoworks.com/blockchain/fx-chain/x/dex/types";
 
 service Msg {
     rpc CreateOrder(MsgCreateOrder) returns (MsgCreateOrderResponse);

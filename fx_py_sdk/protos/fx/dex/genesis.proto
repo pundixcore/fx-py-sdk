@@ -9,7 +9,7 @@ import "fx/dex/margin.proto";
 import "gogoproto/gogo.proto";
 import "fx/dex/params.proto";
 import "fx/dex/match.proto";
-option go_package = "github.com/functionx/fx-dex/x/dex/types";
+option go_package = "git.wokoworks.com/blockchain/fx-chain/x/dex/types";
 
 // GenesisState defines the capability module's genesis state.
 message GenesisState {

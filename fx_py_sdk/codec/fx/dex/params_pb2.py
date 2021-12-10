@@ -18,9 +18,9 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='fx/dex/params.proto',
   package='fx.dex',
   syntax='proto3',
-  serialized_options=b'Z\'github.com/functionx/fx-dex/x/dex/types',
+  serialized_options=b'Z1git.wokoworks.com/blockchain/fx-chain/x/dex/types',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x13\x66x/dex/params.proto\x12\x06\x66x.dex\x1a\x14gogoproto/gogo.proto\"\xe8\x03\n\x06Params\x12@\n\x08\x66\x65\x65_rate\x18\x01 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12H\n\x10\x61\x63\x63umulative_fee\x18\x02 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x44\n\x0crisk_reserve\x18\x03 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x44\n\x0clock_capital\x18\x04 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12[\n#forced_liquidation_order_price_rate\x18\x05 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12/\n\'force_liquidation_margin_rate_threshold\x18\x06 \x01(\x03\x12\x1b\n\x13order_expire_blocks\x18\x07 \x01(\x03\x12\x1b\n\x13max_deals_per_block\x18\x08 \x01(\x03\x42)Z\'github.com/functionx/fx-dex/x/dex/typesb\x06proto3'
+  serialized_pb=b'\n\x13\x66x/dex/params.proto\x12\x06\x66x.dex\x1a\x14gogoproto/gogo.proto\"\xe8\x03\n\x06Params\x12@\n\x08\x66\x65\x65_rate\x18\x01 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12H\n\x10\x61\x63\x63umulative_fee\x18\x02 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x44\n\x0crisk_reserve\x18\x03 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x44\n\x0clock_capital\x18\x04 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12[\n#forced_liquidation_order_price_rate\x18\x05 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12/\n\'force_liquidation_margin_rate_threshold\x18\x06 \x01(\x03\x12\x1b\n\x13order_expire_blocks\x18\x07 \x01(\x03\x12\x1b\n\x13max_deals_per_block\x18\x08 \x01(\x03\x42\x33Z1git.wokoworks.com/blockchain/fx-chain/x/dex/typesb\x06proto3'
   ,
   dependencies=[gogoproto_dot_gogo__pb2.DESCRIPTOR,])
 

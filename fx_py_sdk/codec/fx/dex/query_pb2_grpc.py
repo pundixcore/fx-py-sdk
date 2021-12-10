@@ -55,6 +55,11 @@ class QueryStub(object):
                 request_serializer=fx_dot_dex_dot_query__pb2.QueryPairFundingRatesReq.SerializeToString,
                 response_deserializer=fx_dot_dex_dot_query__pb2.QueryPairFundingRatesResp.FromString,
                 )
+        self.QueryFundingTime = channel.unary_unary(
+                '/fx.dex.Query/QueryFundingTime',
+                request_serializer=fx_dot_dex_dot_query__pb2.QueryFundingTimeReq.SerializeToString,
+                response_deserializer=fx_dot_dex_dot_query__pb2.QueryFundingTimeResp.FromString,
+                )
         self.QueryDealPrice = channel.unary_unary(
                 '/fx.dex.Query/QueryDealPrice',
                 request_serializer=fx_dot_dex_dot_query__pb2.QueryDealPriceReq.SerializeToString,
@@ -152,6 +157,12 @@ class QueryServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def QueryPairFundingRates(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def QueryFundingTime(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -255,6 +266,11 @@ def add_QueryServicer_to_server(servicer, server):
                     servicer.QueryPairFundingRates,
                     request_deserializer=fx_dot_dex_dot_query__pb2.QueryPairFundingRatesReq.FromString,
                     response_serializer=fx_dot_dex_dot_query__pb2.QueryPairFundingRatesResp.SerializeToString,
+            ),
+            'QueryFundingTime': grpc.unary_unary_rpc_method_handler(
+                    servicer.QueryFundingTime,
+                    request_deserializer=fx_dot_dex_dot_query__pb2.QueryFundingTimeReq.FromString,
+                    response_serializer=fx_dot_dex_dot_query__pb2.QueryFundingTimeResp.SerializeToString,
             ),
             'QueryDealPrice': grpc.unary_unary_rpc_method_handler(
                     servicer.QueryDealPrice,
@@ -445,6 +461,23 @@ class Query(object):
         return grpc.experimental.unary_unary(request, target, '/fx.dex.Query/QueryPairFundingRates',
             fx_dot_dex_dot_query__pb2.QueryPairFundingRatesReq.SerializeToString,
             fx_dot_dex_dot_query__pb2.QueryPairFundingRatesResp.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def QueryFundingTime(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/fx.dex.Query/QueryFundingTime',
+            fx_dot_dex_dot_query__pb2.QueryFundingTimeReq.SerializeToString,
+            fx_dot_dex_dot_query__pb2.QueryFundingTimeResp.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

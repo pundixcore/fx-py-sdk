@@ -7,7 +7,6 @@ from google.protobuf.any_pb2 import Any
 
 """转账交易测试"""
 
-
 def test_send_tx():
     """导入种子账户"""
     priv_key = wallet.seed_to_privkey(

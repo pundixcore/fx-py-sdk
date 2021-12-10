@@ -18,9 +18,9 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='fx/dex/funding.proto',
   package='fx.dex',
   syntax='proto3',
-  serialized_options=b'Z\'github.com/functionx/fx-dex/x/dex/types',
+  serialized_options=b'Z1git.wokoworks.com/blockchain/fx-chain/x/dex/types',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x14\x66x/dex/funding.proto\x12\x06\x66x.dex\x1a\x14gogoproto/gogo.proto\"\x7f\n\x10PairFundingRates\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12\x44\n\x0c\x66unding_rate\x18\x02 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x14\n\x0c\x66unding_time\x18\x03 \x01(\x03\"\xa5\x01\n\x07\x46unding\x12\x16\n\x0e\x66unding_period\x18\x01 \x01(\x03\x12\x19\n\x11next_funding_time\x18\x02 \x01(\x03\x12\x15\n\rfunding_times\x18\x03 \x01(\x03\x12\x15\n\rnext_log_time\x18\x04 \x01(\x03\x12\x1a\n\x12log_funding_period\x18\x05 \x01(\x03\x12\x1d\n\x15max_funding_per_block\x18\x06 \x01(\x03\"w\n\x0b\x46undingTime\x12\x13\n\x0bsummer_time\x18\x01 \x01(\x03\x12\x13\n\x0bwinter_time\x18\x02 \x01(\x03\x12\x15\n\rsummer_clocks\x18\x03 \x03(\t\x12\x15\n\rwinter_clocks\x18\x04 \x03(\t\x12\x10\n\x08holidays\x18\x05 \x03(\t\"n\n\rSettleFunding\x12\x12\n\nis_funding\x18\x01 \x01(\x08\x12I\n\x10next_position_id\x18\x02 \x01(\tB/\xda\xde\x1f\'github.com/cosmos/cosmos-sdk/types.Uint\xc8\xde\x1f\x00\"\xa1\x01\n\x10PremiumIndexConf\x12\x15\n\rupdate_period\x18\x01 \x01(\x03\x12\x18\n\x10next_update_time\x18\x02 \x01(\x03\x12\x18\n\x10round_start_time\x18\x03 \x01(\x03\x12\x17\n\x0fnext_round_time\x18\x04 \x01(\x03\x12\x14\n\x0cround_period\x18\x05 \x01(\x03\x12\x13\n\x0bround_index\x18\x06 \x01(\x05\"\xb5\x01\n\x0cPremiumIndex\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12\x17\n\x0fround_timestamp\x18\x02 \x01(\x03\x12(\n\x05ticks\x18\x03 \x03(\x0b\x32\x19.fx.dex.PremiumIndex.Tick\x1aQ\n\x04Tick\x12=\n\x05value\x18\x01 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\n\n\x02ts\x18\x02 \x01(\x03\x42)Z\'github.com/functionx/fx-dex/x/dex/typesb\x06proto3'
+  serialized_pb=b'\n\x14\x66x/dex/funding.proto\x12\x06\x66x.dex\x1a\x14gogoproto/gogo.proto\"\x7f\n\x10PairFundingRates\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12\x44\n\x0c\x66unding_rate\x18\x02 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x14\n\x0c\x66unding_time\x18\x03 \x01(\x03\"\xa5\x01\n\x07\x46unding\x12\x16\n\x0e\x66unding_period\x18\x01 \x01(\x03\x12\x19\n\x11next_funding_time\x18\x02 \x01(\x03\x12\x15\n\rfunding_times\x18\x03 \x01(\x03\x12\x15\n\rnext_log_time\x18\x04 \x01(\x03\x12\x1a\n\x12log_funding_period\x18\x05 \x01(\x03\x12\x1d\n\x15max_funding_per_block\x18\x06 \x01(\x03\"w\n\x0b\x46undingTime\x12\x13\n\x0bsummer_time\x18\x01 \x01(\x03\x12\x13\n\x0bwinter_time\x18\x02 \x01(\x03\x12\x15\n\rsummer_clocks\x18\x03 \x03(\t\x12\x15\n\rwinter_clocks\x18\x04 \x03(\t\x12\x10\n\x08holidays\x18\x05 \x03(\t\"n\n\rSettleFunding\x12\x12\n\nis_funding\x18\x01 \x01(\x08\x12I\n\x10next_position_id\x18\x02 \x01(\tB/\xda\xde\x1f\'github.com/cosmos/cosmos-sdk/types.Uint\xc8\xde\x1f\x00\"\x8b\x01\n\x10PremiumIndexConf\x12\x15\n\rupdate_period\x18\x01 \x01(\x03\x12\x18\n\x10next_update_time\x18\x02 \x01(\x03\x12\x18\n\x10round_start_time\x18\x03 \x01(\x03\x12\x17\n\x0fnext_round_time\x18\x04 \x01(\x03\x12\x13\n\x0bround_index\x18\x05 \x01(\x05\"\xb5\x01\n\x0cPremiumIndex\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12\x17\n\x0fround_timestamp\x18\x02 \x01(\x03\x12(\n\x05ticks\x18\x03 \x03(\x0b\x32\x19.fx.dex.PremiumIndex.Tick\x1aQ\n\x04Tick\x12=\n\x05value\x18\x01 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\n\n\x02ts\x18\x02 \x01(\x03\x42\x33Z1git.wokoworks.com/blockchain/fx-chain/x/dex/typesb\x06proto3'
   ,
   dependencies=[gogoproto_dot_gogo__pb2.DESCRIPTOR,])
 
@@ -276,15 +276,8 @@ _PREMIUMINDEXCONF = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='round_period', full_name='fx.dex.PremiumIndexConf.round_period', index=4,
-      number=5, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='round_index', full_name='fx.dex.PremiumIndexConf.round_index', index=5,
-      number=6, type=5, cpp_type=1, label=1,
+      name='round_index', full_name='fx.dex.PremiumIndexConf.round_index', index=4,
+      number=5, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -302,7 +295,7 @@ _PREMIUMINDEXCONF = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=585,
-  serialized_end=746,
+  serialized_end=724,
 )
 
 
@@ -340,8 +333,8 @@ _PREMIUMINDEX_TICK = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=849,
-  serialized_end=930,
+  serialized_start=827,
+  serialized_end=908,
 )
 
 _PREMIUMINDEX = _descriptor.Descriptor(
@@ -385,8 +378,8 @@ _PREMIUMINDEX = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=749,
-  serialized_end=930,
+  serialized_start=727,
+  serialized_end=908,
 )
 
 _PREMIUMINDEX_TICK.containing_type = _PREMIUMINDEX

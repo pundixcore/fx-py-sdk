@@ -3,7 +3,7 @@ package fx.dex;
 
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/functionx/fx-dex/x/dex/types";
+option go_package = "git.wokoworks.com/blockchain/fx-chain/x/dex/types";
 
 //cumulative funding rates
 message PairFundingRates {
@@ -47,8 +47,7 @@ message PremiumIndexConf {
   int64 next_update_time = 2;
   int64 round_start_time = 3;
   int64 next_round_time = 4;
-  int64 round_period = 5;
-  int32 round_index = 6;
+  int32 round_index = 5;
 }
 
 // get/set -> key_prefix:pair_id:roundTimestamp
