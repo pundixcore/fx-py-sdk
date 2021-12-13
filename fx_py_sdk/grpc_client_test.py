@@ -6,6 +6,9 @@ from fx_py_sdk.builder import TxBuilder
 from fx_py_sdk.codec.cosmos.base.v1beta1.coin_pb2 import Coin
 from fx_py_sdk.codec.fx.dex.order_pb2 import *
 import decimal
+from fx_py_sdk.codec.cosmos.tx.v1beta1.service_pb2 import BROADCAST_MODE_BLOCK, BROADCAST_MODE_SYNC
+from google.protobuf.json_format import MessageToJson
+import json
 
 client = GRPCClient('44.196.199.119:9090')
 # client = GRPCClient('127.0.0.1:9090')
@@ -35,7 +38,7 @@ class MyTestCase(unittest.TestCase):
         print(account)
 
     def test_query_positions(self):
-        positions = client.query_positions(owner='dex1ggz598a4506llaglzsmhp3r23hfke6nw29wans', pair_id="tsla:usdt")
+        positions = client.query_positions(owner='dex1zgpzdf2uqla7hkx85wnn4p2r3duwqzd8cfus97', pair_id="tsla:usdt")
         print("positions: ", positions)
         # owner = Address(resp.positions[0].owner)
         # print(owner.to_string())
@@ -83,7 +86,7 @@ class MyTestCase(unittest.TestCase):
 
         tx_builder = TxBuilder(priv_key, chain_id, account.account_number, Coin(amount='60000000', denom='FX'))
 
-        tx_response = cli.create_order(tx_builder, 'tsla:usdt', BUY, 1, 1.1, 10)
+        tx_response = cli.create_order(tx_builder, 'tsla:usdt', "SELL", 1, 1.1, 10, account.sequence, mode=BROADCAST_MODE_BLOCK)
         print(tx_response)
 
     def test_cancel_order(self):
@@ -102,12 +105,26 @@ class MyTestCase(unittest.TestCase):
         print('account number:', account.account_number, 'sequence:', account.sequence)
 
         tx_builder = TxBuilder(priv_key, chain_id, account.account_number, Coin(amount='60000000', denom='FX'))
-        tx_response = cli.cancel_order(tx_builder, "ID-880797-1")
+
+        create_tx_response = cli.create_order(tx_builder, 'tsla:dai', BUY, 1, 1.1, 10, account.sequence, mode=BROADCAST_MODE_BLOCK)
+        res_str = MessageToJson(create_tx_response)
+        res = json.loads(res_str)
+        order_id = ''
+        events = res['logs'][0]['events']
+        for event in events:
+            if event['type'] == 'fx.dex.Order':
+                for attribute in event['attributes']:
+                    if attribute['key'] == 'order_id':
+                        order_id = attribute['value']
+
+        print("create order id = ", order_id)
+
+        tx_response = cli.cancel_order(tx_builder, order_id, account.sequence + 1, mode=BROADCAST_MODE_BLOCK)
         print(tx_response)
 
     def test_close_position(self):
         cli = GRPCClient('44.196.199.119:9090')
-
+        pair_id = "tsla:usdt"
         priv_key = wallet.seed_to_privkey(
             "dune antenna hood magic kit blouse film video another pioneer dilemma hobby message rug sail gas culture upgrade twin flag joke people general aunt")
 
@@ -120,11 +137,13 @@ class MyTestCase(unittest.TestCase):
         account = cli.query_account_info(address)
         print('account number:', account.account_number, 'sequence:', account.sequence)
 
+        positions = client.query_positions(owner='dex1zgpzdf2uqla7hkx85wnn4p2r3duwqzd8cfus97', pair_id=pair_id)
+        print("positions: ", positions)
+        self.assertNotEqual(len(positions), 0)
+
         tx_builder = TxBuilder(priv_key, chain_id, account.account_number, Coin(amount='60000000', denom='FX'))
-
-        tx_response = cli.close_position(tx_builder, "tsla:usdt", "1593", 1, 1.1)
+        tx_response = cli.close_position(tx_builder, pair_id, positions[0].Id, positions[0].MarkPrice, positions[0].BaseQuantity, account.sequence, mode=BROADCAST_MODE_BLOCK)
         print(tx_response)
-
 
 if __name__ == '__main__':
     unittest.main()

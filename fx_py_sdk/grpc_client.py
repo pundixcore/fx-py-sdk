@@ -16,7 +16,7 @@ from fx_py_sdk.codec.cosmos.tx.v1beta1.service_pb2_grpc import ServiceStub as Tx
 from fx_py_sdk.codec.cosmos.tx.v1beta1.service_pb2 import SimulateRequest
 from fx_py_sdk.codec.cosmos.tx.v1beta1.service_pb2 import BroadcastTxRequest
 from fx_py_sdk.codec.cosmos.tx.v1beta1.service_pb2 import BroadcastMode
-from fx_py_sdk.codec.cosmos.tx.v1beta1.service_pb2 import BROADCAST_MODE_BLOCK
+from fx_py_sdk.codec.cosmos.tx.v1beta1.service_pb2 import BROADCAST_MODE_BLOCK, BROADCAST_MODE_SYNC
 from fx_py_sdk.codec.cosmos.tx.v1beta1.tx_pb2 import Tx
 from fx_py_sdk.codec.cosmos.tx.v1beta1.tx_pb2 import TxRaw
 from fx_py_sdk.codec.cosmos.tx.v1beta1.tx_pb2 import Fee
@@ -58,11 +58,15 @@ class GRPCClient:
                     account_number: 11
                     sequence: 642626
         """
-        response = AuthQuery(self.channel).Account(QueryAccountRequest(address=address))
-        # Any 类型转换 - BaseAccount
-        base_account = BaseAccount()
-        response.account.Unpack(base_account)
-        return base_account
+        try:
+            # Any 类型转换 - BaseAccount
+            account_any = AuthQuery(self.channel).Account(QueryAccountRequest(address=address)).account
+            account = BaseAccount()
+            if account_any.Is(account.DESCRIPTOR):
+                account_any.Unpack(account)
+                return account
+        except:
+            return None
 
     def query_all_balances(self, address: str) -> []:
         """查询所有余额.
@@ -462,8 +466,8 @@ class GRPCClient:
         response = DexQuery(self.channel).QueryMarkPrice(QueryMarkPriceReq(pair_id=pair_id, query_all=query_all))
         return response
 
-    def create_order(self, tx_builder: TxBuilder, pair_id: str, direction: Direction, price: float, base_quantity: float,
-                     leverage: int):
+    def create_order(self, tx_builder: TxBuilder, pair_id: str, direction: Direction, price: float, base_quantity: float, leverage: int,
+                     acc_seq: int, mode: BroadcastMode = BROADCAST_MODE_BLOCK):
         """创建订单"""
 
         price = decimal.Decimal(str(price))
@@ -482,19 +486,21 @@ class GRPCClient:
 
         msg_any = Any(type_url='/fx.dex.MsgCreateOrder', value=msg.SerializeToString())
         # DEX 交易设置固定gas
-        tx = self.build_tx(tx_builder, [msg_any], DEFAULT_DEX_GAS)
-        tx_response = self.broadcast_tx(tx)
+        tx = self.build_tx(tx_builder, acc_seq, [msg_any], DEFAULT_DEX_GAS)
+        tx_response = self.broadcast_tx(tx, mode)
         return tx_response
 
-    def cancel_order(self, tx_builder: TxBuilder, order_id: str):
+    def cancel_order(self, tx_builder: TxBuilder, order_id: str,
+                     acc_seq: int, mode: BroadcastMode = BROADCAST_MODE_BLOCK):
         """取消订单"""
         msg = MsgCancelOrder(owner=tx_builder.acc_address(), order_id=order_id)
         msg_any = Any(type_url='/fx.dex.MsgCancelOrder', value=msg.SerializeToString())
         # DEX 交易设置固定gas
-        tx = self.build_tx(tx_builder, [msg_any], DEFAULT_DEX_GAS)
-        return self.broadcast_tx(tx)
+        tx = self.build_tx(tx_builder, acc_seq, [msg_any], DEFAULT_DEX_GAS)
+        return self.broadcast_tx(tx, mode)
 
-    def close_position(self, tx_builder: TxBuilder, pair_id: str, position_id: str, price: float, base_quantity: float):
+    def close_position(self, tx_builder: TxBuilder, pair_id: str, position_id: str, price: float, base_quantity: float,
+                       acc_seq: int, mode: BroadcastMode = BROADCAST_MODE_BLOCK):
         price = decimal.Decimal(str(price))
         price = price * decimal.Decimal(DEFAULT_DEC)
         price = str(price)
@@ -511,18 +517,18 @@ class GRPCClient:
 
         msg_any = Any(type_url='/fx.dex.MsgClosePosition', value=msg.SerializeToString())
         # DEX 交易设置固定gas
-        tx = self.build_tx(tx_builder, [msg_any], DEFAULT_DEX_GAS)
-        return self.broadcast_tx(tx)
+        tx = self.build_tx(tx_builder, acc_seq, [msg_any], DEFAULT_DEX_GAS)
+        return self.broadcast_tx(tx, mode)
 
-    def build_tx(self, tx_builder: TxBuilder, msg: [Any], gas_limit: int = 0) -> Tx:
+    def build_tx(self, tx_builder: TxBuilder, acc_seq: int, msg: [Any], gas_limit: int = 0) -> Tx:
         """签名交易"""
         if tx_builder.chain_id == '':
             # 查询chain_id
             tx_builder.chain_id = self.query_chain_id()
 
-        account = self.query_account_info(tx_builder.address())
         if tx_builder.account_number <= -1:
             # 查询账户信息
+            account = self.query_account_info(tx_builder.address())
             tx_builder.account_number = account.account_number
 
         gas_price_amount = int(tx_builder.gas_price.amount)
@@ -537,14 +543,14 @@ class GRPCClient:
             # 计算默认的gas amount
             fee_amount = Coin(amount=str(gas_limit * gas_price_amount), denom=fee_denom)
             fee = Fee(amount=[fee_amount], gas_limit=gas_limit)
-            tx = tx_builder.sign(account.sequence, msg, fee)
+            tx = tx_builder.sign(acc_seq, msg, fee)
             # 估算gas limit
             gas_info = self.estimating_gas(tx)
             gas_limit = int(float(gas_info.gas_used) * 1.5)
 
         fee_amount = Coin(amount=str(gas_limit * gas_price_amount), denom=fee_denom)
         fee = Fee(amount=[fee_amount], gas_limit=gas_limit)
-        return tx_builder.sign(account.sequence, msg, fee)
+        return tx_builder.sign(acc_seq, msg, fee)
 
     def estimating_gas(self, tx: Tx) -> GasInfo:
         """估算交易Gas limit"""
