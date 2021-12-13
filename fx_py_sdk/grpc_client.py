@@ -492,9 +492,7 @@ class GRPCClient:
         tx = self.build_tx(tx_builder, [msg_any], DEFAULT_DEX_GAS)
         return self.broadcast_tx(tx)
 
-    def close_position(self, tx_builder: TxBuilder, pair_id: str, position_id: str, price: str, base_quantity: str):
-        msg = MsgClosePosition(owner=tx_builder.acc_address(), pair_id=pair_id, position_id=position_id, price=price,
-                               base_quantity=base_quantity)
+    def close_position(self, tx_builder: TxBuilder, pair_id: str, position_id: str, price: float, base_quantity: float):
         price = decimal.Decimal(str(price))
         price = price * decimal.Decimal(DEFAULT_DEC)
         price = str(price)
@@ -502,6 +500,9 @@ class GRPCClient:
         base_quantity = decimal.Decimal(str(base_quantity))
         base_quantity = base_quantity * decimal.Decimal(DEFAULT_DEC)
         base_quantity = str(base_quantity)
+
+        msg = MsgClosePosition(owner=tx_builder.acc_address(), pair_id=pair_id, position_id=position_id, price=price,
+                               base_quantity=base_quantity)
 
         msg_any = Any(type_url='/fx.dex.MsgClosePosition', value=msg.SerializeToString())
         # DEX 交易设置固定gas

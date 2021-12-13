@@ -7,8 +7,8 @@ from fx_py_sdk.codec.cosmos.base.v1beta1.coin_pb2 import Coin
 from fx_py_sdk.codec.fx.dex.order_pb2 import *
 import decimal
 
-# client = GRPCClient('44.196.199.119:9090')
-client = GRPCClient('127.0.0.1:9090')
+client = GRPCClient('44.196.199.119:9090')
+# client = GRPCClient('127.0.0.1:9090')
 
 
 class MyTestCase(unittest.TestCase):
@@ -70,7 +70,7 @@ class MyTestCase(unittest.TestCase):
         cli = GRPCClient('44.196.199.119:9090')
 
         priv_key = wallet.seed_to_privkey(
-            "sunset earth lab edit usage hire night today nurse swap bubble summer trigger improve nice shrimp brown jaguar uncover affair wood envelope bar pear")
+            "dune antenna hood magic kit blouse film video another pioneer dilemma hobby message rug sail gas culture upgrade twin flag joke people general aunt")
 
         address = priv_key.to_address()
         print('address:', address)
@@ -83,15 +83,14 @@ class MyTestCase(unittest.TestCase):
 
         tx_builder = TxBuilder(priv_key, chain_id, account.account_number, Coin(amount='60000000', denom='FX'))
 
-        tx_response = cli.create_order(tx_builder, 'tsla:usdt', BUY, 1,
-                                       1, 10)
+        tx_response = cli.create_order(tx_builder, 'tsla:usdt', BUY, 1, 1, 10)
         print(tx_response)
 
     def test_cancel_order(self):
         cli = GRPCClient('44.196.199.119:9090')
 
         priv_key = wallet.seed_to_privkey(
-            "sunset earth lab edit usage hire night today nurse swap bubble summer trigger improve nice shrimp brown jaguar uncover affair wood envelope bar pear")
+            "dune antenna hood magic kit blouse film video another pioneer dilemma hobby message rug sail gas culture upgrade twin flag joke people general aunt")
 
         address = priv_key.to_address()
         print('address:', address)
@@ -110,7 +109,7 @@ class MyTestCase(unittest.TestCase):
         cli = GRPCClient('44.196.199.119:9090')
 
         priv_key = wallet.seed_to_privkey(
-            "sunset earth lab edit usage hire night today nurse swap bubble summer trigger improve nice shrimp brown jaguar uncover affair wood envelope bar pear")
+            "dune antenna hood magic kit blouse film video another pioneer dilemma hobby message rug sail gas culture upgrade twin flag joke people general aunt")
 
         address = priv_key.to_address()
         print('address:', address)
@@ -123,7 +122,7 @@ class MyTestCase(unittest.TestCase):
 
         tx_builder = TxBuilder(priv_key, chain_id, account.account_number, Coin(amount='60000000', denom='FX'))
 
-        tx_response = cli.close_position(tx_builder, "tsla:usdt", "1593", "100", "1765981856000000000000")
+        tx_response = cli.close_position(tx_builder, "tsla:usdt", "1593", 1, 1)
         print(tx_response)
 
 
