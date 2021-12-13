@@ -469,13 +469,15 @@ class GRPCClient:
         price = decimal.Decimal(str(price))
         price = price * decimal.Decimal(DEFAULT_DEC)
         price = str(price)
+        price_split = price.split('.', 1)
 
         base_quantity = decimal.Decimal(str(base_quantity))
         base_quantity = base_quantity * decimal.Decimal(DEFAULT_DEC)
         base_quantity = str(base_quantity)
+        base_quantity_split = base_quantity.split('.', 1)
 
-        msg = MsgCreateOrder(owner=tx_builder.acc_address(), pair_id=pair_id, direction=direction, price=price,
-                             base_quantity=base_quantity,
+        msg = MsgCreateOrder(owner=tx_builder.acc_address(), pair_id=pair_id, direction=direction, price=price_split[0],
+                             base_quantity=base_quantity_split[0],
                              ttl=1000, leverage=leverage)
 
         msg_any = Any(type_url='/fx.dex.MsgCreateOrder', value=msg.SerializeToString())
@@ -496,13 +498,16 @@ class GRPCClient:
         price = decimal.Decimal(str(price))
         price = price * decimal.Decimal(DEFAULT_DEC)
         price = str(price)
+        price_split = price.split('.', 1)
+
 
         base_quantity = decimal.Decimal(str(base_quantity))
         base_quantity = base_quantity * decimal.Decimal(DEFAULT_DEC)
         base_quantity = str(base_quantity)
+        base_quantity_split = base_quantity.split('.', 1)
 
-        msg = MsgClosePosition(owner=tx_builder.acc_address(), pair_id=pair_id, position_id=position_id, price=price,
-                               base_quantity=base_quantity)
+        msg = MsgClosePosition(owner=tx_builder.acc_address(), pair_id=pair_id, position_id=position_id, price=price_split[0],
+                               base_quantity=base_quantity_split[0])
 
         msg_any = Any(type_url='/fx.dex.MsgClosePosition', value=msg.SerializeToString())
         # DEX 交易设置固定gas

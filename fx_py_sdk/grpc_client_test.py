@@ -83,7 +83,7 @@ class MyTestCase(unittest.TestCase):
 
         tx_builder = TxBuilder(priv_key, chain_id, account.account_number, Coin(amount='60000000', denom='FX'))
 
-        tx_response = cli.create_order(tx_builder, 'tsla:usdt', BUY, 1, 1, 10)
+        tx_response = cli.create_order(tx_builder, 'tsla:usdt', BUY, 1, 1.1, 10)
         print(tx_response)
 
     def test_cancel_order(self):
@@ -122,7 +122,7 @@ class MyTestCase(unittest.TestCase):
 
         tx_builder = TxBuilder(priv_key, chain_id, account.account_number, Coin(amount='60000000', denom='FX'))
 
-        tx_response = cli.close_position(tx_builder, "tsla:usdt", "1593", 1, 1)
+        tx_response = cli.close_position(tx_builder, "tsla:usdt", "1593", 1, 1.1)
         print(tx_response)
 
 
