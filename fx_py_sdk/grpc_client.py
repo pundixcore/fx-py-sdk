@@ -1,7 +1,5 @@
 import decimal
-
 import grpc
-
 from fx_py_sdk.codec.cosmos.auth.v1beta1.auth_pb2 import BaseAccount
 from fx_py_sdk.codec.cosmos.auth.v1beta1.query_pb2 import QueryAccountRequest
 from fx_py_sdk.codec.cosmos.auth.v1beta1.query_pb2_grpc import QueryStub as AuthQuery
@@ -34,7 +32,7 @@ from fx_py_sdk.wallet import Address
 from fx_py_sdk.constants import *
 import logging
 from google.protobuf.json_format import MessageToJson
-
+import json
 
 DEFAULT_DEX_GAS = 5000000
 DEFAULT_GRPC_NONE = "Not found"
@@ -360,20 +358,19 @@ class GRPCClient:
                 max_funding_per_block：最大资金费率结算数量
 
                 example:
-                    funding {
-                      funding_period: 14400
-                      next_funding_time: 1638867900
-                      funding_times: 27
-                      next_log_time: 1638845352
-                      log_funding_period: 300
-                      max_funding_per_block: 1000
-                    }
+                    {'funding': {'fundingPeriod': '14400', 'nextFundingTime': '1639472700', 'fundingTimes': '4', 'nextLogTime': '1639466219', 'logFundingPeriod': '300', 'maxFundingPerBlock': '1000'}}
         """
-        response = DexQuery(self.channel).QueryFunding(QueryFundingReq())
-        return response
+        try:
+            response = DexQuery(self.channel).QueryFunding(QueryFundingReq())
+            res_str = MessageToJson(response)
+            res = json.loads(res_str)
+            return res
+        except Exception as e:
+            print("query error: ", e)
+            return e
 
     def query_funding_rate(self, pair_id, funding_times, query_all):
-        """查询资金费率.
+        """查询资金费率, fundingRate字段需要精度转换.
             Args:
                 pair_id: 交易对
                 funding_times: 结算次数
@@ -384,14 +381,20 @@ class GRPCClient:
                 funding_time：资金费率结算时间
 
                 example:
-                    pair_funding_rates {
-                      pair_id: "tsla:usdt"
-                      funding_rate: "100000000000000"
-                      funding_time: 1638306300
-                    }
+                    {'pairFundingRates': [{'pairId': 'tsla:usdt', 'fundingRate': '0', 'fundingTime': '1639379542'}, {'pairId': 'tsla:usdt', 'fundingRate': '-0.0001', 'fundingTime': '1639386301'}]}
         """
-        response = DexQuery(self.channel).QueryPairFundingRates(QueryPairFundingRatesReq(pair_id=pair_id, funding_times=funding_times, query_all=query_all))
-        return response
+        try:
+            response = DexQuery(self.channel).QueryPairFundingRates(QueryPairFundingRatesReq(pair_id=pair_id, funding_times=funding_times, query_all=query_all))
+            res_str = MessageToJson(response)
+            res = json.loads(res_str)
+            for rate in res['pairFundingRates']:
+                funding_rate = decimal.Decimal(rate['fundingRate'])
+                funding_rate = funding_rate / decimal.Decimal(DEFAULT_DEC)
+                rate['fundingRate'] = str(funding_rate)
+            return res
+        except Exception as e:
+            print("query error: ", e)
+            return e
 
     def query_orderbook(self, pair_id):
         """查询资金费率.
@@ -402,17 +405,16 @@ class GRPCClient:
                     price：价格
                     quantity：数量
                 Bids：买单
-                Asks {
-                  price: "1239.740000000000000000"
-                  quantity: "0.277000000000000000"
-                }
-                Bids {
-                  price: "0.100000000000000000"
-                  quantity: "1000000008.413720000000000000"
-                }
+                {"Asks":[{"price":"1157.170000000000000000","quantity":"0.071999999999999562"},{"price":"1157.240000000000000000","quantity":"0.031000000000000000"}],"Bids":[{"price":"1118.396987012654667678","quantity":"6.699999999999999955"},{"price":"1079.623974025309335355","quantity":"19.995000000000000284"},{"price":"1077.610000000000000000","quantity":"0.404000000000000000"}]}
         """
-        response = DexQuery(self.channel).QeuryOrderbook(QueryOrderbookReq(pair_id=pair_id))
-        return response
+        try:
+            response = DexQuery(self.channel).QeuryOrderbook(QueryOrderbookReq(pair_id=pair_id))
+            res_str = MessageToJson(response)
+            res = json.loads(res_str)
+            return res
+        except Exception as e:
+            print("query error: ", e)
+            return e
 
     # 查询标记价格
     #   pair_id: 交易对
@@ -429,17 +431,20 @@ class GRPCClient:
                 query_all	bool	一般查链上所有的交易对，也可以单独查某一个交易对
 
                 example:
-                pair_mark_price {
-                      pair_id: "tsla:usdt"
-                      price: "1078550000000000000000"
-                    }
-                    pair_mark_price {
-                      pair_id: "aapl:usdt"
-                      price: "168065000000000000000"
-                    }
+                {'pairMarkPrice': [{'pairId': 'tsla:usdt', 'price': '1130.67510779198068958'}, {'pairId': 'aapl:usdt', 'price': '169'}, {'pairId': 'tsla:usdc', 'price': '1091.970493546293773044'}, {'pairId': 'aapl:usdc', 'price': '167.97'}, {'pairId': 'tsla:dai', 'price': '678.12218871527777799'}, {'pairId': 'aapl:dai', 'price': '124.753180455902777817'}]}
         """
-        response = DexQuery(self.channel).QueryMarkPrice(QueryMarkPriceReq(pair_id=pair_id, query_all=query_all))
-        return response
+        try:
+            response = DexQuery(self.channel).QueryMarkPrice(QueryMarkPriceReq(pair_id=pair_id, query_all=query_all))
+            res_str = MessageToJson(response)
+            res = json.loads(res_str)
+            for rate in res['pairMarkPrice']:
+                funding_rate = decimal.Decimal(rate['price'])
+                funding_rate = funding_rate / decimal.Decimal(DEFAULT_DEC)
+                rate['price'] = str(funding_rate)
+            return res
+        except Exception as e:
+            print("query error: ", e)
+            return e
 
     def create_order(self, tx_builder: TxBuilder, pair_id: str, direction: Direction, price: Decimal, base_quantity: Decimal, leverage: int,
                      acc_seq: int, mode: BroadcastMode = BROADCAST_MODE_BLOCK):

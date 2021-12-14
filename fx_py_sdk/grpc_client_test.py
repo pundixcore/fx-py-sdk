@@ -57,7 +57,7 @@ class MyTestCase(unittest.TestCase):
         print(resp)
 
     def test_query_funding_rates(self):
-        resp = client.query_funding_rate("tsla:usdt", 10, query_all=True)
+        resp = client.query_funding_rate("tsla:usdt", 1, query_all=True)
         print(resp)
 
     def test_mark_price(self):

@@ -36,4 +36,3 @@ class Position(NamedTuple):
     MarginRate: Decimal
     InitialMargin: Decimal
     PendingOrderQuantity: Decimal
-
