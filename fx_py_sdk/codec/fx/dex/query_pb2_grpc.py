@@ -30,8 +30,8 @@ class QueryStub(object):
                 request_serializer=fx_dot_dex_dot_query__pb2.QueryOrderRequest.SerializeToString,
                 response_deserializer=fx_dot_dex_dot_query__pb2.QueryOrderResponse.FromString,
                 )
-        self.QeuryOrderbook = channel.unary_unary(
-                '/fx.dex.Query/QeuryOrderbook',
+        self.QueryOrderbook = channel.unary_unary(
+                '/fx.dex.Query/QueryOrderbook',
                 request_serializer=fx_dot_dex_dot_query__pb2.QueryOrderbookReq.SerializeToString,
                 response_deserializer=fx_dot_dex_dot_query__pb2.QueryOrderbookResp.FromString,
                 )
@@ -105,6 +105,11 @@ class QueryStub(object):
                 request_serializer=fx_dot_dex_dot_query__pb2.QueryIsFundingReq.SerializeToString,
                 response_deserializer=fx_dot_dex_dot_query__pb2.QueryIsFundingResp.FromString,
                 )
+        self.QueryFundingRate = channel.unary_unary(
+                '/fx.dex.Query/QueryFundingRate',
+                request_serializer=fx_dot_dex_dot_query__pb2.QueryFundingRateReq.SerializeToString,
+                response_deserializer=fx_dot_dex_dot_query__pb2.QueryFundingRateResp.FromString,
+                )
 
 
 class QueryServicer(object):
@@ -130,7 +135,7 @@ class QueryServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def QeuryOrderbook(self, request, context):
+    def QueryOrderbook(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -224,6 +229,12 @@ class QueryServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def QueryFundingRate(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_QueryServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -242,8 +253,8 @@ def add_QueryServicer_to_server(servicer, server):
                     request_deserializer=fx_dot_dex_dot_query__pb2.QueryOrderRequest.FromString,
                     response_serializer=fx_dot_dex_dot_query__pb2.QueryOrderResponse.SerializeToString,
             ),
-            'QeuryOrderbook': grpc.unary_unary_rpc_method_handler(
-                    servicer.QeuryOrderbook,
+            'QueryOrderbook': grpc.unary_unary_rpc_method_handler(
+                    servicer.QueryOrderbook,
                     request_deserializer=fx_dot_dex_dot_query__pb2.QueryOrderbookReq.FromString,
                     response_serializer=fx_dot_dex_dot_query__pb2.QueryOrderbookResp.SerializeToString,
             ),
@@ -317,6 +328,11 @@ def add_QueryServicer_to_server(servicer, server):
                     request_deserializer=fx_dot_dex_dot_query__pb2.QueryIsFundingReq.FromString,
                     response_serializer=fx_dot_dex_dot_query__pb2.QueryIsFundingResp.SerializeToString,
             ),
+            'QueryFundingRate': grpc.unary_unary_rpc_method_handler(
+                    servicer.QueryFundingRate,
+                    request_deserializer=fx_dot_dex_dot_query__pb2.QueryFundingRateReq.FromString,
+                    response_serializer=fx_dot_dex_dot_query__pb2.QueryFundingRateResp.SerializeToString,
+            ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
             'fx.dex.Query', rpc_method_handlers)
@@ -380,7 +396,7 @@ class Query(object):
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def QeuryOrderbook(request,
+    def QueryOrderbook(request,
             target,
             options=(),
             channel_credentials=None,
@@ -390,7 +406,7 @@ class Query(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/fx.dex.Query/QeuryOrderbook',
+        return grpc.experimental.unary_unary(request, target, '/fx.dex.Query/QueryOrderbook',
             fx_dot_dex_dot_query__pb2.QueryOrderbookReq.SerializeToString,
             fx_dot_dex_dot_query__pb2.QueryOrderbookResp.FromString,
             options, channel_credentials,
@@ -631,5 +647,22 @@ class Query(object):
         return grpc.experimental.unary_unary(request, target, '/fx.dex.Query/QueryIsFunding',
             fx_dot_dex_dot_query__pb2.QueryIsFundingReq.SerializeToString,
             fx_dot_dex_dot_query__pb2.QueryIsFundingResp.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def QueryFundingRate(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/fx.dex.Query/QueryFundingRate',
+            fx_dot_dex_dot_query__pb2.QueryFundingRateReq.SerializeToString,
+            fx_dot_dex_dot_query__pb2.QueryFundingRateResp.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

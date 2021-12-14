@@ -7,7 +7,6 @@ import "fx/dex/match.proto";
 import "fx/dex/position.proto";
 import "fx/dex/params.proto";
 import "fx/dex/funding.proto";
-import "fx/dex/margin.proto";
 import "gogoproto/gogo.proto";
 
 option go_package = "git.wokoworks.com/blockchain/fx-chain/x/dex/types";
@@ -27,7 +26,7 @@ service Query {
         option (google.api.http).get = "/dex/order";
     }
 
-    rpc QeuryOrderbook(QueryOrderbookReq) returns (QueryOrderbookResp) {
+    rpc QueryOrderbook(QueryOrderbookReq) returns (QueryOrderbookResp) {
         option (google.api.http).get = "/dex/order";
     }
 
@@ -90,6 +89,18 @@ service Query {
     rpc QueryIsFunding(QueryIsFundingReq) returns (QueryIsFundingResp) {
         option (google.api.http).get = "/dex/is_funding";
     }
+
+  rpc QueryFundingRate(QueryFundingRateReq) returns (QueryFundingRateResp) {
+    option (google.api.http).get = "/dex/funding_rate";
+  }
+}
+
+message QueryFundingRateReq {
+  string pair_id = 1 ;
+}
+
+message QueryFundingRateResp {
+  PairFundingRates pair_funding_rates = 1 [(gogoproto.nullable) = false];
 }
 
 message QueryIsFundingReq {}

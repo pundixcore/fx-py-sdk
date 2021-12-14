@@ -17,7 +17,6 @@ from fx_py_sdk.codec.fx.dex import match_pb2 as fx_dot_dex_dot_match__pb2
 from fx_py_sdk.codec.fx.dex import position_pb2 as fx_dot_dex_dot_position__pb2
 from fx_py_sdk.codec.fx.dex import params_pb2 as fx_dot_dex_dot_params__pb2
 from fx_py_sdk.codec.fx.dex import funding_pb2 as fx_dot_dex_dot_funding__pb2
-from fx_py_sdk.codec.fx.dex import margin_pb2 as fx_dot_dex_dot_margin__pb2
 from fx_py_sdk.codec.gogoproto import gogo_pb2 as gogoproto_dot_gogo__pb2
 
 
@@ -27,11 +26,75 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=b'Z1git.wokoworks.com/blockchain/fx-chain/x/dex/types',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x12\x66x/dex/query.proto\x12\x06\x66x.dex\x1a\x1cgoogle/api/annotations.proto\x1a\x12\x66x/dex/order.proto\x1a\x12\x66x/dex/match.proto\x1a\x15\x66x/dex/position.proto\x1a\x13\x66x/dex/params.proto\x1a\x14\x66x/dex/funding.proto\x1a\x13\x66x/dex/margin.proto\x1a\x14gogoproto/gogo.proto\"\x13\n\x11QueryIsFundingReq\"(\n\x12QueryIsFundingResp\x12\x12\n\nis_funding\x18\x01 \x01(\x08\"\x18\n\x16QueryStoreStatisticReq\"\xbc\x02\n\x17QueryStoreStatisticResp\x12\x17\n\x0fstore_order_num\x18\x01 \x01(\x03\x12K\n\x0f\x64\x65pth_book_nums\x18\x02 \x03(\x0b\x32,.fx.dex.QueryStoreStatisticResp.DepthBookNumB\x04\xc8\xde\x1f\x00\x12R\n\x13\x62ook_order_ids_nums\x18\x03 \x03(\x0b\x32/.fx.dex.QueryStoreStatisticResp.BookOrderIDsNumB\x04\xc8\xde\x1f\x00\x1a.\n\x0c\x44\x65pthBookNum\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x03\x1a\x37\n\x0f\x42ookOrderIDsNum\x12\x15\n\rorder_ids_key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x03\"\x1d\n\nQueryMAReq\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\"\x94\x01\n\x0bQueryMAResp\x12\x45\n\raverage_price\x18\x01 \x03(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12>\n\x06price2\x18\x02 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"\x10\n\x0eQueryParamsReq\"7\n\x0fQueryParamsResp\x12$\n\x06params\x18\x01 \x01(\x0b\x32\x0e.fx.dex.ParamsB\x04\xc8\xde\x1f\x00\"\xe6\x01\n\x12QueryOrdersRequest\x12@\n\x05owner\x18\x01 \x01(\x0c\x42\x31\xfa\xde\x1f-github.com/cosmos/cosmos-sdk/types.AccAddress\x12\x0f\n\x07pair_id\x18\x02 \x01(\t\x12=\n\x04page\x18\x03 \x01(\tB/\xda\xde\x1f\'github.com/cosmos/cosmos-sdk/types.Uint\xc8\xde\x1f\x00\x12>\n\x05limit\x18\x04 \x01(\tB/\xda\xde\x1f\'github.com/cosmos/cosmos-sdk/types.Uint\xc8\xde\x1f\x00\":\n\x13QueryOrdersResponse\x12#\n\x06orders\x18\x01 \x03(\x0b\x32\r.fx.dex.OrderB\x04\xc8\xde\x1f\x00\"%\n\x11QueryOrderRequest\x12\x10\n\x08order_id\x18\x01 \x01(\t\"8\n\x12QueryOrderResponse\x12\"\n\x05order\x18\x01 \x01(\x0b\x32\r.fx.dex.OrderB\x04\xc8\xde\x1f\x00\"$\n\x11QueryOrderbookReq\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\".\n\x0b\x42ookResItem\x12\r\n\x05price\x18\x01 \x01(\t\x12\x10\n\x08quantity\x18\x02 \x01(\t\"f\n\x12QueryOrderbookResp\x12\'\n\x04\x41sks\x18\x01 \x03(\x0b\x32\x13.fx.dex.BookResItemB\x04\xc8\xde\x1f\x00\x12\'\n\x04\x42ids\x18\x02 \x03(\x0b\x32\x13.fx.dex.BookResItemB\x04\xc8\xde\x1f\x00\"\x8e\x02\n\x11QueryPositionsReq\x12@\n\x05owner\x18\x01 \x01(\x0c\x42\x31\xfa\xde\x1f-github.com/cosmos/cosmos-sdk/types.AccAddress\x12\'\n\tdirection\x18\x02 \x01(\x0e\x32\x14.fx.dex.PosDirection\x12\x0f\n\x07pair_id\x18\x03 \x01(\t\x12=\n\x04page\x18\x04 \x01(\tB/\xda\xde\x1f\'github.com/cosmos/cosmos-sdk/types.Uint\xc8\xde\x1f\x00\x12>\n\x05limit\x18\x05 \x01(\tB/\xda\xde\x1f\'github.com/cosmos/cosmos-sdk/types.Uint\xc8\xde\x1f\x00\"?\n\x12QueryPositionsResp\x12)\n\tpositions\x18\x01 \x03(\x0b\x32\x10.fx.dex.PositionB\x04\xc8\xde\x1f\x00\"e\n\x10QueryPositionReq\x12@\n\x05owner\x18\x01 \x01(\x0c\x42\x31\xfa\xde\x1f-github.com/cosmos/cosmos-sdk/types.AccAddress\x12\x0f\n\x07pair_id\x18\x02 \x01(\t\">\n\x11QueryPositionResp\x12)\n\tpositions\x18\x01 \x03(\x0b\x32\x10.fx.dex.PositionB\x04\xc8\xde\x1f\x00\"\x11\n\x0fQueryFundingReq\":\n\x10QueryFundingResp\x12&\n\x07\x66unding\x18\x01 \x01(\x0b\x32\x0f.fx.dex.FundingB\x04\xc8\xde\x1f\x00\"U\n\x18QueryPairFundingRatesReq\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12\x15\n\rfunding_times\x18\x02 \x01(\x03\x12\x11\n\tquery_all\x18\x03 \x01(\x08\"W\n\x19QueryPairFundingRatesResp\x12:\n\x12pair_funding_rates\x18\x01 \x03(\x0b\x32\x18.fx.dex.PairFundingRatesB\x04\xc8\xde\x1f\x00\"\x15\n\x13QueryFundingTimeReq\"G\n\x14QueryFundingTimeResp\x12/\n\x0c\x66unding_time\x18\x01 \x01(\x0b\x32\x13.fx.dex.FundingTimeB\x04\xc8\xde\x1f\x00\"[\n\tPairPrice\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12=\n\x05price\x18\x02 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\":\n\x11QueryDealPriceReq\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12\x14\n\x0c\x62lock_number\x18\x02 \x01(\x03\"A\n\x12QueryDealPriceResp\x12+\n\ndeal_price\x18\x01 \x01(\x0b\x32\x11.fx.dex.DealPriceB\x04\xc8\xde\x1f\x00\"7\n\x11QueryPairPriceReq\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12\x11\n\tquery_all\x18\x02 \x01(\x08\"A\n\x12QueryPairPriceResp\x12+\n\npair_price\x18\x01 \x03(\x0b\x32\x11.fx.dex.PairPriceB\x04\xc8\xde\x1f\x00\"<\n\x13QueryMatchResultReq\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12\x14\n\x0c\x62lock_number\x18\x02 \x01(\x03\"G\n\x14QueryMatchResultResp\x12/\n\x0cmatch_result\x18\x01 \x01(\x0b\x32\x13.fx.dex.MatchResultB\x04\xc8\xde\x1f\x00\"7\n\x11QueryMarkPriceReq\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12\x11\n\tquery_all\x18\x02 \x01(\x08\"F\n\x12QueryMarkPriceResp\x12\x30\n\x0fpair_mark_price\x18\x01 \x03(\x0b\x32\x11.fx.dex.PairPriceB\x04\xc8\xde\x1f\x00\"\xaf\x01\n\x12MarkAndOraclePrice\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12\x42\n\nmark_price\x18\x02 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x44\n\x0coracle_price\x18\x03 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"@\n\x1aQueryMarkAndOraclePriceReq\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12\x11\n\tquery_all\x18\x02 \x01(\x08\"O\n\x1bQueryMarkAndOraclePriceResp\x12\x30\n\x06prices\x18\x01 \x03(\x0b\x32\x1a.fx.dex.MarkAndOraclePriceB\x04\xc8\xde\x1f\x00\"\xb5\x02\n\x18QueryLiquidationPriceReq\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12\x10\n\x08leverage\x18\x02 \x01(\x04\x12\'\n\tdirection\x18\x03 \x01(\x0e\x32\x14.fx.dex.PosDirection\x12\x43\n\x0b\x65ntry_price\x18\x04 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12@\n\x08quantity\x18\x05 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x46\n\x0ewallet_balance\x18\x06 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"f\n\x19QueryLiquidationPriceResp\x12I\n\x11liquidation_price\x18\x01 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x32\xb1\x0e\n\x05Query\x12S\n\x0bQueryParams\x12\x16.fx.dex.QueryParamsReq\x1a\x17.fx.dex.QueryParamsResp\"\x13\x82\xd3\xe4\x93\x02\r\x12\x0b/dex/params\x12[\n\x0bQueryOrders\x12\x1a.fx.dex.QueryOrdersRequest\x1a\x1b.fx.dex.QueryOrdersResponse\"\x13\x82\xd3\xe4\x93\x02\r\x12\x0b/dex/orders\x12W\n\nQueryOrder\x12\x19.fx.dex.QueryOrderRequest\x1a\x1a.fx.dex.QueryOrderResponse\"\x12\x82\xd3\xe4\x93\x02\x0c\x12\n/dex/order\x12[\n\x0eQeuryOrderbook\x12\x19.fx.dex.QueryOrderbookReq\x1a\x1a.fx.dex.QueryOrderbookResp\"\x12\x82\xd3\xe4\x93\x02\x0c\x12\n/dex/order\x12_\n\x0eQueryPositions\x12\x19.fx.dex.QueryPositionsReq\x1a\x1a.fx.dex.QueryPositionsResp\"\x16\x82\xd3\xe4\x93\x02\x10\x12\x0e/dex/positions\x12[\n\rQueryPosition\x12\x18.fx.dex.QueryPositionReq\x1a\x19.fx.dex.QueryPositionResp\"\x15\x82\xd3\xe4\x93\x02\x0f\x12\r/dex/position\x12W\n\x0cQueryFunding\x12\x17.fx.dex.QueryFundingReq\x1a\x18.fx.dex.QueryFundingResp\"\x14\x82\xd3\xe4\x93\x02\x0e\x12\x0c/dex/funding\x12x\n\x15QueryPairFundingRates\x12 .fx.dex.QueryPairFundingRatesReq\x1a!.fx.dex.QueryPairFundingRatesResp\"\x1a\x82\xd3\xe4\x93\x02\x14\x12\x12/dex/funding_rates\x12h\n\x10QueryFundingTime\x12\x1b.fx.dex.QueryFundingTimeReq\x1a\x1c.fx.dex.QueryFundingTimeResp\"\x19\x82\xd3\xe4\x93\x02\x13\x12\x11/dex/funding_time\x12`\n\x0eQueryDealPrice\x12\x19.fx.dex.QueryDealPriceReq\x1a\x1a.fx.dex.QueryDealPriceResp\"\x17\x82\xd3\xe4\x93\x02\x11\x12\x0f/dex/deal_price\x12`\n\x0eQueryPairPrice\x12\x19.fx.dex.QueryPairPriceReq\x1a\x1a.fx.dex.QueryPairPriceResp\"\x17\x82\xd3\xe4\x93\x02\x11\x12\x0f/dex/pair_price\x12h\n\x10QueryMatchResult\x12\x1b.fx.dex.QueryMatchResultReq\x1a\x1c.fx.dex.QueryMatchResultResp\"\x19\x82\xd3\xe4\x93\x02\x13\x12\x11/dex/match_result\x12`\n\x0eQueryMarkPrice\x12\x19.fx.dex.QueryMarkPriceReq\x1a\x1a.fx.dex.QueryMarkPriceResp\"\x17\x82\xd3\xe4\x93\x02\x11\x12\x0f/dex/mark_price\x12\x82\x01\n\x17QueryMarkAndOraclePrice\x12\".fx.dex.QueryMarkAndOraclePriceReq\x1a#.fx.dex.QueryMarkAndOraclePriceResp\"\x1e\x82\xd3\xe4\x93\x02\x18\x12\x16/dex/mark_oracle_price\x12|\n\x15QueryLiquidationPrice\x12 .fx.dex.QueryLiquidationPriceReq\x1a!.fx.dex.QueryLiquidationPriceResp\"\x1e\x82\xd3\xe4\x93\x02\x18\x12\x16/dex/liquidation_price\x12Z\n\x12QueryMovingAverage\x12\x12.fx.dex.QueryMAReq\x1a\x13.fx.dex.QueryMAResp\"\x1b\x82\xd3\xe4\x93\x02\x15\x12\x13/dex/moving_average\x12t\n\x13QueryStoreStatistic\x12\x1e.fx.dex.QueryStoreStatisticReq\x1a\x1f.fx.dex.QueryStoreStatisticResp\"\x1c\x82\xd3\xe4\x93\x02\x16\x12\x14/dex/store_statistic\x12`\n\x0eQueryIsFunding\x12\x19.fx.dex.QueryIsFundingReq\x1a\x1a.fx.dex.QueryIsFundingResp\"\x17\x82\xd3\xe4\x93\x02\x11\x12\x0f/dex/is_fundingB3Z1git.wokoworks.com/blockchain/fx-chain/x/dex/typesb\x06proto3'
+  serialized_pb=b'\n\x12\x66x/dex/query.proto\x12\x06\x66x.dex\x1a\x1cgoogle/api/annotations.proto\x1a\x12\x66x/dex/order.proto\x1a\x12\x66x/dex/match.proto\x1a\x15\x66x/dex/position.proto\x1a\x13\x66x/dex/params.proto\x1a\x14\x66x/dex/funding.proto\x1a\x14gogoproto/gogo.proto\"&\n\x13QueryFundingRateReq\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\"R\n\x14QueryFundingRateResp\x12:\n\x12pair_funding_rates\x18\x01 \x01(\x0b\x32\x18.fx.dex.PairFundingRatesB\x04\xc8\xde\x1f\x00\"\x13\n\x11QueryIsFundingReq\"(\n\x12QueryIsFundingResp\x12\x12\n\nis_funding\x18\x01 \x01(\x08\"\x18\n\x16QueryStoreStatisticReq\"\xbc\x02\n\x17QueryStoreStatisticResp\x12\x17\n\x0fstore_order_num\x18\x01 \x01(\x03\x12K\n\x0f\x64\x65pth_book_nums\x18\x02 \x03(\x0b\x32,.fx.dex.QueryStoreStatisticResp.DepthBookNumB\x04\xc8\xde\x1f\x00\x12R\n\x13\x62ook_order_ids_nums\x18\x03 \x03(\x0b\x32/.fx.dex.QueryStoreStatisticResp.BookOrderIDsNumB\x04\xc8\xde\x1f\x00\x1a.\n\x0c\x44\x65pthBookNum\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x03\x1a\x37\n\x0f\x42ookOrderIDsNum\x12\x15\n\rorder_ids_key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x03\"\x1d\n\nQueryMAReq\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\"\x94\x01\n\x0bQueryMAResp\x12\x45\n\raverage_price\x18\x01 \x03(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12>\n\x06price2\x18\x02 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"\x10\n\x0eQueryParamsReq\"7\n\x0fQueryParamsResp\x12$\n\x06params\x18\x01 \x01(\x0b\x32\x0e.fx.dex.ParamsB\x04\xc8\xde\x1f\x00\"\xe6\x01\n\x12QueryOrdersRequest\x12@\n\x05owner\x18\x01 \x01(\x0c\x42\x31\xfa\xde\x1f-github.com/cosmos/cosmos-sdk/types.AccAddress\x12\x0f\n\x07pair_id\x18\x02 \x01(\t\x12=\n\x04page\x18\x03 \x01(\tB/\xda\xde\x1f\'github.com/cosmos/cosmos-sdk/types.Uint\xc8\xde\x1f\x00\x12>\n\x05limit\x18\x04 \x01(\tB/\xda\xde\x1f\'github.com/cosmos/cosmos-sdk/types.Uint\xc8\xde\x1f\x00\":\n\x13QueryOrdersResponse\x12#\n\x06orders\x18\x01 \x03(\x0b\x32\r.fx.dex.OrderB\x04\xc8\xde\x1f\x00\"%\n\x11QueryOrderRequest\x12\x10\n\x08order_id\x18\x01 \x01(\t\"8\n\x12QueryOrderResponse\x12\"\n\x05order\x18\x01 \x01(\x0b\x32\r.fx.dex.OrderB\x04\xc8\xde\x1f\x00\"$\n\x11QueryOrderbookReq\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\".\n\x0b\x42ookResItem\x12\r\n\x05price\x18\x01 \x01(\t\x12\x10\n\x08quantity\x18\x02 \x01(\t\"f\n\x12QueryOrderbookResp\x12\'\n\x04\x41sks\x18\x01 \x03(\x0b\x32\x13.fx.dex.BookResItemB\x04\xc8\xde\x1f\x00\x12\'\n\x04\x42ids\x18\x02 \x03(\x0b\x32\x13.fx.dex.BookResItemB\x04\xc8\xde\x1f\x00\"\x8e\x02\n\x11QueryPositionsReq\x12@\n\x05owner\x18\x01 \x01(\x0c\x42\x31\xfa\xde\x1f-github.com/cosmos/cosmos-sdk/types.AccAddress\x12\'\n\tdirection\x18\x02 \x01(\x0e\x32\x14.fx.dex.PosDirection\x12\x0f\n\x07pair_id\x18\x03 \x01(\t\x12=\n\x04page\x18\x04 \x01(\tB/\xda\xde\x1f\'github.com/cosmos/cosmos-sdk/types.Uint\xc8\xde\x1f\x00\x12>\n\x05limit\x18\x05 \x01(\tB/\xda\xde\x1f\'github.com/cosmos/cosmos-sdk/types.Uint\xc8\xde\x1f\x00\"?\n\x12QueryPositionsResp\x12)\n\tpositions\x18\x01 \x03(\x0b\x32\x10.fx.dex.PositionB\x04\xc8\xde\x1f\x00\"e\n\x10QueryPositionReq\x12@\n\x05owner\x18\x01 \x01(\x0c\x42\x31\xfa\xde\x1f-github.com/cosmos/cosmos-sdk/types.AccAddress\x12\x0f\n\x07pair_id\x18\x02 \x01(\t\">\n\x11QueryPositionResp\x12)\n\tpositions\x18\x01 \x03(\x0b\x32\x10.fx.dex.PositionB\x04\xc8\xde\x1f\x00\"\x11\n\x0fQueryFundingReq\":\n\x10QueryFundingResp\x12&\n\x07\x66unding\x18\x01 \x01(\x0b\x32\x0f.fx.dex.FundingB\x04\xc8\xde\x1f\x00\"U\n\x18QueryPairFundingRatesReq\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12\x15\n\rfunding_times\x18\x02 \x01(\x03\x12\x11\n\tquery_all\x18\x03 \x01(\x08\"W\n\x19QueryPairFundingRatesResp\x12:\n\x12pair_funding_rates\x18\x01 \x03(\x0b\x32\x18.fx.dex.PairFundingRatesB\x04\xc8\xde\x1f\x00\"\x15\n\x13QueryFundingTimeReq\"G\n\x14QueryFundingTimeResp\x12/\n\x0c\x66unding_time\x18\x01 \x01(\x0b\x32\x13.fx.dex.FundingTimeB\x04\xc8\xde\x1f\x00\"[\n\tPairPrice\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12=\n\x05price\x18\x02 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\":\n\x11QueryDealPriceReq\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12\x14\n\x0c\x62lock_number\x18\x02 \x01(\x03\"A\n\x12QueryDealPriceResp\x12+\n\ndeal_price\x18\x01 \x01(\x0b\x32\x11.fx.dex.DealPriceB\x04\xc8\xde\x1f\x00\"7\n\x11QueryPairPriceReq\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12\x11\n\tquery_all\x18\x02 \x01(\x08\"A\n\x12QueryPairPriceResp\x12+\n\npair_price\x18\x01 \x03(\x0b\x32\x11.fx.dex.PairPriceB\x04\xc8\xde\x1f\x00\"<\n\x13QueryMatchResultReq\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12\x14\n\x0c\x62lock_number\x18\x02 \x01(\x03\"G\n\x14QueryMatchResultResp\x12/\n\x0cmatch_result\x18\x01 \x01(\x0b\x32\x13.fx.dex.MatchResultB\x04\xc8\xde\x1f\x00\"7\n\x11QueryMarkPriceReq\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12\x11\n\tquery_all\x18\x02 \x01(\x08\"F\n\x12QueryMarkPriceResp\x12\x30\n\x0fpair_mark_price\x18\x01 \x03(\x0b\x32\x11.fx.dex.PairPriceB\x04\xc8\xde\x1f\x00\"\xaf\x01\n\x12MarkAndOraclePrice\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12\x42\n\nmark_price\x18\x02 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x44\n\x0coracle_price\x18\x03 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"@\n\x1aQueryMarkAndOraclePriceReq\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12\x11\n\tquery_all\x18\x02 \x01(\x08\"O\n\x1bQueryMarkAndOraclePriceResp\x12\x30\n\x06prices\x18\x01 \x03(\x0b\x32\x1a.fx.dex.MarkAndOraclePriceB\x04\xc8\xde\x1f\x00\"\xb5\x02\n\x18QueryLiquidationPriceReq\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12\x10\n\x08leverage\x18\x02 \x01(\x04\x12\'\n\tdirection\x18\x03 \x01(\x0e\x32\x14.fx.dex.PosDirection\x12\x43\n\x0b\x65ntry_price\x18\x04 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12@\n\x08quantity\x18\x05 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x46\n\x0ewallet_balance\x18\x06 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"f\n\x19QueryLiquidationPriceResp\x12I\n\x11liquidation_price\x18\x01 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x32\x9b\x0f\n\x05Query\x12S\n\x0bQueryParams\x12\x16.fx.dex.QueryParamsReq\x1a\x17.fx.dex.QueryParamsResp\"\x13\x82\xd3\xe4\x93\x02\r\x12\x0b/dex/params\x12[\n\x0bQueryOrders\x12\x1a.fx.dex.QueryOrdersRequest\x1a\x1b.fx.dex.QueryOrdersResponse\"\x13\x82\xd3\xe4\x93\x02\r\x12\x0b/dex/orders\x12W\n\nQueryOrder\x12\x19.fx.dex.QueryOrderRequest\x1a\x1a.fx.dex.QueryOrderResponse\"\x12\x82\xd3\xe4\x93\x02\x0c\x12\n/dex/order\x12[\n\x0eQueryOrderbook\x12\x19.fx.dex.QueryOrderbookReq\x1a\x1a.fx.dex.QueryOrderbookResp\"\x12\x82\xd3\xe4\x93\x02\x0c\x12\n/dex/order\x12_\n\x0eQueryPositions\x12\x19.fx.dex.QueryPositionsReq\x1a\x1a.fx.dex.QueryPositionsResp\"\x16\x82\xd3\xe4\x93\x02\x10\x12\x0e/dex/positions\x12[\n\rQueryPosition\x12\x18.fx.dex.QueryPositionReq\x1a\x19.fx.dex.QueryPositionResp\"\x15\x82\xd3\xe4\x93\x02\x0f\x12\r/dex/position\x12W\n\x0cQueryFunding\x12\x17.fx.dex.QueryFundingReq\x1a\x18.fx.dex.QueryFundingResp\"\x14\x82\xd3\xe4\x93\x02\x0e\x12\x0c/dex/funding\x12x\n\x15QueryPairFundingRates\x12 .fx.dex.QueryPairFundingRatesReq\x1a!.fx.dex.QueryPairFundingRatesResp\"\x1a\x82\xd3\xe4\x93\x02\x14\x12\x12/dex/funding_rates\x12h\n\x10QueryFundingTime\x12\x1b.fx.dex.QueryFundingTimeReq\x1a\x1c.fx.dex.QueryFundingTimeResp\"\x19\x82\xd3\xe4\x93\x02\x13\x12\x11/dex/funding_time\x12`\n\x0eQueryDealPrice\x12\x19.fx.dex.QueryDealPriceReq\x1a\x1a.fx.dex.QueryDealPriceResp\"\x17\x82\xd3\xe4\x93\x02\x11\x12\x0f/dex/deal_price\x12`\n\x0eQueryPairPrice\x12\x19.fx.dex.QueryPairPriceReq\x1a\x1a.fx.dex.QueryPairPriceResp\"\x17\x82\xd3\xe4\x93\x02\x11\x12\x0f/dex/pair_price\x12h\n\x10QueryMatchResult\x12\x1b.fx.dex.QueryMatchResultReq\x1a\x1c.fx.dex.QueryMatchResultResp\"\x19\x82\xd3\xe4\x93\x02\x13\x12\x11/dex/match_result\x12`\n\x0eQueryMarkPrice\x12\x19.fx.dex.QueryMarkPriceReq\x1a\x1a.fx.dex.QueryMarkPriceResp\"\x17\x82\xd3\xe4\x93\x02\x11\x12\x0f/dex/mark_price\x12\x82\x01\n\x17QueryMarkAndOraclePrice\x12\".fx.dex.QueryMarkAndOraclePriceReq\x1a#.fx.dex.QueryMarkAndOraclePriceResp\"\x1e\x82\xd3\xe4\x93\x02\x18\x12\x16/dex/mark_oracle_price\x12|\n\x15QueryLiquidationPrice\x12 .fx.dex.QueryLiquidationPriceReq\x1a!.fx.dex.QueryLiquidationPriceResp\"\x1e\x82\xd3\xe4\x93\x02\x18\x12\x16/dex/liquidation_price\x12Z\n\x12QueryMovingAverage\x12\x12.fx.dex.QueryMAReq\x1a\x13.fx.dex.QueryMAResp\"\x1b\x82\xd3\xe4\x93\x02\x15\x12\x13/dex/moving_average\x12t\n\x13QueryStoreStatistic\x12\x1e.fx.dex.QueryStoreStatisticReq\x1a\x1f.fx.dex.QueryStoreStatisticResp\"\x1c\x82\xd3\xe4\x93\x02\x16\x12\x14/dex/store_statistic\x12`\n\x0eQueryIsFunding\x12\x19.fx.dex.QueryIsFundingReq\x1a\x1a.fx.dex.QueryIsFundingResp\"\x17\x82\xd3\xe4\x93\x02\x11\x12\x0f/dex/is_funding\x12h\n\x10QueryFundingRate\x12\x1b.fx.dex.QueryFundingRateReq\x1a\x1c.fx.dex.QueryFundingRateResp\"\x19\x82\xd3\xe4\x93\x02\x13\x12\x11/dex/funding_rateB3Z1git.wokoworks.com/blockchain/fx-chain/x/dex/typesb\x06proto3'
   ,
-  dependencies=[google_dot_api_dot_annotations__pb2.DESCRIPTOR,fx_dot_dex_dot_order__pb2.DESCRIPTOR,fx_dot_dex_dot_match__pb2.DESCRIPTOR,fx_dot_dex_dot_position__pb2.DESCRIPTOR,fx_dot_dex_dot_params__pb2.DESCRIPTOR,fx_dot_dex_dot_funding__pb2.DESCRIPTOR,fx_dot_dex_dot_margin__pb2.DESCRIPTOR,gogoproto_dot_gogo__pb2.DESCRIPTOR,])
+  dependencies=[google_dot_api_dot_annotations__pb2.DESCRIPTOR,fx_dot_dex_dot_order__pb2.DESCRIPTOR,fx_dot_dex_dot_match__pb2.DESCRIPTOR,fx_dot_dex_dot_position__pb2.DESCRIPTOR,fx_dot_dex_dot_params__pb2.DESCRIPTOR,fx_dot_dex_dot_funding__pb2.DESCRIPTOR,gogoproto_dot_gogo__pb2.DESCRIPTOR,])
 
 
+
+
+_QUERYFUNDINGRATEREQ = _descriptor.Descriptor(
+  name='QueryFundingRateReq',
+  full_name='fx.dex.QueryFundingRateReq',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='pair_id', full_name='fx.dex.QueryFundingRateReq.pair_id', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=188,
+  serialized_end=226,
+)
+
+
+_QUERYFUNDINGRATERESP = _descriptor.Descriptor(
+  name='QueryFundingRateResp',
+  full_name='fx.dex.QueryFundingRateResp',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='pair_funding_rates', full_name='fx.dex.QueryFundingRateResp.pair_funding_rates', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=b'\310\336\037\000', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=228,
+  serialized_end=310,
+)
 
 
 _QUERYISFUNDINGREQ = _descriptor.Descriptor(
@@ -54,8 +117,8 @@ _QUERYISFUNDINGREQ = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=209,
-  serialized_end=228,
+  serialized_start=312,
+  serialized_end=331,
 )
 
 
@@ -86,8 +149,8 @@ _QUERYISFUNDINGRESP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=230,
-  serialized_end=270,
+  serialized_start=333,
+  serialized_end=373,
 )
 
 
@@ -111,8 +174,8 @@ _QUERYSTORESTATISTICREQ = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=272,
-  serialized_end=296,
+  serialized_start=375,
+  serialized_end=399,
 )
 
 
@@ -150,8 +213,8 @@ _QUERYSTORESTATISTICRESP_DEPTHBOOKNUM = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=512,
-  serialized_end=558,
+  serialized_start=615,
+  serialized_end=661,
 )
 
 _QUERYSTORESTATISTICRESP_BOOKORDERIDSNUM = _descriptor.Descriptor(
@@ -188,8 +251,8 @@ _QUERYSTORESTATISTICRESP_BOOKORDERIDSNUM = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=560,
-  serialized_end=615,
+  serialized_start=663,
+  serialized_end=718,
 )
 
 _QUERYSTORESTATISTICRESP = _descriptor.Descriptor(
@@ -233,8 +296,8 @@ _QUERYSTORESTATISTICRESP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=299,
-  serialized_end=615,
+  serialized_start=402,
+  serialized_end=718,
 )
 
 
@@ -265,8 +328,8 @@ _QUERYMAREQ = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=617,
-  serialized_end=646,
+  serialized_start=720,
+  serialized_end=749,
 )
 
 
@@ -304,8 +367,8 @@ _QUERYMARESP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=649,
-  serialized_end=797,
+  serialized_start=752,
+  serialized_end=900,
 )
 
 
@@ -329,8 +392,8 @@ _QUERYPARAMSREQ = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=799,
-  serialized_end=815,
+  serialized_start=902,
+  serialized_end=918,
 )
 
 
@@ -361,8 +424,8 @@ _QUERYPARAMSRESP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=817,
-  serialized_end=872,
+  serialized_start=920,
+  serialized_end=975,
 )
 
 
@@ -414,8 +477,8 @@ _QUERYORDERSREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=875,
-  serialized_end=1105,
+  serialized_start=978,
+  serialized_end=1208,
 )
 
 
@@ -446,8 +509,8 @@ _QUERYORDERSRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1107,
-  serialized_end=1165,
+  serialized_start=1210,
+  serialized_end=1268,
 )
 
 
@@ -478,8 +541,8 @@ _QUERYORDERREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1167,
-  serialized_end=1204,
+  serialized_start=1270,
+  serialized_end=1307,
 )
 
 
@@ -510,8 +573,8 @@ _QUERYORDERRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1206,
-  serialized_end=1262,
+  serialized_start=1309,
+  serialized_end=1365,
 )
 
 
@@ -542,8 +605,8 @@ _QUERYORDERBOOKREQ = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1264,
-  serialized_end=1300,
+  serialized_start=1367,
+  serialized_end=1403,
 )
 
 
@@ -581,8 +644,8 @@ _BOOKRESITEM = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1302,
-  serialized_end=1348,
+  serialized_start=1405,
+  serialized_end=1451,
 )
 
 
@@ -620,8 +683,8 @@ _QUERYORDERBOOKRESP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1350,
-  serialized_end=1452,
+  serialized_start=1453,
+  serialized_end=1555,
 )
 
 
@@ -680,8 +743,8 @@ _QUERYPOSITIONSREQ = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1455,
-  serialized_end=1725,
+  serialized_start=1558,
+  serialized_end=1828,
 )
 
 
@@ -712,8 +775,8 @@ _QUERYPOSITIONSRESP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1727,
-  serialized_end=1790,
+  serialized_start=1830,
+  serialized_end=1893,
 )
 
 
@@ -751,8 +814,8 @@ _QUERYPOSITIONREQ = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1792,
-  serialized_end=1893,
+  serialized_start=1895,
+  serialized_end=1996,
 )
 
 
@@ -783,8 +846,8 @@ _QUERYPOSITIONRESP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1895,
-  serialized_end=1957,
+  serialized_start=1998,
+  serialized_end=2060,
 )
 
 
@@ -808,8 +871,8 @@ _QUERYFUNDINGREQ = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1959,
-  serialized_end=1976,
+  serialized_start=2062,
+  serialized_end=2079,
 )
 
 
@@ -840,8 +903,8 @@ _QUERYFUNDINGRESP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1978,
-  serialized_end=2036,
+  serialized_start=2081,
+  serialized_end=2139,
 )
 
 
@@ -886,8 +949,8 @@ _QUERYPAIRFUNDINGRATESREQ = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2038,
-  serialized_end=2123,
+  serialized_start=2141,
+  serialized_end=2226,
 )
 
 
@@ -918,8 +981,8 @@ _QUERYPAIRFUNDINGRATESRESP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2125,
-  serialized_end=2212,
+  serialized_start=2228,
+  serialized_end=2315,
 )
 
 
@@ -943,8 +1006,8 @@ _QUERYFUNDINGTIMEREQ = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2214,
-  serialized_end=2235,
+  serialized_start=2317,
+  serialized_end=2338,
 )
 
 
@@ -975,8 +1038,8 @@ _QUERYFUNDINGTIMERESP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2237,
-  serialized_end=2308,
+  serialized_start=2340,
+  serialized_end=2411,
 )
 
 
@@ -1014,8 +1077,8 @@ _PAIRPRICE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2310,
-  serialized_end=2401,
+  serialized_start=2413,
+  serialized_end=2504,
 )
 
 
@@ -1053,8 +1116,8 @@ _QUERYDEALPRICEREQ = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2403,
-  serialized_end=2461,
+  serialized_start=2506,
+  serialized_end=2564,
 )
 
 
@@ -1085,8 +1148,8 @@ _QUERYDEALPRICERESP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2463,
-  serialized_end=2528,
+  serialized_start=2566,
+  serialized_end=2631,
 )
 
 
@@ -1124,8 +1187,8 @@ _QUERYPAIRPRICEREQ = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2530,
-  serialized_end=2585,
+  serialized_start=2633,
+  serialized_end=2688,
 )
 
 
@@ -1156,8 +1219,8 @@ _QUERYPAIRPRICERESP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2587,
-  serialized_end=2652,
+  serialized_start=2690,
+  serialized_end=2755,
 )
 
 
@@ -1195,8 +1258,8 @@ _QUERYMATCHRESULTREQ = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2654,
-  serialized_end=2714,
+  serialized_start=2757,
+  serialized_end=2817,
 )
 
 
@@ -1227,8 +1290,8 @@ _QUERYMATCHRESULTRESP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2716,
-  serialized_end=2787,
+  serialized_start=2819,
+  serialized_end=2890,
 )
 
 
@@ -1266,8 +1329,8 @@ _QUERYMARKPRICEREQ = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2789,
-  serialized_end=2844,
+  serialized_start=2892,
+  serialized_end=2947,
 )
 
 
@@ -1298,8 +1361,8 @@ _QUERYMARKPRICERESP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2846,
-  serialized_end=2916,
+  serialized_start=2949,
+  serialized_end=3019,
 )
 
 
@@ -1344,8 +1407,8 @@ _MARKANDORACLEPRICE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2919,
-  serialized_end=3094,
+  serialized_start=3022,
+  serialized_end=3197,
 )
 
 
@@ -1383,8 +1446,8 @@ _QUERYMARKANDORACLEPRICEREQ = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=3096,
-  serialized_end=3160,
+  serialized_start=3199,
+  serialized_end=3263,
 )
 
 
@@ -1415,8 +1478,8 @@ _QUERYMARKANDORACLEPRICERESP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=3162,
-  serialized_end=3241,
+  serialized_start=3265,
+  serialized_end=3344,
 )
 
 
@@ -1482,8 +1545,8 @@ _QUERYLIQUIDATIONPRICEREQ = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=3244,
-  serialized_end=3553,
+  serialized_start=3347,
+  serialized_end=3656,
 )
 
 
@@ -1514,10 +1577,11 @@ _QUERYLIQUIDATIONPRICERESP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=3555,
-  serialized_end=3657,
+  serialized_start=3658,
+  serialized_end=3760,
 )
 
+_QUERYFUNDINGRATERESP.fields_by_name['pair_funding_rates'].message_type = fx_dot_dex_dot_funding__pb2._PAIRFUNDINGRATES
 _QUERYSTORESTATISTICRESP_DEPTHBOOKNUM.containing_type = _QUERYSTORESTATISTICRESP
 _QUERYSTORESTATISTICRESP_BOOKORDERIDSNUM.containing_type = _QUERYSTORESTATISTICRESP
 _QUERYSTORESTATISTICRESP.fields_by_name['depth_book_nums'].message_type = _QUERYSTORESTATISTICRESP_DEPTHBOOKNUM
@@ -1539,6 +1603,8 @@ _QUERYMATCHRESULTRESP.fields_by_name['match_result'].message_type = fx_dot_dex_d
 _QUERYMARKPRICERESP.fields_by_name['pair_mark_price'].message_type = _PAIRPRICE
 _QUERYMARKANDORACLEPRICERESP.fields_by_name['prices'].message_type = _MARKANDORACLEPRICE
 _QUERYLIQUIDATIONPRICEREQ.fields_by_name['direction'].enum_type = fx_dot_dex_dot_position__pb2._POSDIRECTION
+DESCRIPTOR.message_types_by_name['QueryFundingRateReq'] = _QUERYFUNDINGRATEREQ
+DESCRIPTOR.message_types_by_name['QueryFundingRateResp'] = _QUERYFUNDINGRATERESP
 DESCRIPTOR.message_types_by_name['QueryIsFundingReq'] = _QUERYISFUNDINGREQ
 DESCRIPTOR.message_types_by_name['QueryIsFundingResp'] = _QUERYISFUNDINGRESP
 DESCRIPTOR.message_types_by_name['QueryStoreStatisticReq'] = _QUERYSTORESTATISTICREQ
@@ -1579,6 +1645,20 @@ DESCRIPTOR.message_types_by_name['QueryMarkAndOraclePriceResp'] = _QUERYMARKANDO
 DESCRIPTOR.message_types_by_name['QueryLiquidationPriceReq'] = _QUERYLIQUIDATIONPRICEREQ
 DESCRIPTOR.message_types_by_name['QueryLiquidationPriceResp'] = _QUERYLIQUIDATIONPRICERESP
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
+
+QueryFundingRateReq = _reflection.GeneratedProtocolMessageType('QueryFundingRateReq', (_message.Message,), {
+  'DESCRIPTOR' : _QUERYFUNDINGRATEREQ,
+  '__module__' : 'fx.dex.query_pb2'
+  # @@protoc_insertion_point(class_scope:fx.dex.QueryFundingRateReq)
+  })
+_sym_db.RegisterMessage(QueryFundingRateReq)
+
+QueryFundingRateResp = _reflection.GeneratedProtocolMessageType('QueryFundingRateResp', (_message.Message,), {
+  'DESCRIPTOR' : _QUERYFUNDINGRATERESP,
+  '__module__' : 'fx.dex.query_pb2'
+  # @@protoc_insertion_point(class_scope:fx.dex.QueryFundingRateResp)
+  })
+_sym_db.RegisterMessage(QueryFundingRateResp)
 
 QueryIsFundingReq = _reflection.GeneratedProtocolMessageType('QueryIsFundingReq', (_message.Message,), {
   'DESCRIPTOR' : _QUERYISFUNDINGREQ,
@@ -1871,6 +1951,7 @@ _sym_db.RegisterMessage(QueryLiquidationPriceResp)
 
 
 DESCRIPTOR._options = None
+_QUERYFUNDINGRATERESP.fields_by_name['pair_funding_rates']._options = None
 _QUERYSTORESTATISTICRESP.fields_by_name['depth_book_nums']._options = None
 _QUERYSTORESTATISTICRESP.fields_by_name['book_order_ids_nums']._options = None
 _QUERYMARESP.fields_by_name['average_price']._options = None
@@ -1912,8 +1993,8 @@ _QUERY = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=3660,
-  serialized_end=5501,
+  serialized_start=3763,
+  serialized_end=5710,
   methods=[
   _descriptor.MethodDescriptor(
     name='QueryParams',
@@ -1946,8 +2027,8 @@ _QUERY = _descriptor.ServiceDescriptor(
     create_key=_descriptor._internal_create_key,
   ),
   _descriptor.MethodDescriptor(
-    name='QeuryOrderbook',
-    full_name='fx.dex.Query.QeuryOrderbook',
+    name='QueryOrderbook',
+    full_name='fx.dex.Query.QueryOrderbook',
     index=3,
     containing_service=None,
     input_type=_QUERYORDERBOOKREQ,
@@ -2093,6 +2174,16 @@ _QUERY = _descriptor.ServiceDescriptor(
     input_type=_QUERYISFUNDINGREQ,
     output_type=_QUERYISFUNDINGRESP,
     serialized_options=b'\202\323\344\223\002\021\022\017/dex/is_funding',
+    create_key=_descriptor._internal_create_key,
+  ),
+  _descriptor.MethodDescriptor(
+    name='QueryFundingRate',
+    full_name='fx.dex.Query.QueryFundingRate',
+    index=18,
+    containing_service=None,
+    input_type=_QUERYFUNDINGRATEREQ,
+    output_type=_QUERYFUNDINGRATERESP,
+    serialized_options=b'\202\323\344\223\002\023\022\021/dex/funding_rate',
     create_key=_descriptor._internal_create_key,
   ),
 ])

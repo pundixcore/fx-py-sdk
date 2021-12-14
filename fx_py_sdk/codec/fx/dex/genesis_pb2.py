@@ -11,7 +11,6 @@ from google.protobuf import symbol_database as _symbol_database
 _sym_db = _symbol_database.Default()
 
 
-from fx_py_sdk.codec.fx.dex import order_pb2 as fx_dot_dex_dot_order__pb2
 from fx_py_sdk.codec.fx.dex import position_pb2 as fx_dot_dex_dot_position__pb2
 from fx_py_sdk.codec.fx.dex import funding_pb2 as fx_dot_dex_dot_funding__pb2
 from fx_py_sdk.codec.fx.dex import margin_pb2 as fx_dot_dex_dot_margin__pb2
@@ -26,9 +25,9 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=b'Z1git.wokoworks.com/blockchain/fx-chain/x/dex/types',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x14\x66x/dex/genesis.proto\x12\x06\x66x.dex\x1a\x12\x66x/dex/order.proto\x1a\x15\x66x/dex/position.proto\x1a\x14\x66x/dex/funding.proto\x1a\x13\x66x/dex/margin.proto\x1a\x14gogoproto/gogo.proto\x1a\x13\x66x/dex/params.proto\x1a\x12\x66x/dex/match.proto\"\x89\x04\n\x0cGenesisState\x12$\n\x06params\x18\x01 \x01(\x0b\x32\x0e.fx.dex.ParamsB\x04\xc8\xde\x1f\x00\x12*\n\tpositions\x18\x02 \x01(\x0b\x32\x11.fx.dex.PositionsB\x04\xc8\xde\x1f\x00\x12-\n\x0bposition_id\x18\x03 \x01(\x0b\x32\x12.fx.dex.PositionIDB\x04\xc8\xde\x1f\x00\x12:\n\x12pair_funding_rates\x18\x04 \x03(\x0b\x32\x18.fx.dex.PairFundingRatesB\x04\xc8\xde\x1f\x00\x12<\n\x14premium_index_config\x18\x05 \x01(\x0b\x32\x18.fx.dex.PremiumIndexConfB\x04\xc8\xde\x1f\x00\x12\x34\n\x12margin_rate_tables\x18\x06 \x03(\x0b\x32\x12.fx.dex.MarginRateB\x04\xc8\xde\x1f\x00\x12=\n\x17init_margin_rate_tables\x18\x07 \x03(\x0b\x32\x16.fx.dex.InitMarginRateB\x04\xc8\xde\x1f\x00\x12+\n\x0c\x66unding_info\x18\x08 \x01(\x0b\x32\x0f.fx.dex.FundingB\x04\xc8\xde\x1f\x00\x12+\n\ndeal_price\x18\t \x03(\x0b\x32\x11.fx.dex.DealPriceB\x04\xc8\xde\x1f\x00\x12/\n\x0c\x66unding_time\x18\n \x01(\x0b\x32\x13.fx.dex.FundingTimeB\x04\xc8\xde\x1f\x00\x42\x33Z1git.wokoworks.com/blockchain/fx-chain/x/dex/typesb\x06proto3'
+  serialized_pb=b'\n\x14\x66x/dex/genesis.proto\x12\x06\x66x.dex\x1a\x15\x66x/dex/position.proto\x1a\x14\x66x/dex/funding.proto\x1a\x13\x66x/dex/margin.proto\x1a\x14gogoproto/gogo.proto\x1a\x13\x66x/dex/params.proto\x1a\x12\x66x/dex/match.proto\"\x89\x04\n\x0cGenesisState\x12$\n\x06params\x18\x01 \x01(\x0b\x32\x0e.fx.dex.ParamsB\x04\xc8\xde\x1f\x00\x12*\n\tpositions\x18\x02 \x01(\x0b\x32\x11.fx.dex.PositionsB\x04\xc8\xde\x1f\x00\x12-\n\x0bposition_id\x18\x03 \x01(\x0b\x32\x12.fx.dex.PositionIDB\x04\xc8\xde\x1f\x00\x12:\n\x12pair_funding_rates\x18\x04 \x03(\x0b\x32\x18.fx.dex.PairFundingRatesB\x04\xc8\xde\x1f\x00\x12<\n\x14premium_index_config\x18\x05 \x01(\x0b\x32\x18.fx.dex.PremiumIndexConfB\x04\xc8\xde\x1f\x00\x12\x34\n\x12margin_rate_tables\x18\x06 \x03(\x0b\x32\x12.fx.dex.MarginRateB\x04\xc8\xde\x1f\x00\x12=\n\x17init_margin_rate_tables\x18\x07 \x03(\x0b\x32\x16.fx.dex.InitMarginRateB\x04\xc8\xde\x1f\x00\x12+\n\x0c\x66unding_info\x18\x08 \x01(\x0b\x32\x0f.fx.dex.FundingB\x04\xc8\xde\x1f\x00\x12+\n\ndeal_price\x18\t \x03(\x0b\x32\x11.fx.dex.DealPriceB\x04\xc8\xde\x1f\x00\x12/\n\x0c\x66unding_time\x18\n \x01(\x0b\x32\x13.fx.dex.FundingTimeB\x04\xc8\xde\x1f\x00\x42\x33Z1git.wokoworks.com/blockchain/fx-chain/x/dex/typesb\x06proto3'
   ,
-  dependencies=[fx_dot_dex_dot_order__pb2.DESCRIPTOR,fx_dot_dex_dot_position__pb2.DESCRIPTOR,fx_dot_dex_dot_funding__pb2.DESCRIPTOR,fx_dot_dex_dot_margin__pb2.DESCRIPTOR,gogoproto_dot_gogo__pb2.DESCRIPTOR,fx_dot_dex_dot_params__pb2.DESCRIPTOR,fx_dot_dex_dot_match__pb2.DESCRIPTOR,])
+  dependencies=[fx_dot_dex_dot_position__pb2.DESCRIPTOR,fx_dot_dex_dot_funding__pb2.DESCRIPTOR,fx_dot_dex_dot_margin__pb2.DESCRIPTOR,gogoproto_dot_gogo__pb2.DESCRIPTOR,fx_dot_dex_dot_params__pb2.DESCRIPTOR,fx_dot_dex_dot_match__pb2.DESCRIPTOR,])
 
 
 
@@ -123,8 +122,8 @@ _GENESISSTATE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=182,
-  serialized_end=703,
+  serialized_start=162,
+  serialized_end=683,
 )
 
 _GENESISSTATE.fields_by_name['params'].message_type = fx_dot_dex_dot_params__pb2._PARAMS

@@ -2,7 +2,6 @@ syntax = "proto3";
 package fx.dex;
 
 // this line is used by starport scaffolding # genesis/proto/import
-import "fx/dex/order.proto";
 import "fx/dex/position.proto";
 import "fx/dex/funding.proto";
 import "fx/dex/margin.proto";

@@ -408,9 +408,32 @@ class GRPCClient:
                 {"Asks":[{"price":"1157.170000000000000000","quantity":"0.071999999999999562"},{"price":"1157.240000000000000000","quantity":"0.031000000000000000"}],"Bids":[{"price":"1118.396987012654667678","quantity":"6.699999999999999955"},{"price":"1079.623974025309335355","quantity":"19.995000000000000284"},{"price":"1077.610000000000000000","quantity":"0.404000000000000000"}]}
         """
         try:
-            response = DexQuery(self.channel).QeuryOrderbook(QueryOrderbookReq(pair_id=pair_id))
+            response = DexQuery(self.channel).QueryOrderbook(QueryOrderbookReq(pair_id=pair_id))
             res_str = MessageToJson(response)
             res = json.loads(res_str)
+            return res
+        except Exception as e:
+            print("query error: ", e)
+            return e
+
+    def query_funding_rate_log(self, pair_id):
+        """查询变动资金费率.
+            Args:
+                pair_id: 交易对
+            Returns:
+                Asks：卖单
+                    price：价格
+                    quantity：数量
+                Bids：买单
+                {'pairFundingRates': {'pairId': 'tsla:usdt', 'fundingRate': '0.133420164103952947', 'fundingTime': '1639474025'}}
+        """
+        try:
+            response = DexQuery(self.channel).QueryFundingRate(QueryOrderbookReq(pair_id=pair_id))
+            res_str = MessageToJson(response)
+            res = json.loads(res_str)
+            funding_rate = decimal.Decimal(res['pairFundingRates']['fundingRate'])
+            funding_rate = funding_rate / decimal.Decimal(DEFAULT_DEC)
+            res['pairFundingRates']['fundingRate'] = str(funding_rate)
             return res
         except Exception as e:
             print("query error: ", e)

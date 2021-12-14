@@ -57,7 +57,7 @@ class MyTestCase(unittest.TestCase):
         print(resp)
 
     def test_query_funding_rates(self):
-        resp = client.query_funding_rate("tsla:usdt", 1, query_all=True)
+        resp = client.query_funding_rate("tsla:usdt", 4, query_all=True)
         print(resp)
 
     def test_mark_price(self):
@@ -66,6 +66,10 @@ class MyTestCase(unittest.TestCase):
 
     def test_query_orderbook(self):
         resp = client.query_orderbook(pair_id="tsla:usdt")
+        print(resp)
+
+    def test_query_funding_rate_log(self):
+        resp = client.query_funding_rate_log(pair_id="tsla:usdt")
         print(resp)
 
     def test_create_order(self):
