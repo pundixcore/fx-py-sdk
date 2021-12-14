@@ -1,7 +1,7 @@
 import unittest
 from fx_py_sdk import wallet
 from fx_py_sdk.wallet import Address
-from fx_py_sdk.grpc_client import GRPCClient, DEFAULT_GRPC_NONE
+from fx_py_sdk.grpc_client import GRPCClient, DEFAULT_GRPC_NONE, DEFAULT_DEC
 from fx_py_sdk.builder import TxBuilder
 from fx_py_sdk.codec.cosmos.base.v1beta1.coin_pb2 import Coin
 from fx_py_sdk.codec.fx.dex.order_pb2 import *
@@ -38,15 +38,14 @@ class MyTestCase(unittest.TestCase):
         print(account)
 
     def test_query_positions(self):
-        positions = client.query_positions(owner='dex1zgpzdf2uqla7hkx85wnn4p2r3duwqzd8cfus97', pair_id="tsla:usdt")
+        positions = client.query_positions(owner='dex179q82e7fcck4ftfvf4vfpwkg86jmxf7upext3v', pair_id="tsla:usdt")
         print("positions: ", positions)
         # owner = Address(resp.positions[0].owner)
         # print(owner.to_string())
 
     def test_query_order(self):
-        resp = client.query_order(order_id='ID-706-1')
+        resp = client.query_order(order_id='ID-82476-1')
         print(resp)
-
 
     def test_query_orders(self):
         resp = client.query_orders(owner="dex1ggz598a4506llaglzsmhp3r23hfke6nw29wans", pair_id="tsla:usdc",
@@ -86,8 +85,8 @@ class MyTestCase(unittest.TestCase):
 
         tx_builder = TxBuilder(priv_key, chain_id, account.account_number, Coin(amount='60000000', denom='FX'))
 
-        tx_response = cli.create_order(tx_builder, 'tsla:usdt', "SELL", 1, 1.1, 10, account.sequence, mode=BROADCAST_MODE_BLOCK)
-        print(tx_response)
+        tx_response = cli.create_order(tx_builder, 'tsla:usdt', "SELL", decimal.Decimal(1.1), decimal.Decimal(1.2), 10, account.sequence, mode=BROADCAST_MODE_BLOCK)
+        print(MessageToJson(tx_response))
 
     def test_cancel_order(self):
         cli = GRPCClient('44.196.199.119:9090')
@@ -106,7 +105,7 @@ class MyTestCase(unittest.TestCase):
 
         tx_builder = TxBuilder(priv_key, chain_id, account.account_number, Coin(amount='60000000', denom='FX'))
 
-        create_tx_response = cli.create_order(tx_builder, 'tsla:dai', BUY, 1, 1.1, 10, account.sequence, mode=BROADCAST_MODE_BLOCK)
+        create_tx_response = cli.create_order(tx_builder, 'tsla:dai', BUY, decimal.Decimal(1.1), decimal.Decimal(1.2), 10, account.sequence, mode=BROADCAST_MODE_BLOCK)
         res_str = MessageToJson(create_tx_response)
         res = json.loads(res_str)
         order_id = ''
@@ -144,6 +143,13 @@ class MyTestCase(unittest.TestCase):
         tx_builder = TxBuilder(priv_key, chain_id, account.account_number, Coin(amount='60000000', denom='FX'))
         tx_response = cli.close_position(tx_builder, pair_id, positions[0].Id, positions[0].MarkPrice, positions[0].BaseQuantity, account.sequence, mode=BROADCAST_MODE_BLOCK)
         print(tx_response)
+
+    def test_decimal(self):
+        base_quantity = decimal.Decimal(str(1.281999999999997730))
+        base_quantity = base_quantity * decimal.Decimal(DEFAULT_DEC)
+        base_quantity = str(base_quantity)
+        base_quantity_split = base_quantity.split('.', 1)
+        print(base_quantity_split)
 
 if __name__ == '__main__':
     unittest.main()

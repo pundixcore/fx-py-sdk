@@ -33,6 +33,8 @@ from fx_py_sdk.codec.fx.dex.order_pb2 import Direction
 from fx_py_sdk.wallet import Address
 from fx_py_sdk.constants import *
 import logging
+from google.protobuf.json_format import MessageToJson
+
 
 DEFAULT_DEX_GAS = 5000000
 DEFAULT_GRPC_NONE = "Not found"
@@ -136,7 +138,7 @@ class GRPCClient:
                 initial_margin	string	初始保证金
                 funding_times	int64	仓位变动时（开仓/加仓）所处的资金费率周期
                 example:
-                    [Position(Id='1', Owner='dex1ggz598a4506llaglzsmhp3r23hfke6nw29wans', PairId='tsla:usdt', Direction=1, EntryPrice=1000.4, MarkPrice=820.0, LiquidationPrice=1089.5445544554455, BaseQuantity=0.5, Margin=50.02, Leverage=10, UnrealizedPnl=90.2, MarginRate=0.029239766081871343, InitialMargin=50.02, PendingOrderQuantity=0.0)]
+                    [Position(Id='961', Owner='dex179q82e7fcck4ftfvf4vfpwkg86jmxf7upext3v', PairId='tsla:usdt', Direction=1, EntryPrice=Decimal('1140.282785843766290421'), MarkPrice=Decimal('1118.254987012654667678'), LiquidationPrice=Decimal('1241.892142998161337064'), BaseQuantity=Decimal('0.00999999999999993'), Margin=Decimal('1.140282785843758246'), Leverage=10, UnrealizedPnl=Decimal('0.220277988311114685'), MarginRate=Decimal('0.082190741365982938'), InitialMargin=Decimal('146.18425314517057959'), PendingOrderQuantity=Decimal('0'))]
             """
 
         positions = []
@@ -146,39 +148,30 @@ class GRPCClient:
             for pos in response.positions:
                 entry_price = decimal.Decimal(pos.entry_price)
                 entry_price = entry_price / decimal.Decimal(DEFAULT_DEC)
-                entry_price = float(str(entry_price))
 
                 mark_price = decimal.Decimal(pos.mark_price)
                 mark_price = mark_price / decimal.Decimal(DEFAULT_DEC)
-                mark_price = float(str(mark_price))
 
                 liquidation_price = decimal.Decimal(pos.liquidation_price)
                 liquidation_price = liquidation_price / decimal.Decimal(DEFAULT_DEC)
-                liquidation_price = float(str(liquidation_price))
 
                 base_quantity = decimal.Decimal(pos.base_quantity)
                 base_quantity = base_quantity / decimal.Decimal(DEFAULT_DEC)
-                base_quantity = float(str(base_quantity))
 
                 margin = decimal.Decimal(pos.margin)
                 margin = margin / decimal.Decimal(DEFAULT_DEC)
-                margin = float(str(margin))
 
                 unrealized_pnl = decimal.Decimal(pos.unrealized_pnl)
                 unrealized_pnl = unrealized_pnl / decimal.Decimal(DEFAULT_DEC)
-                unrealized_pnl = float(str(unrealized_pnl))
 
                 margin_rate = decimal.Decimal(pos.margin_rate)
                 margin_rate = margin_rate / decimal.Decimal(DEFAULT_DEC)
-                margin_rate = float(str(margin_rate))
 
                 initial_margin = decimal.Decimal(pos.initial_margin)
                 initial_margin = initial_margin / decimal.Decimal(DEFAULT_DEC)
-                initial_margin = float(str(initial_margin))
 
                 pending_order_quantity = decimal.Decimal(pos.pending_order_quantity)
                 pending_order_quantity = pending_order_quantity / decimal.Decimal(DEFAULT_DEC)
-                pending_order_quantity = float(str(pending_order_quantity))
 
                 position = Position(
                     pos.id,
@@ -235,37 +228,27 @@ class GRPCClient:
             order = response.order
             price = decimal.Decimal(order.price)
             price = price / decimal.Decimal(DEFAULT_DEC)
-            price = float(str(price))
 
             base_quantity = decimal.Decimal(order.base_quantity)
             base_quantity = base_quantity / decimal.Decimal(DEFAULT_DEC)
-            base_quantity = float(str(base_quantity))
 
             quote_quantity = decimal.Decimal(order.quote_quantity)
             quote_quantity = quote_quantity / decimal.Decimal(DEFAULT_DEC)
-            quote_quantity = float(str(quote_quantity))
 
             filled_quantity = decimal.Decimal(order.filled_quantity)
             filled_quantity = filled_quantity / decimal.Decimal(DEFAULT_DEC)
-            filled_quantity = float(str(filled_quantity))
 
             filled_avg_price = decimal.Decimal(order.filled_avg_price)
             filled_avg_price = filled_avg_price / decimal.Decimal(DEFAULT_DEC)
-            filled_avg_price = float(str(filled_avg_price))
 
             remain_locked = decimal.Decimal(order.remain_locked)
             remain_locked = remain_locked / decimal.Decimal(DEFAULT_DEC)
-            remain_locked = float(str(remain_locked))
 
             cost_fee = decimal.Decimal(order.cost_fee)
             cost_fee = cost_fee / decimal.Decimal(DEFAULT_DEC)
-            cost_fee = float(str(cost_fee))
 
             locked_fee = decimal.Decimal(order.locked_fee)
             locked_fee = locked_fee / decimal.Decimal(DEFAULT_DEC)
-            locked_fee = float(str(locked_fee))
-
-            print(order.created_at)
 
             new_order = Order(
                 order.tx_hash,
@@ -284,7 +267,8 @@ class GRPCClient:
                 order.order_type,
                 cost_fee,
                 locked_fee,
-                order.ttl, )
+                order.ttl,
+                MessageToJson(order.created_at),)
             return new_order
 
         except Exception as e:
@@ -313,38 +297,27 @@ class GRPCClient:
             for order in response.orders:
                 price = decimal.Decimal(order.price)
                 price = price / decimal.Decimal(DEFAULT_DEC)
-                price = float(str(price))
 
                 base_quantity = decimal.Decimal(order.base_quantity)
                 base_quantity = base_quantity / decimal.Decimal(DEFAULT_DEC)
-                base_quantity = float(str(base_quantity))
 
                 quote_quantity = decimal.Decimal(order.quote_quantity)
                 quote_quantity = quote_quantity / decimal.Decimal(DEFAULT_DEC)
-                quote_quantity = float(str(quote_quantity))
 
                 filled_quantity = decimal.Decimal(order.filled_quantity)
                 filled_quantity = filled_quantity / decimal.Decimal(DEFAULT_DEC)
-                filled_quantity = float(str(filled_quantity))
-
 
                 filled_avg_price = decimal.Decimal(order.filled_avg_price)
                 filled_avg_price = filled_avg_price / decimal.Decimal(DEFAULT_DEC)
-                filled_avg_price = float(str(filled_avg_price))
 
                 remain_locked = decimal.Decimal(order.remain_locked)
                 remain_locked = remain_locked / decimal.Decimal(DEFAULT_DEC)
-                remain_locked = float(str(remain_locked))
 
                 cost_fee = decimal.Decimal(order.cost_fee)
                 cost_fee = cost_fee / decimal.Decimal(DEFAULT_DEC)
-                cost_fee = float(str(cost_fee))
 
                 locked_fee = decimal.Decimal(order.locked_fee)
                 locked_fee = locked_fee / decimal.Decimal(DEFAULT_DEC)
-                locked_fee = float(str(locked_fee))
-
-                print(order.created_at)
 
                 new_order = Order(
                     order.tx_hash,
@@ -363,7 +336,9 @@ class GRPCClient:
                     order.order_type,
                     cost_fee,
                     locked_fee,
-                    order.ttl,)
+                    order.ttl,
+                    MessageToJson(order.created_at),)
+
                 orders.append(new_order)
 
         except Exception as e:
@@ -466,16 +441,14 @@ class GRPCClient:
         response = DexQuery(self.channel).QueryMarkPrice(QueryMarkPriceReq(pair_id=pair_id, query_all=query_all))
         return response
 
-    def create_order(self, tx_builder: TxBuilder, pair_id: str, direction: Direction, price: float, base_quantity: float, leverage: int,
+    def create_order(self, tx_builder: TxBuilder, pair_id: str, direction: Direction, price: Decimal, base_quantity: Decimal, leverage: int,
                      acc_seq: int, mode: BroadcastMode = BROADCAST_MODE_BLOCK):
         """创建订单"""
 
-        price = decimal.Decimal(str(price))
         price = price * decimal.Decimal(DEFAULT_DEC)
         price = str(price)
         price_split = price.split('.', 1)
 
-        base_quantity = decimal.Decimal(str(base_quantity))
         base_quantity = base_quantity * decimal.Decimal(DEFAULT_DEC)
         base_quantity = str(base_quantity)
         base_quantity_split = base_quantity.split('.', 1)
@@ -499,15 +472,12 @@ class GRPCClient:
         tx = self.build_tx(tx_builder, acc_seq, [msg_any], DEFAULT_DEX_GAS)
         return self.broadcast_tx(tx, mode)
 
-    def close_position(self, tx_builder: TxBuilder, pair_id: str, position_id: str, price: float, base_quantity: float,
+    def close_position(self, tx_builder: TxBuilder, pair_id: str, position_id: str, price: Decimal, base_quantity: Decimal,
                        acc_seq: int, mode: BroadcastMode = BROADCAST_MODE_BLOCK):
-        price = decimal.Decimal(str(price))
         price = price * decimal.Decimal(DEFAULT_DEC)
         price = str(price)
         price_split = price.split('.', 1)
 
-
-        base_quantity = decimal.Decimal(str(base_quantity))
         base_quantity = base_quantity * decimal.Decimal(DEFAULT_DEC)
         base_quantity = str(base_quantity)
         base_quantity_split = base_quantity.split('.', 1)

@@ -1,4 +1,5 @@
 from typing import NamedTuple
+from decimal import Decimal
 
 class Order(NamedTuple):
     TxHash: str
@@ -6,17 +7,18 @@ class Order(NamedTuple):
     Owner: str
     PairId: str
     Direction: str
-    Price: float
-    BaseQuantity: float
-    QuoteQuantity: float
-    FilledQuantity: float
-    FilledAvgPrice: float
-    RemainLocked: float
+    Price: Decimal
+    BaseQuantity: Decimal
+    QuoteQuantity: Decimal
+    FilledQuantity: Decimal
+    FilledAvgPrice: Decimal
+    RemainLocked: Decimal
     Leverage: int
     Status: str
     OrderType: str
-    CostFee: float
-    LockedFee: float
+    CostFee: Decimal
+    LockedFee: Decimal
+    Created_at: str
     Ttl: int
 
 class Position(NamedTuple):
@@ -24,14 +26,14 @@ class Position(NamedTuple):
     Owner: str
     PairId: str
     Direction: str
-    EntryPrice: float
-    MarkPrice: float
-    LiquidationPrice: float
-    BaseQuantity: float
-    Margin: float
+    EntryPrice: Decimal
+    MarkPrice: Decimal
+    LiquidationPrice: Decimal
+    BaseQuantity: Decimal
+    Margin: Decimal
     Leverage: int
-    UnrealizedPnl: float
-    MarginRate: float
-    InitialMargin: float
-    PendingOrderQuantity: float
+    UnrealizedPnl: Decimal
+    MarginRate: Decimal
+    InitialMargin: Decimal
+    PendingOrderQuantity: Decimal
 
