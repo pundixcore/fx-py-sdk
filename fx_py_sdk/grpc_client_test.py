@@ -89,7 +89,7 @@ class MyTestCase(unittest.TestCase):
 
         tx_builder = TxBuilder(priv_key, chain_id, account.account_number, Coin(amount='60000000', denom='FX'))
 
-        tx_response = cli.create_order(tx_builder, 'tsla:usdt', "SELL", decimal.Decimal(1.1), decimal.Decimal(1.2), 10, account.sequence, mode=BROADCAST_MODE_BLOCK)
+        tx_response = cli.create_order(tx_builder, 'tsla:usdt', "BUY", decimal.Decimal(910.1), decimal.Decimal(1.2), 10, account.sequence, mode=BROADCAST_MODE_BLOCK)
         print(MessageToJson(tx_response))
 
     def test_cancel_order(self):
@@ -145,7 +145,7 @@ class MyTestCase(unittest.TestCase):
         self.assertNotEqual(len(positions), 0)
 
         tx_builder = TxBuilder(priv_key, chain_id, account.account_number, Coin(amount='60000000', denom='FX'))
-        tx_response = cli.close_position(tx_builder, pair_id, positions[0].Id, positions[0].MarkPrice, positions[0].BaseQuantity, account.sequence, mode=BROADCAST_MODE_BLOCK)
+        tx_response = cli.close_position(tx_builder, pair_id, positions[0].Id, positions[0].MarkPrice, decimal.Decimal(0.1), True, account.sequence, mode=BROADCAST_MODE_BLOCK)
         print(tx_response)
 
     def test_decimal(self):

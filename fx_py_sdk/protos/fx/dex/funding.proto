@@ -58,7 +58,9 @@ message PremiumIndex {
   int64 round_timestamp = 2;
 
   // 每回合所包含的所有ticks
-  repeated Tick ticks = 3;
+  repeated Tick ticks = 3 [
+    (gogoproto.nullable) = false
+  ];
 
   // 每分钟的tick
   message Tick {

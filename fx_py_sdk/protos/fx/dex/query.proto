@@ -27,7 +27,7 @@ service Query {
     }
 
     rpc QueryOrderbook(QueryOrderbookReq) returns (QueryOrderbookResp) {
-        option (google.api.http).get = "/dex/order";
+        option (google.api.http).get = "/dex/orderbook";
     }
 
     // positions query

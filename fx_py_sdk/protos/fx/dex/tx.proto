@@ -93,6 +93,7 @@ message MsgClosePosition {
         (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
         (gogoproto.nullable) = false
     ];
+    bool full_close = 6 ;
 }
 
 message MsgClosePositionResp {
