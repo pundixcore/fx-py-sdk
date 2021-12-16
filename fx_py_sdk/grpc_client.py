@@ -189,8 +189,7 @@ class GRPCClient:
                 positions.append(position)
 
         except Exception as e:
-            print("query_position: ", e)
-            return "not found"
+            return []
 
         return positions
 
@@ -270,7 +269,6 @@ class GRPCClient:
             return new_order
 
         except Exception as e:
-            print("query orders: ", e)
             return "not found"
 
 
@@ -340,8 +338,7 @@ class GRPCClient:
                 orders.append(new_order)
 
         except Exception as e:
-            print("query orders: ", e)
-            return "not found"
+            return []
 
         return orders
 
