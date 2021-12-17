@@ -28,6 +28,10 @@ from fx_py_sdk.codec.fx.dex.query_pb2_grpc import QueryStub as DexQuery
 from fx_py_sdk.codec.fx.dex.query_pb2 import *
 from fx_py_sdk.codec.fx.dex.tx_pb2 import *
 from fx_py_sdk.codec.fx.dex.order_pb2 import Direction
+
+from fx_py_sdk.codec.fx.oracle.query_pb2_grpc import QueryStub as OracleQuery
+from fx_py_sdk.codec.fx.oracle.query_pb2 import QueryPriceRequest
+
 from fx_py_sdk.wallet import Address
 from fx_py_sdk.constants import *
 import logging
@@ -110,16 +114,30 @@ class GRPCClient:
         response = TendermintClient(self.channel).GetLatestBlock(GetBlockByHeightRequest())
         return response.block.header.chain_id
 
-    """fx dex api"""
+    def query_oracle_price(self, pair_id: str) -> Decimal:
+        """查询预言机价格
+            Args:
+                pair_id:交易对
+            Returns:
+                price
+                example:
+                    919.8
+        """
+        try:
+            response = OracleQuery(self.channel).GetCurrentPrice(
+                QueryPriceRequest(pair_id=pair_id))
+            print(response)
+            price = decimal.Decimal(response.currentPrice.price)
+            price = price / decimal.Decimal(DEFAULT_DEC)
+            return price
+        except Exception as e:
+            return Decimal(0)
 
-    # 查询仓位
-    #   owner: 仓位持有人
-    #   pair_id: 交易对
-    def query_positions(self, owner: str, pair_id: str) -> [dict]:
+    def query_positions(self, owner: str, pair_id: str) -> []:
         """查询仓位.
             Args:
                 owner: 账户地址
-                pair_id: 币种名称
+                pair_id: 交易对
             Returns:
                 id	string	仓位ID		
                 owner	string	仓位持有者地址
@@ -269,7 +287,7 @@ class GRPCClient:
             return new_order
 
         except Exception as e:
-            return "not found"
+            return None
 
 
     def query_orders(self, owner: str, pair_id: str, page=b"1".decode('utf-8'), limit=b"20".decode('utf-8')):

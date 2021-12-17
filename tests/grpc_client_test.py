@@ -37,6 +37,10 @@ class MyTestCase(unittest.TestCase):
         account = client.query_account_info(address="dex1v0zwwfe3gw2fqdhdnx0hcurh2gzz98z8dagewy")
         print(account)
 
+    def test_query_oracle_price(self):
+        oracle_price = client.query_oracle_price(pair_id="tsla:usdt")
+        print(oracle_price)
+
     def test_query_positions(self):
         positions = client.query_positions(owner='dex179q82e7fcck4ftfvf4vfpwkg86jmxf7upext3v', pair_id="tsla:usdt")
         print("positions: ", positions)

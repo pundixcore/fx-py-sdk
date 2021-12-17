@@ -1,7 +1,6 @@
 import unittest
 
-import fx_py_sdk.wallet
-
+from fx_py_sdk import wallet
 from fx_py_sdk.wallet import PublicKey
 from fx_py_sdk.wallet import PrivateKey
 
