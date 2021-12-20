@@ -36,3 +36,6 @@ class Position(NamedTuple):
     MarginRate: Decimal
     InitialMargin: Decimal
     PendingOrderQuantity: Decimal
+
+class BackEndApi:
+    query_order_page = "http://44.195.213.51:30225/api/address/queryOrderPage"

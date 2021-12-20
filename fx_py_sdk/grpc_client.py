@@ -37,6 +37,7 @@ from fx_py_sdk.constants import *
 import logging
 from google.protobuf.json_format import MessageToJson
 import json
+import requests
 
 DEFAULT_DEX_GAS = 5000000
 DEFAULT_GRPC_NONE = "Not found"
@@ -113,6 +114,75 @@ class GRPCClient:
         """查询 chain id"""
         response = TendermintClient(self.channel).GetLatestBlock(GetBlockByHeightRequest())
         return response.block.header.chain_id
+
+    def query_orders_by_account(self, address: str, page_index: int, page_size: int) -> []:
+        """根据账户号查询订单
+        args:
+            address:链账号地址
+            page_index：页码
+            page_size：分页大小
+        """
+
+        orders = []
+        try:
+            r = requests.post(url=BackEndApi.query_order_page, data=json.dumps({'address': address,
+                                                                                'pageIndex': page_index,
+                                                                                'pageSize': page_size}),
+                              headers={'Content-Type': 'application/json'})
+
+            data = json.loads(r.text)
+
+            for order in data['data']['data']:
+                base_quantity = decimal.Decimal(order['baseQuantity'])
+                base_quantity = base_quantity / decimal.Decimal(DEFAULT_DEC)
+
+                price = decimal.Decimal(order['price'])
+                price = price / decimal.Decimal(DEFAULT_DEC)
+
+                quote_quantity = decimal.Decimal(order['quoteQuantity'])
+                quote_quantity = quote_quantity / decimal.Decimal(DEFAULT_DEC)
+
+                filled_quantity = decimal.Decimal(order['filledQuantity'])
+                filled_quantity = filled_quantity / decimal.Decimal(DEFAULT_DEC)
+
+                filled_avg_price = decimal.Decimal(order['filledAvgPrice'])
+                filled_avg_price = filled_avg_price / decimal.Decimal(DEFAULT_DEC)
+
+                remain_locked = decimal.Decimal(order['remainLocked'])
+                remain_locked = remain_locked / decimal.Decimal(DEFAULT_DEC)
+
+                cost_fee = decimal.Decimal(order['costFee'])
+                cost_fee = cost_fee / decimal.Decimal(DEFAULT_DEC)
+
+                locked_fee = decimal.Decimal(order['lockedFee'])
+                locked_fee = locked_fee / decimal.Decimal(DEFAULT_DEC)
+
+                new_order = Order(
+                    order['txHash'],
+                    order['orderId'],
+                    order['ownerAddress'],
+                    order['pair'],
+                    order['directionName'],
+                    price,
+                    base_quantity,
+                    quote_quantity,
+                    filled_quantity,
+                    filled_avg_price,
+                    remain_locked,
+                    order['leverage'],
+                    order['statusName'],
+                    order['orderTypeName'],
+                    cost_fee,
+                    locked_fee,
+                    order['blockTime'],
+                    order['expiredTime'],)
+
+                orders.append(new_order)
+
+        except Exception as e:
+            return []
+
+        return orders
 
     def query_oracle_price(self, pair_id: str) -> Decimal:
         """查询预言机价格

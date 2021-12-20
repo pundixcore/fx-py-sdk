@@ -152,6 +152,11 @@ class MyTestCase(unittest.TestCase):
         tx_response = cli.close_position(tx_builder, pair_id, positions[0].Id, positions[0].MarkPrice, decimal.Decimal(0.1), True, account.sequence, mode=BROADCAST_MODE_BLOCK)
         print(tx_response)
 
+
+    def test_query_orders_by_account(self):
+        orders = client.query_orders_by_account('dex14xav7xz74lgrsfja36ak440kjwd7ga4wy2q6r6', 1, 20)
+        print(orders)
+
     def test_decimal(self):
         base_quantity = decimal.Decimal(str(1.281999999999997730))
         base_quantity = base_quantity * decimal.Decimal(DEFAULT_DEC)
