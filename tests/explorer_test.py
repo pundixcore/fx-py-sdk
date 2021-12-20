@@ -1,6 +1,5 @@
 import asyncio
 from fx_py_sdk.explorer import DexExploer
-from fx_py_sdk.rpc.websockets import WebsocketRpcClient
 
 loop = None
 
@@ -11,7 +10,7 @@ async def main():
 
     while True:
         print("sleeping to keep loop open")
-        await asyncio.sleep(20, loop=loop)
+        await asyncio.sleep(10)
 
 
 if __name__ == "__main__":

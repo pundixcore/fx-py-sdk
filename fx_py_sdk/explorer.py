@@ -1,7 +1,7 @@
 import asyncio
 import logging
 from fx_py_sdk.rpc.websockets import WebsocketRpcClient
-from fx_py_sdk.constants import BlockResponse, BlockResponseValue, OrderFilledFields
+from fx_py_sdk.model.block import BlockResponse, BlockResponseValue, OrderFilledFields
 import json
 
 class DexExploer:
@@ -20,9 +20,9 @@ class DexExploer:
         except Exception as e:
             logging.error("error checking orders filled", e)
 
-
     async def handle_msg(self, msg):
-        self._event_orders_filled(json.loads(msg))
+        # self._event_orders_filled(json.loads(msg))
+        print(json.dumps(msg))
 
     async def explorer(self):
         wrc = await WebsocketRpcClient.create(None, self.handle_msg)

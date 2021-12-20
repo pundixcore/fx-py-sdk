@@ -5,6 +5,8 @@ from random import random
 from typing import Dict, Callable, Awaitable, Optional, List
 
 import websockets as ws
+import os
+import constants
 
 class ReconnectingWebsocket:
 
@@ -23,7 +25,16 @@ class ReconnectingWebsocket:
         self._connect_id: int = None
         self._ping_timeout = 60
         self._socket: Optional[ws.client.WebSocketClientProtocol] = None
-        self.wss_url = "ws://44.196.199.119:26657"
+        network = os.environ[constants.EnvVar.NETWORK]
+        if network == constants.NetworkENV.LOCAL:
+            self.wss_url = constants.Network.LOCAL
+        elif network == constants.NetworkENV.DEVNET:
+            self.wss_url = constants.Network.DEVNET
+        elif network == constants.NetworkENV.TESTNET:
+            self.wss_url = constants.Network.TESTNET
+        elif network == constants.NetworkENV.MAINNET:
+            self.wss_url = constants.Network.MAINNET
+
         self._connect()
 
     def _connect(self):
