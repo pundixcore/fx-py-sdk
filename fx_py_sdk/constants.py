@@ -11,8 +11,8 @@ class NetworkENV:
     MAINNET = "mainnet"
 
 class Network:
-    LOCAL = "ws://127.0.0.1:26657"
-    DEVNET = "ws://44.196.199.119:26657"
+    LOCAL = "ws://127.0.0.1:26657/"
+    DEVNET = "ws://44.196.199.119:26657/"
     TESTNET = ""
     MAINNET = ""
 

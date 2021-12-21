@@ -10,6 +10,28 @@ class BlockResponse:
     RESULT_BEGIN_BLOCK = "result_begin_block"
     RESULT_END_BLOCK = "result_end_block"
     TYPE = "type"
+    TxResult = "TxResult"
+
+class EventTypes:
+    # EndBlock
+    Add_position = "dex.add_position"
+    Order_fill = "dex.order_fill"
+    New_position = "fx.dex.Position"
+    Part_close_position = "dex.part_close_position"
+    Full_close_position = "dex.full_close_position"
+    Cancel_order_expire = "dex.cancel_order" # expire block
+    Cancel_order_partial_order = "dex.cancel_order" # will not happen from 2021/12/21
+
+    # BeginBlock
+    Forced_liquidation_position = "dex.forced_liquidation_position"
+    Liq_cancel_order = "dex.liq_cancel_order"
+    Liquidation_position_order = "dex.liquidation_position_order"
+
+    # Tx event
+    Order = "fx.dex.Order"
+    Cancel_order = "dex.cancel_order"
+    Close_position_order = "dex.close_position_order"
+
 
 class BlockResponseValue:
     DEX_ORDER_FILL = "dex.order_fill"

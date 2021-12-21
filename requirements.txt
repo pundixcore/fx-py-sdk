@@ -6,3 +6,6 @@ hdwallets
 mnemonic
 hdwallets
 pytest
+ujson
+websocket-client==0.54.0
+websockets==8.1
