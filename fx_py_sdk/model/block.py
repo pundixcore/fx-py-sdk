@@ -1,3 +1,4 @@
+from decimal import Decimal
 
 class BlockResponse:
     RESULT = "result"
@@ -11,6 +12,8 @@ class BlockResponse:
     RESULT_END_BLOCK = "result_end_block"
     TYPE = "type"
     TxResult = "TxResult"
+    Attributes = "attributes"
+    Key = "key"
 
 class EventTypes:
     # EndBlock
@@ -31,6 +34,26 @@ class EventTypes:
     Order = "fx.dex.Order"
     Cancel_order = "dex.cancel_order"
     Close_position_order = "dex.close_position_order"
+
+class EventKeys:
+    tx_hash = "tx_hash"
+    order_id = "order_id"
+    owner = "owner"
+    pair_id = "pair_id"
+    direction = "direction"
+    price = "price"
+    base_quantity = "base_quantity"
+    quote_quantity = "quote_quantity"
+    filled_quantity = "filled_quantity"
+    filled_avg_price = "filled_avg_price"
+    remain_locked = "remain_locked"
+    created_at = "created_at"
+    leverage = "leverage"
+    status = "status"
+    order_type = "order_type"
+    cost_fee = "cost_fee"
+    locked_fee = "locked_fee"
+
 
 
 class BlockResponseValue:

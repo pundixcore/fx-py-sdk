@@ -1,3 +1,5 @@
+import base64
+
 import websocket
 import json
 import logging
@@ -5,14 +7,16 @@ import os
 from fx_py_sdk import constants
 import threading
 from fx_py_sdk.model.block import *
-import psycopg2
+from fx_py_sdk.model.model import *
+from fx_py_sdk.model.crud import *
+import decimal
 
 reconnect_block_count = 0
 reconnect_tx_count = 0
 
 class DexScan:
     def __init__(self):
-        self.conn = psycopg2.connect(database="fxdex", user="postgres", password="123456", host="127.0.0.1", port="5432")
+        self.crud = Crud()
         self.wss_url = ''
         network_url = os.environ[constants.EnvVar.NETWORK]
         if network_url == constants.NetworkENV.LOCAL:
@@ -132,7 +136,7 @@ class DexScan:
     """
     def on_error_tx(self, error):
         global reconnect_tx_count
-        print("websocket caught: ", error)
+        print("tx websocket caught: ", error)
         if type(error) == ConnectionRefusedError or \
                 type(error) == ConnectionResetError or \
                 type(error) == websocket._exceptions.WebSocketConnectionClosedException:
@@ -141,7 +145,7 @@ class DexScan:
             if reconnect_tx_count < 10:
                 self.subscribe_tx()
         else:
-            print("error: ", error)
+            print("tx websocket error: ", error)
 
     def on_message_tx(self, message):
         global reconnect_tx_count
@@ -184,21 +188,69 @@ class DexScan:
             if BlockResponse.VALUE not in message[BlockResponse.RESULT][BlockResponse.DATA]:
                 logging.info(f"value not in message yet {message}")
                 return
-            if BlockResponse.TxResult not in message[BlockResponse.RESULT][BlockResponse.DATA][BlockResponse.VALUE][BlockResponse.TxResult]:
+            if BlockResponse.TxResult not in message[BlockResponse.RESULT][BlockResponse.DATA][BlockResponse.VALUE]:
                 logging.info(f"tx_result not in message yet {message}")
                 return
             tx_events = message[BlockResponse.RESULT][BlockResponse.DATA][BlockResponse.VALUE][BlockResponse.TxResult][BlockResponse.RESULT][BlockResponse.EVENTS]
             for event in tx_events:
                 if event[BlockResponse.TYPE] == EventTypes.Order:
-                    print(event)
+                    order = Order()
+                    order_number = message[BlockResponse.RESULT][BlockResponse.DATA][BlockResponse.VALUE][BlockResponse.TxResult][BlockResponse.HEIGHT]
+                    order.block_number = order_number
+                    for attribute in event[BlockResponse.Attributes]:
+                        key = base64.b64decode(attribute[BlockResponse.Key]).decode('utf8')
+                        value = base64.b64decode(attribute[BlockResponse.VALUE]).decode('utf8')
+                        if key == EventKeys.tx_hash:
+                            order.tx_hash = value
+                        elif key == EventKeys.order_id:
+                            order.order_id = value
+                        elif key == EventKeys.order_id:
+                            order.order_id = value
+                        elif key == EventKeys.owner:
+                            order.owner = value
+                        elif key == EventKeys.pair_id:
+                            order.pair_id = value
+                        elif key == EventKeys.direction:
+                            order.direction = value
+                        elif key == EventKeys.price: #to decimal
+                            order.price = decimal.Decimal(value)
+                        elif key == EventKeys.base_quantity:
+                            order.base_quantity = decimal.Decimal(value)
+                        elif key == EventKeys.quote_quantity:
+                            order.quote_quantity = decimal.Decimal(value)
+                        elif key == EventKeys.filled_quantity:
+                            order.filled_quantity = decimal.Decimal(value)
+                        elif key == EventKeys.filled_avg_price:
+                            order.filled_avg_price = decimal.Decimal(value)
+                        elif key == EventKeys.remain_locked:
+                            order.remain_locked = decimal.Decimal(value)
+                        elif key == EventKeys.created_at:
+                            order.created_at = value
+                        elif key == EventKeys.leverage:
+                            order.leverage = value
+                        elif key == EventKeys.status:
+                            order.status = value
+                        elif key == EventKeys.order_type:
+                            order.order_type = value
+                        elif key == EventKeys.cost_fee:
+                            order.cost_fee = decimal.Decimal(value)
+                        elif key == EventKeys.locked_fee:
+                            order.locked_fee = decimal.Decimal(value)
+                    self.crud.add(order)
+
+
                 elif event[BlockResponse.TYPE] == EventTypes.Cancel_order:
-                    print(event)
+                    for attribute in event[BlockResponse.Attributes]:
+                        key = base64.b64decode(attribute[BlockResponse.Key]).decode('utf8')
+                        value = base64.b64decode(attribute[BlockResponse.VALUE]).decode('utf8')
+
                 elif event[BlockResponse.TYPE] == EventTypes.Close_position_order:
-                    print(event)
+                    for attribute in event[BlockResponse.Attributes]:
+                        key = base64.b64decode(attribute[BlockResponse.Key]).decode('utf8')
+                        value = base64.b64decode(attribute[BlockResponse.VALUE]).decode('utf8')
 
         except Exception as e:
             logging.error("error process tx: ", e)
-
 
 
 """

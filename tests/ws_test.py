@@ -1,7 +1,13 @@
+#!/usr/bin/env python
+# coding='uft8'
+
+import sys
+import os
 import asyncio
 from fx_py_sdk import ws
 
-loop = None
+rootPath = os.path.abspath(os.path.dirname(__file__))
+sys.path.append(rootPath)
 
 async def main():
     ws.DexScan()

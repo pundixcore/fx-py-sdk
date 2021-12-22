@@ -3,6 +3,7 @@ from decimal import Decimal
 
 class EnvVar:
     NETWORK = "NETWORK"
+    DB_URI = "DB_URI"
 
 class NetworkENV:
     LOCAL = "local"
@@ -15,6 +16,13 @@ class Network:
     DEVNET = "ws://44.196.199.119:26657/"
     TESTNET = ""
     MAINNET = ""
+
+class DB:
+    Database = "database"
+    User = "user"
+    Password = "password"
+    Host = "host"
+    Port = "port"
 
 class Order(NamedTuple):
     TxHash: str
