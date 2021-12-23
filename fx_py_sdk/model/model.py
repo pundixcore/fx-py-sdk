@@ -14,15 +14,20 @@ if pip install psycopg2 have problem, try this:
 """
 Base = declarative_base()
 
+def to_dict(self):
+    return {c.name: getattr(self, c.name, None) for c in self.__table__.columns}
+
+Base.to_dict = to_dict
+
 class Order(Base):
     __tablename__ = 'orders'
 
     id = Column('id', Integer, primary_key=True, autoincrement=True)
     block_number = Column(Integer)
     tx_hash = Column(String(66))
-    order_id = Column(String(20), nullable=False, unique=True)
+    order_id = Column(String(30), nullable=False, unique=True)
     owner = Column(String(42))
-    pair_id = Column(String(10))
+    pair_id = Column(String(20))
     direction = Column(String(10))
     price = Column(Numeric)
     base_quantity = Column(Numeric)
@@ -30,10 +35,10 @@ class Order(Base):
     filled_quantity = Column(Numeric)
     filled_avg_price = Column(Numeric)
     remain_locked = Column(Numeric)
-    created_at = Column(String(10))
+    created_at = Column(String(30))
     leverage = Column(Integer)
-    status = Column(String(10))
-    order_type = Column(String(10))
+    status = Column(String(30))
+    order_type = Column(String(30))
     cost_fee = Column(Numeric)
     locked_fee = Column(Numeric)
 
@@ -43,7 +48,7 @@ class Position(Base):
     id = Column('id', Integer, primary_key=True, autoincrement=True)
     position_id = Column(String(10), nullable=False, unique=True)
     owner = Column(String(42))
-    pair_id = Column(String(10))
+    pair_id = Column(String(20))
     direction = Column(String(10))
     entry_price = Column(Numeric)
     mark_price = Column(Numeric)

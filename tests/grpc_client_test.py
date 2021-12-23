@@ -10,8 +10,8 @@ from fx_py_sdk.codec.cosmos.tx.v1beta1.service_pb2 import BROADCAST_MODE_BLOCK, 
 from google.protobuf.json_format import MessageToJson
 import json
 
-client = GRPCClient('44.196.199.119:9090')
-# client = GRPCClient('127.0.0.1:9090')
+# client = GRPCClient('44.196.199.119:9090')
+client = GRPCClient('127.0.0.1:9090')
 
 
 class MyTestCase(unittest.TestCase):
@@ -48,7 +48,7 @@ class MyTestCase(unittest.TestCase):
         # print(owner.to_string())
 
     def test_query_order(self):
-        resp = client.query_order(order_id='ID-82476-1')
+        resp = client.query_order(order_id='ID-718-1')
         print(resp)
 
     def test_query_orders(self):

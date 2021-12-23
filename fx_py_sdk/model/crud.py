@@ -8,18 +8,18 @@ class Crud:
         self.DBSession = sessionmaker(bind=sql.engine)
         self.session=self.DBSession()
 
-    def add(self,object):
+    def insert(self, object):
         self.session.add(object)
         self.session.commit()
 
-    def add_many(self,objectlist):
+    def insert_many(self, objectlist):
         self.session.add_all(objectlist)
         self.session.commit()
 
-    def filterone(self,object,filter):
+    def filterone(self, object, filter):
         return self.session.query(object).filter(filter).first()
 
-    def update(self,object,filter,updic):
+    def update(self, object, filter, updic):
         self.session.query(object).filter(filter).update(updic)
         self.session.commit()
 

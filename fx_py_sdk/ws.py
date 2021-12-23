@@ -30,9 +30,9 @@ class DexScan:
 
         self.ws_block = None
         self.ws_tx = None
-        threading.Thread(
-            target=self.subscribe_block()
-        ).start()
+        # threading.Thread(
+        #     target=self.subscribe_block()
+        # ).start()
         threading.Thread(
             target=self.subscribe_tx()
         ).start()
@@ -196,14 +196,12 @@ class DexScan:
                 if event[BlockResponse.TYPE] == EventTypes.Order:
                     order = Order()
                     order_number = message[BlockResponse.RESULT][BlockResponse.DATA][BlockResponse.VALUE][BlockResponse.TxResult][BlockResponse.HEIGHT]
-                    order.block_number = order_number
+                    order.block_number = int(order_number)
                     for attribute in event[BlockResponse.Attributes]:
                         key = base64.b64decode(attribute[BlockResponse.Key]).decode('utf8')
                         value = base64.b64decode(attribute[BlockResponse.VALUE]).decode('utf8')
                         if key == EventKeys.tx_hash:
                             order.tx_hash = value
-                        elif key == EventKeys.order_id:
-                            order.order_id = value
                         elif key == EventKeys.order_id:
                             order.order_id = value
                         elif key == EventKeys.owner:
@@ -227,7 +225,7 @@ class DexScan:
                         elif key == EventKeys.created_at:
                             order.created_at = value
                         elif key == EventKeys.leverage:
-                            order.leverage = value
+                            order.leverage = int(value)
                         elif key == EventKeys.status:
                             order.status = value
                         elif key == EventKeys.order_type:
@@ -236,13 +234,37 @@ class DexScan:
                             order.cost_fee = decimal.Decimal(value)
                         elif key == EventKeys.locked_fee:
                             order.locked_fee = decimal.Decimal(value)
-                    self.crud.add(order)
-
+                    try:
+                        self.crud.insert(order)
+                    except Exception as e:
+                        logging.error("insert error: ", e)
 
                 elif event[BlockResponse.TYPE] == EventTypes.Cancel_order:
+                    cancel_order = Order()
                     for attribute in event[BlockResponse.Attributes]:
                         key = base64.b64decode(attribute[BlockResponse.Key]).decode('utf8')
                         value = base64.b64decode(attribute[BlockResponse.VALUE]).decode('utf8')
+                        if key == EventKeys.order_id:
+                            cancel_order = self.crud.filterone(Order, Order.order_id==value)
+                            print(cancel_order.to_dict)
+                        elif key == EventKeys.base_quantity:
+                            cancel_order.base_quantity = decimal.Decimal(value)
+                        elif key == EventKeys.quote_quantity:
+                            cancel_order.quote_quantity = decimal.Decimal(value)
+                        elif key == EventKeys.filled_quantity:
+                            cancel_order.filled_quantity = decimal.Decimal(value)
+                        elif key == EventKeys.filled_avg_price:
+                            cancel_order.filled_avg_price = decimal.Decimal(value)
+                        elif key == EventKeys.status:
+                            cancel_order.status = value
+                        elif key == EventKeys.cost_fee:
+                            cancel_order.cost_fee = decimal.Decimal(value)
+                        elif key == EventKeys.locked_fee:
+                            cancel_order.locked_fee = decimal.Decimal(value)
+                    try:
+                        self.crud.update(Order, filter=(Order.order_id == cancel_order.order_id), updic=cancel_order.to_dict())
+                    except Exception as e:
+                        logging.error("insert error: ", e)
 
                 elif event[BlockResponse.TYPE] == EventTypes.Close_position_order:
                     for attribute in event[BlockResponse.Attributes]:
