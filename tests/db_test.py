@@ -20,10 +20,9 @@ class MyTestCase(unittest.TestCase):
         sql = Sql(database="fxdex")
         sql.drop_table()
 
-
-    def test_add(self):
+    def test_crud(self):
         sql = Crud()
-        order_id = "ID-1892-6"
+        order_id = "ID-1892-7"
         order = Order(
             block_number=100,
             tx_hash="84E6164550DF980D4FD7AEA68E3B2E3C608B7ADFB730A69C75EEC372CC706D59",
@@ -32,11 +31,10 @@ class MyTestCase(unittest.TestCase):
             pair_id="tsla:usdt",
             price=decimal.Decimal(100)
         )
-        print(order.to_dict())
         sql.insert(order)
-        order = sql.filterone(Order, Order.order_id==order_id)
-        print(order.to_dict())
-
+        order_sql = sql.filterone(Order, Order.order_id==order_id)
+        assert order.block_number==order_sql.block_number
+        print(order_sql.to_dict())
 
 if __name__ == '__main__':
     unittest.main()

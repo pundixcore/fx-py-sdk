@@ -41,6 +41,7 @@ class Order(Base):
     order_type = Column(String(30))
     cost_fee = Column(Numeric)
     locked_fee = Column(Numeric)
+    close_position_tx_hash = Column(String(66))
 
 class Position(Base):
     __tablename__ = 'position'

@@ -9,7 +9,7 @@ import threading
 from fx_py_sdk.model.block import *
 from fx_py_sdk.model.model import *
 from fx_py_sdk.model.crud import *
-import decimal
+from decimal import Decimal
 
 reconnect_block_count = 0
 reconnect_tx_count = 0
@@ -30,9 +30,9 @@ class DexScan:
 
         self.ws_block = None
         self.ws_tx = None
-        # threading.Thread(
-        #     target=self.subscribe_block()
-        # ).start()
+        threading.Thread(
+            target=self.subscribe_block()
+        ).start()
         threading.Thread(
             target=self.subscribe_tx()
         ).start()
@@ -96,32 +96,126 @@ class DexScan:
             if BlockResponse.DATA not in message[BlockResponse.RESULT]:
                 logging.info(f"data not in message yet {message}")
                 return
-            begin_block_events = message[BlockResponse.RESULT][BlockResponse.DATA][BlockResponse.VALUE][BlockResponse.RESULT_BEGIN_BLOCK][BlockResponse.EVENTS]
-            self._process_begin_block(begin_block_events)
+            block_number = message[BlockResponse.RESULT][BlockResponse.DATA][BlockResponse.VALUE][
+                BlockResponse.BLOCK][BlockResponse.HEADER][BlockResponse.HEIGHT]
+            block_number = int(block_number)
 
-            end_block_events = message[BlockResponse.RESULT][BlockResponse.DATA][BlockResponse.VALUE][BlockResponse.RESULT_END_BLOCK][BlockResponse.EVENTS]
-            self._process_end_block(end_block_events)
+            begin_block_events = message[BlockResponse.RESULT][BlockResponse.DATA][BlockResponse.VALUE][
+                BlockResponse.RESULT_BEGIN_BLOCK][BlockResponse.EVENTS]
+            self._process_begin_block(begin_block_events, block_number)
+
+            end_block_events = message[BlockResponse.RESULT][BlockResponse.DATA][BlockResponse.VALUE][
+                BlockResponse.RESULT_END_BLOCK][BlockResponse.EVENTS]
+            self._process_end_block(end_block_events, block_number)
 
         except Exception as e:
             logging.error("error process block: ", e)
 
-    def _process_end_block(self, events: str):
+    def _process_end_block(self, events: str, block_number: int):
         for event in events:
             if event[BlockResponse.TYPE] == EventTypes.Add_position:
-                print(event)
+                position = Position()
+                for attribute in event[BlockResponse.Attributes]:
+                    key = base64.b64decode(attribute[BlockResponse.Key]).decode('utf8')
+                    value = base64.b64decode(attribute[BlockResponse.VALUE]).decode('utf8')
+                    if key == EventKeys.position_id:
+                        try:
+                            position = self.crud.filterone(Position, Position.position_id == value)
+                        except Exception as e:
+                            logging.error("error filter position: ", e)
+                    elif key == EventKeys.pair_id:
+                        position.pair_id = value
+                    elif key == EventKeys.margin:
+                        position.margin = Decimal(value)
+                    elif key == EventKeys.mark_price:
+                        position.mark_price = Decimal(value)
+                    elif key == EventKeys.base_quantity:
+                        position.base_quantity = Decimal(value)
+                    elif key == EventKeys.direction:
+                        position.direction = value
+                    elif key == EventKeys.owner:
+                        position.owner = value
+                    elif key == EventKeys.leverage:
+                        position.leverage = int(value)
+                    elif key == EventKeys.entry_price:
+                        position.entry_price = Decimal(value)
+                    elif key == EventKeys.liquidation_price:
+                        position.liquidation_price = Decimal(value)
+                    elif key == EventKeys.margin_rate:
+                        position.margin_rate = Decimal(value)
+                    elif key == EventKeys.deal_price:
+                        position.deal_price = Decimal(value)
+                try:
+                    self.crud.update(Position, filter=(Position.position_id == position.position_id),
+                                     updic=position.to_dict())
+                except Exception as e:
+                    logging.error("update position error: ", e)
+
             elif event[BlockResponse.TYPE] == EventTypes.Order_fill:
-                print(event)
+                for attribute in event[BlockResponse.Attributes]:
+                    key = base64.b64decode(attribute[BlockResponse.Key]).decode('utf8')
+                    value = base64.b64decode(attribute[BlockResponse.VALUE]).decode('utf8')
+
             elif event[BlockResponse.TYPE] == EventTypes.New_position:
-                print(event)
+                position = Position()
+                for attribute in event[BlockResponse.Attributes]:
+                    key = base64.b64decode(attribute[BlockResponse.Key]).decode('utf8')
+                    value = base64.b64decode(attribute[BlockResponse.VALUE]).decode('utf8')
+
+                    # fx.dex.position is proto generate, different from other events
+                    value = eval(value)
+
+                    if key == EventKeys.id:
+                        position.position_id = value
+                    elif key == EventKeys.owner:
+                        position.owner = value
+                    elif key == EventKeys.pair_id:
+                        position.pair_id = value
+                    elif key == EventKeys.direction:
+                        position.direction = value
+                    elif key == EventKeys.entry_price:
+                        position.entry_price = Decimal(value)
+                    elif key == EventKeys.mark_price:
+                        position.mark_price = Decimal(value)
+                    elif key == EventKeys.liquidation_price:
+                        position.liquidation_price = Decimal(value)
+                    elif key == EventKeys.base_quantity:
+                        position.base_quantity = Decimal(value)
+                    elif key == EventKeys.margin:
+                        position.margin = Decimal(value)
+                    elif key == EventKeys.leverage:
+                        position.leverage = int(value)
+                    elif key == EventKeys.unrealized_pnl:
+                        position.unrealized_pnl = Decimal(value)
+                    elif key == EventKeys.margin_rate:
+                        position.margin_rate = Decimal(value)
+                    elif key == EventKeys.initial_margin:
+                        position.initial_margin = Decimal(value)
+                    elif key == EventKeys.pending_order_quantity:
+                        position.pending_order_quantity = Decimal(value)
+                try:
+                    self.crud.insert(position)
+                except Exception as e:
+                    logging.error("insert position error: ", e)
+
             elif event[BlockResponse.TYPE] == EventTypes.Cancel_order_expire:
-                print(event)
+                for attribute in event[BlockResponse.Attributes]:
+                    key = base64.b64decode(attribute[BlockResponse.Key]).decode('utf8')
+                    value = base64.b64decode(attribute[BlockResponse.VALUE]).decode('utf8')
+
             elif event[BlockResponse.TYPE] == EventTypes.Part_close_position:
-                print(event)
+                for attribute in event[BlockResponse.Attributes]:
+                    key = base64.b64decode(attribute[BlockResponse.Key]).decode('utf8')
+                    value = base64.b64decode(attribute[BlockResponse.VALUE]).decode('utf8')
+
             elif event[BlockResponse.TYPE] == EventTypes.Full_close_position:
-                print(event)
+                for attribute in event[BlockResponse.Attributes]:
+                    key = base64.b64decode(attribute[BlockResponse.Key]).decode('utf8')
+                    value = base64.b64decode(attribute[BlockResponse.VALUE]).decode('utf8')
+                    print(key, value)
         return
 
-    def _process_begin_block(self, events: str):
+    def _process_begin_block(self, events: str, block_number: int):
         for event in events:
             if event[BlockResponse.TYPE] == EventTypes.Forced_liquidation_position:
                 print(event)
@@ -193,10 +287,10 @@ class DexScan:
                 return
             tx_events = message[BlockResponse.RESULT][BlockResponse.DATA][BlockResponse.VALUE][BlockResponse.TxResult][BlockResponse.RESULT][BlockResponse.EVENTS]
             for event in tx_events:
-                if event[BlockResponse.TYPE] == EventTypes.Order:
+                if event[BlockResponse.TYPE] == EventTypes.Order or event[BlockResponse.TYPE] == EventTypes.Close_position_order:
                     order = Order()
-                    order_number = message[BlockResponse.RESULT][BlockResponse.DATA][BlockResponse.VALUE][BlockResponse.TxResult][BlockResponse.HEIGHT]
-                    order.block_number = int(order_number)
+                    block_number = message[BlockResponse.RESULT][BlockResponse.DATA][BlockResponse.VALUE][BlockResponse.TxResult][BlockResponse.HEIGHT]
+                    order.block_number = int(block_number)
                     for attribute in event[BlockResponse.Attributes]:
                         key = base64.b64decode(attribute[BlockResponse.Key]).decode('utf8')
                         value = base64.b64decode(attribute[BlockResponse.VALUE]).decode('utf8')
@@ -211,17 +305,17 @@ class DexScan:
                         elif key == EventKeys.direction:
                             order.direction = value
                         elif key == EventKeys.price: #to decimal
-                            order.price = decimal.Decimal(value)
+                            order.price = Decimal(value)
                         elif key == EventKeys.base_quantity:
-                            order.base_quantity = decimal.Decimal(value)
+                            order.base_quantity = Decimal(value)
                         elif key == EventKeys.quote_quantity:
-                            order.quote_quantity = decimal.Decimal(value)
+                            order.quote_quantity = Decimal(value)
                         elif key == EventKeys.filled_quantity:
-                            order.filled_quantity = decimal.Decimal(value)
+                            order.filled_quantity = Decimal(value)
                         elif key == EventKeys.filled_avg_price:
-                            order.filled_avg_price = decimal.Decimal(value)
+                            order.filled_avg_price = Decimal(value)
                         elif key == EventKeys.remain_locked:
-                            order.remain_locked = decimal.Decimal(value)
+                            order.remain_locked = Decimal(value)
                         elif key == EventKeys.created_at:
                             order.created_at = value
                         elif key == EventKeys.leverage:
@@ -231,13 +325,13 @@ class DexScan:
                         elif key == EventKeys.order_type:
                             order.order_type = value
                         elif key == EventKeys.cost_fee:
-                            order.cost_fee = decimal.Decimal(value)
+                            order.cost_fee = Decimal(value)
                         elif key == EventKeys.locked_fee:
-                            order.locked_fee = decimal.Decimal(value)
+                            order.locked_fee = Decimal(value)
                     try:
                         self.crud.insert(order)
                     except Exception as e:
-                        logging.error("insert error: ", e)
+                        logging.error("insert order error: ", e)
 
                 elif event[BlockResponse.TYPE] == EventTypes.Cancel_order:
                     cancel_order = Order()
@@ -248,28 +342,23 @@ class DexScan:
                             cancel_order = self.crud.filterone(Order, Order.order_id==value)
                             print(cancel_order.to_dict)
                         elif key == EventKeys.base_quantity:
-                            cancel_order.base_quantity = decimal.Decimal(value)
+                            cancel_order.base_quantity = Decimal(value)
                         elif key == EventKeys.quote_quantity:
-                            cancel_order.quote_quantity = decimal.Decimal(value)
+                            cancel_order.quote_quantity = Decimal(value)
                         elif key == EventKeys.filled_quantity:
-                            cancel_order.filled_quantity = decimal.Decimal(value)
+                            cancel_order.filled_quantity = Decimal(value)
                         elif key == EventKeys.filled_avg_price:
-                            cancel_order.filled_avg_price = decimal.Decimal(value)
+                            cancel_order.filled_avg_price = Decimal(value)
                         elif key == EventKeys.status:
                             cancel_order.status = value
                         elif key == EventKeys.cost_fee:
-                            cancel_order.cost_fee = decimal.Decimal(value)
+                            cancel_order.cost_fee = Decimal(value)
                         elif key == EventKeys.locked_fee:
-                            cancel_order.locked_fee = decimal.Decimal(value)
+                            cancel_order.locked_fee = Decimal(value)
                     try:
                         self.crud.update(Order, filter=(Order.order_id == cancel_order.order_id), updic=cancel_order.to_dict())
                     except Exception as e:
-                        logging.error("insert error: ", e)
-
-                elif event[BlockResponse.TYPE] == EventTypes.Close_position_order:
-                    for attribute in event[BlockResponse.Attributes]:
-                        key = base64.b64decode(attribute[BlockResponse.Key]).decode('utf8')
-                        value = base64.b64decode(attribute[BlockResponse.VALUE]).decode('utf8')
+                        logging.error("update order error: ", e)
 
         except Exception as e:
             logging.error("error process tx: ", e)

@@ -36,6 +36,7 @@ class EventTypes:
     Close_position_order = "dex.close_position_order"
 
 class EventKeys:
+    """orders"""
     tx_hash = "tx_hash"
     order_id = "order_id"
     owner = "owner"
@@ -54,6 +55,21 @@ class EventKeys:
     cost_fee = "cost_fee"
     locked_fee = "locked_fee"
 
+    """positions"""
+    id = "id"
+    position_id = "position_id"
+    margin = "margin"
+    mark_price = "mark_price"
+    entry_price = "entry_price"
+    liquidation_price = "liquidation_price"
+    margin_rate = "margin_rate"
+    deal_price = "deal_price"
+    unrealized_pnl = "unrealized_pnl"
+    initial_margin = "initial_margin"
+    pending_order_quantity = "pending_order_quantity"
+
+    matched_quantity = "matched_quantity"
+    unfilled_quantity = "unfilled_quantity"
 
 
 class BlockResponseValue:

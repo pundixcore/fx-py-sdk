@@ -153,7 +153,14 @@ class MyTestCase(unittest.TestCase):
         print(tx_response)
 
     def test_decimal(self):
-        base_quantity = decimal.Decimal(str(1.281999999999997730))
+        base_quantity = decimal.Decimal('1.281999999999997730')
+        base_quantity = base_quantity * decimal.Decimal(DEFAULT_DEC)
+        base_quantity = str(base_quantity)
+        base_quantity_split = base_quantity.split('.', 1)
+        print(base_quantity_split)
+
+    def test_decimal_neg(self):
+        base_quantity = decimal.Decimal('-1.281999999999997730')
         base_quantity = base_quantity * decimal.Decimal(DEFAULT_DEC)
         base_quantity = str(base_quantity)
         base_quantity_split = base_quantity.split('.', 1)
