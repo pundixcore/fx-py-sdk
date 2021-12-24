@@ -55,6 +55,7 @@ class EventKeys:
     order_type = "order_type"
     cost_fee = "cost_fee"
     locked_fee = "locked_fee"
+    cancel_time = "cancel_time"
 
     """positions"""
     id = "id"
@@ -72,6 +73,10 @@ class EventKeys:
     matched_quantity = "matched_quantity"
     unfilled_quantity = "unfilled_quantity"
 
+class PositionStatus:
+    Open = "open"
+    Close = "close"
+    Liquidated = "liquidated"
 
 class BlockResponseValue:
     DEX_ORDER_FILL = "dex.order_fill"

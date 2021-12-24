@@ -41,6 +41,8 @@ class Order(Base):
     order_type = Column(String(50))
     cost_fee = Column(Numeric)
     locked_fee = Column(Numeric)
+    cancel_block_number = Column(Integer)
+    cancel_time = Column(Numeric)
 
 class Position(Base):
     __tablename__ = 'position'
@@ -60,6 +62,9 @@ class Position(Base):
     margin_rate = Column(Numeric)
     initial_margin = Column(Numeric)
     pending_order_quantity = Column(Numeric)
+    status = Column(Numeric)  # open, close
+    open_number = Column(Integer)
+    close_number = Column(Integer)
 
 class Orderbook(Base):
     __tablename__ = 'orderbook'
