@@ -25,7 +25,7 @@ class Order(Base):
     id = Column('id', Integer, primary_key=True, autoincrement=True)
     block_number = Column(Integer)
     tx_hash = Column(String(66))
-    order_id = Column(String(30), nullable=False, unique=True)
+    order_id = Column(String(100), nullable=False, unique=True)
     owner = Column(String(42))
     pair_id = Column(String(20))
     direction = Column(String(10))
@@ -35,19 +35,18 @@ class Order(Base):
     filled_quantity = Column(Numeric)
     filled_avg_price = Column(Numeric)
     remain_locked = Column(Numeric)
-    created_at = Column(String(30))
+    created_at = Column(String(100))
     leverage = Column(Integer)
-    status = Column(String(30))
-    order_type = Column(String(30))
+    status = Column(String(50))
+    order_type = Column(String(50))
     cost_fee = Column(Numeric)
     locked_fee = Column(Numeric)
-    close_position_tx_hash = Column(String(66))
 
 class Position(Base):
     __tablename__ = 'position'
 
-    id = Column('id', Integer, primary_key=True, autoincrement=True)
-    position_id = Column(String(10), nullable=False, unique=True)
+    # id = Column('id', Integer, primary_key=True, autoincrement=True)
+    position_id = Column(Integer, primary_key=True, nullable=False)
     owner = Column(String(42))
     pair_id = Column(String(20))
     direction = Column(String(10))
@@ -67,6 +66,25 @@ class Orderbook(Base):
     id = Column('id', Integer, primary_key=True, autoincrement=True)
     price = Column(Numeric)
     quantity = Column(Numeric)
+
+class Trade(Base):
+    __tablename__ = 'trade'
+    id = Column('id', Integer, primary_key=True, autoincrement=True)
+    block_number = Column(Integer)
+    deal_price = Column(Numeric)
+    matched_quantity = Column(Numeric)
+    order_id = Column(String(100), nullable=False, unique=True)
+    owner = Column(String(42))
+    pair_id = Column(String(20))
+    direction = Column(String(10))
+    price = Column(Numeric)  #entry price
+    base_quantity = Column(Numeric)
+    quote_quantity = Column(Numeric)
+    filled_quantity = Column(Numeric)
+    filled_avg_price = Column(Numeric)
+    order_type = Column(String(50))
+    cost_fee = Column(Numeric)
+    locked_fee = Column(Numeric)
 
 class Sql:
     def __init__(self, database: str = "postgres", user: str = "postgres", password: str = "123456", host: str = "localhost",
