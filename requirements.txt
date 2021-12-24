@@ -19,3 +19,4 @@ ujson==5.1.0
 websocket-client==0.54.0
 websockets==8.1
 sqlalchemy==1.4.28
+psycopg2-binary==2.9.2

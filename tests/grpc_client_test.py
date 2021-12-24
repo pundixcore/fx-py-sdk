@@ -9,6 +9,7 @@ import decimal
 from fx_py_sdk.codec.cosmos.tx.v1beta1.service_pb2 import BROADCAST_MODE_BLOCK, BROADCAST_MODE_SYNC
 from google.protobuf.json_format import MessageToJson
 import json
+from google.protobuf.timestamp_pb2 import Timestamp
 
 # client = GRPCClient('44.196.199.119:9090')
 client = GRPCClient('127.0.0.1:9090')
@@ -165,6 +166,14 @@ class MyTestCase(unittest.TestCase):
         base_quantity = str(base_quantity)
         base_quantity_split = base_quantity.split('.', 1)
         print(base_quantity_split)
+
+    def test_proto_time(self):
+        time1 = "2021-12-24T07:09:12.504154Z"
+        time2 = Timestamp()
+        time2.FromJsonString(time1)
+        print(time2)
+        time3 = Timestamp().FromJsonString(time1) #return None
+        print(time3)
 
 if __name__ == '__main__':
     unittest.main()

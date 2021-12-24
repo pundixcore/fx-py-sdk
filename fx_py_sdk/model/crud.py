@@ -23,3 +23,4 @@ class Crud:
         self.session.query(object).filter(filter).update(updic)
         self.session.commit()
 
+

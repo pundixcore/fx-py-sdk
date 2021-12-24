@@ -1,4 +1,5 @@
 import base64
+import datetime
 
 import websocket
 import json
@@ -12,6 +13,7 @@ from fx_py_sdk.model.crud import *
 from decimal import Decimal
 import sqlalchemy
 from sqlalchemy.orm.exc import NoResultFound
+from google.protobuf.timestamp_pb2 import Timestamp
 
 reconnect_block_count = 0
 reconnect_tx_count = 0
@@ -106,22 +108,37 @@ class DexScan:
             if BlockResponse.DATA not in message[BlockResponse.RESULT]:
                 logging.info(f"data not in message: {message}")
                 return
-            block_number = message[BlockResponse.RESULT][BlockResponse.DATA][BlockResponse.VALUE][
+            block_height = message[BlockResponse.RESULT][BlockResponse.DATA][BlockResponse.VALUE][
                 BlockResponse.BLOCK][BlockResponse.HEADER][BlockResponse.HEIGHT]
-            block_number = int(block_number)
+            block_height = int(block_height)
+            block_time = message[BlockResponse.RESULT][BlockResponse.DATA][BlockResponse.VALUE][
+                BlockResponse.BLOCK][BlockResponse.HEADER][BlockResponse.Time]
+
+            timestamp = Timestamp()
+            timestamp.FromJsonString(block_time),
+            block_datetime = datetime.datetime.utcfromtimestamp(timestamp.ToSeconds())
+
+            block = Block(height=block_height, time=block_datetime)
+
+            sql_block = self.crud.filterone(Block, Block.height == block_height)
+            if sql_block is None:
+                self.crud.insert(block)
+            else:
+                self.crud.update(Position, filter=(Block.height == block_height),
+                                 updic=block.to_dict())
 
             begin_block_events = message[BlockResponse.RESULT][BlockResponse.DATA][BlockResponse.VALUE][
                 BlockResponse.RESULT_BEGIN_BLOCK][BlockResponse.EVENTS]
-            self._process_begin_block(begin_block_events, block_number)
+            self._process_begin_block(begin_block_events, block_height)
 
             end_block_events = message[BlockResponse.RESULT][BlockResponse.DATA][BlockResponse.VALUE][
                 BlockResponse.RESULT_END_BLOCK][BlockResponse.EVENTS]
-            self._process_end_block(end_block_events, block_number)
+            self._process_end_block(end_block_events, block_height)
 
         except Exception as e:
             logging.error("error process block: ", e)
 
-    def _process_end_block(self, events: str, block_number: int):
+    def _process_end_block(self, events: str, block_height: int):
         for event in events:
             if event[BlockResponse.TYPE] == EventTypes.New_position:
                 position = Position()
@@ -163,7 +180,7 @@ class DexScan:
 
                 sql_position = self.crud.filterone(Position, Position.position_id==position.position_id)
                 position.status = PositionStatus.Open
-                position.open_order_number = block_number
+                position.open_height = block_height
                 if sql_position is None:
                     self.crud.insert(position)
                 else:
@@ -183,7 +200,7 @@ class DexScan:
             elif event[BlockResponse.TYPE] == EventTypes.Full_close_position:
                 position = self.get_position(event[BlockResponse.Attributes])
                 position.status = PositionStatus.Close
-                position.close_number = block_number
+                position.close_height = block_height
                 sql_position = self.crud.filterone(Position, Position.position_id == position.position_id)
                 if sql_position is None:
                     self.crud.insert(position)
@@ -204,7 +221,7 @@ class DexScan:
             elif event[BlockResponse.TYPE] == EventTypes.Cancel_order_expire:
                 """update order status to expiration"""
                 order = self.get_order(event[BlockResponse.Attributes])
-                order.cancel_block_number = block_number
+                order.cancel_block_height = block_height
                 sql_order = self.crud.filterone(Order, Order.order_id == order.order_id)
                 if sql_order is None:
                     self.crud.insert(order)
@@ -218,7 +235,7 @@ class DexScan:
                 order = self.get_order(event[BlockResponse.Attributes])
                 sql_order = self.crud.filterone(Order, Order.order_id == order.order_id)
                 if sql_order is None:
-                    order.block_number = block_number
+                    order.block_height = block_height
                     self.crud.insert(order)
                 else:
                     order.id = sql_order.id
@@ -226,19 +243,19 @@ class DexScan:
                                      updic=order.to_dict())
 
                 trade = self.get_trade(event[BlockResponse.Attributes])
-                trade.block_number = block_number
+                trade.block_height = block_height
                 try:
                     self.crud.insert(trade)
                 except Exception as e:
                     logging.error("insert trade error: ", e)
         return
 
-    def _process_begin_block(self, events: str, block_number: int):
+    def _process_begin_block(self, events: str, block_height: int):
         for event in events:
             if event[BlockResponse.TYPE] == EventTypes.Forced_liquidation_position:
                 position = self.get_position(event[BlockResponse.Attributes])
                 position.status = PositionStatus.Liquidated
-                position.close_number = block_number
+                position.close_height = block_height
                 sql_position = self.crud.filterone(Position, Position.position_id == position.position_id)
                 if sql_position is None:
                     self.crud.insert(position)
@@ -249,7 +266,7 @@ class DexScan:
             elif event[BlockResponse.TYPE] == EventTypes.Liq_cancel_order:
                 """liquidation cancel pending close-position order, only update order"""
                 order = self.get_order(event[BlockResponse.Attributes])
-                order.cancel_block_number = block_number
+                order.cancel_block_height = block_height
                 sql_order = self.crud.filterone(Order, Order.order_id == order.order_id)
                 if sql_order is None:
                     self.crud.insert(order)
@@ -261,7 +278,7 @@ class DexScan:
             elif event[BlockResponse.TYPE] == EventTypes.Liquidation_position_order:
                 """liquidation generate new order, only insert order"""
                 order = self.get_order(event[BlockResponse.Attributes])
-                order.block_number = block_number
+                order.block_height = block_height
                 sql_order = self.crud.filterone(Order, Order.order_id == order.order_id)
                 if sql_order is None:
                     self.crud.insert(order)
@@ -286,14 +303,14 @@ class DexScan:
                 return
             tx_events = message[BlockResponse.RESULT][BlockResponse.DATA][BlockResponse.VALUE][BlockResponse.TxResult][
                 BlockResponse.RESULT][BlockResponse.EVENTS]
-            block_number = message[BlockResponse.RESULT][BlockResponse.DATA][BlockResponse.VALUE][BlockResponse.TxResult][
+            block_height = message[BlockResponse.RESULT][BlockResponse.DATA][BlockResponse.VALUE][BlockResponse.TxResult][
                 BlockResponse.HEIGHT]
-            block_number = int(block_number)
+            block_height = int(block_height)
             for event in tx_events:
                 if event[BlockResponse.TYPE] == EventTypes.Order or event[BlockResponse.TYPE] == EventTypes.Close_position_order:
                     """only insert order, if sql order is none, then do not update"""
                     order = self.get_order(event[BlockResponse.Attributes])
-                    order.block_number = block_number
+                    order.block_height = block_height
                     sql_order = self.crud.filterone(Order, Order.order_id == order.order_id)
                     if sql_order is None:
                         self.crud.insert(order)
@@ -301,7 +318,7 @@ class DexScan:
                 elif event[BlockResponse.TYPE] == EventTypes.Cancel_order:
                     """only update order, but in case of not listened create order"""
                     order = self.get_order(event[BlockResponse.Attributes])
-                    order.cancel_block_number = block_number
+                    order.cancel_block_height = block_height
                     sql_order = self.crud.filterone(Order, Order.order_id == order.order_id)
                     if sql_order is None:
                         self.crud.insert(order)
@@ -377,7 +394,10 @@ class DexScan:
             elif key == EventKeys.remain_locked:
                 order.remain_locked = Decimal(value)
             elif key == EventKeys.created_at:
-                order.created_at = value
+                timestamp = Timestamp()
+                timestamp.FromJsonString(value),
+                block_datetime = datetime.datetime.utcfromtimestamp(timestamp.ToSeconds())
+                order.created_at = block_datetime
             elif key == EventKeys.leverage:
                 order.leverage = int(value)
             elif key == EventKeys.status:
@@ -389,7 +409,10 @@ class DexScan:
             elif key == EventKeys.locked_fee:
                 order.locked_fee = Decimal(value)
             elif key == EventKeys.cancel_time:  # only cancel order or expire order have cancel_time
-                order.cancel_time = value
+                timestamp = Timestamp()
+                timestamp.FromJsonString(value),
+                block_datetime = datetime.datetime.utcfromtimestamp(timestamp.ToSeconds())
+                order.cancel_time = block_datetime
         return order
 
     def get_trade(self, attributes: []) -> Order:

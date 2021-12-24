@@ -15,6 +15,8 @@ class BlockResponse:
     TxResult = "TxResult"
     Attributes = "attributes"
     Key = "key"
+    Time = "time"
+
 
 class EventTypes:
     # EndBlock
