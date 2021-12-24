@@ -12,10 +12,15 @@ class NetworkENV:
     MAINNET = "mainnet"
 
 class Network:
-    LOCAL = "ws://127.0.0.1:26657/"
-    DEVNET = "ws://44.196.199.119:26657/"
-    TESTNET = ""
-    MAINNET = ""
+    LOCAL_RPC = "http://127.0.0.1:26657"
+    DEVNET_RPC = "http://44.196.199.119:26657"
+    TESTNET_RPC = ""
+    MAINNET_RPC = ""
+
+    LOCAL_WS = "ws://127.0.0.1:26657/"
+    DEVNET_WS = "ws://44.196.199.119:26657/"
+    TESTNET_WS = ""
+    MAINNET_WS = ""
 
 class DB:
     Database = "database"

@@ -24,15 +24,15 @@ class DexScan:
     def __init__(self):
         self.crud = Crud()
         self.wss_url = ''
-        network_url = os.environ[constants.EnvVar.NETWORK]
-        if network_url == constants.NetworkENV.LOCAL:
-            self.wss_url = constants.Network.LOCAL
-        elif network_url == constants.NetworkENV.DEVNET:
-            self.wss_url = constants.Network.DEVNET
-        elif network_url == constants.NetworkENV.TESTNET:
-            self.wss_url = constants.Network.TESTNET
-        elif network_url == constants.NetworkENV.MAINNET:
-            self.wss_url = constants.Network.MAINNET
+        network = os.environ[constants.EnvVar.NETWORK]
+        if network == constants.NetworkENV.LOCAL:
+            self.wss_url = constants.Network.LOCAL_WS
+        elif network == constants.NetworkENV.DEVNET:
+            self.wss_url = constants.Network.DEVNET_WS
+        elif network == constants.NetworkENV.TESTNET:
+            self.wss_url = constants.Network.TESTNET_WS
+        elif network == constants.NetworkENV.MAINNET:
+            self.wss_url = constants.Network.MAINNET_WS
         self.ws_block = None
         threading.Thread(target=self.subscribe_block()).start()
 
