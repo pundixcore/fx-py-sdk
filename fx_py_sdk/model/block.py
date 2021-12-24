@@ -17,6 +17,10 @@ class BlockResponse:
     Key = "key"
     Time = "time"
 
+    Response = "response"
+    Txs_results = "txs_results"
+    Begin_block_events = "begin_block_events"
+    End_block_events = "end_block_events"
 
 class EventTypes:
     # EndBlock

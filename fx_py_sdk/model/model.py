@@ -54,7 +54,7 @@ class Position(Base):
     margin_rate = Column(Numeric)
     initial_margin = Column(Numeric)
     pending_order_quantity = Column(Numeric)
-    status = Column(Numeric)  # open, close
+    status = Column(String(20))  # open, close
     open_height = Column(Integer)
     close_height = Column(Integer)
 

@@ -10,6 +10,7 @@ import threading
 from fx_py_sdk.model.block import *
 from fx_py_sdk.model.model import *
 from fx_py_sdk.model.crud import *
+from fx_py_sdk.fx_rpc.rpc import *
 from decimal import Decimal
 import sqlalchemy
 from sqlalchemy.orm.exc import NoResultFound
@@ -20,10 +21,43 @@ reconnect_tx_count = 0
 tm_event_NewBlock = "tm.event='NewBlock'"
 tm_event_Tx = "tm.event='Tx'"
 
-class DexScan:
+class RpcScan:
     def __init__(self):
+        network = os.environ[constants.EnvVar.NETWORK]
+        if network == constants.NetworkENV.LOCAL:
+            self.rpc_url = constants.Network.LOCAL_RPC
+        elif network == constants.NetworkENV.DEVNET:
+            self.rpc_url = constants.Network.DEVNET_RPC
+        elif network == constants.NetworkENV.TESTNET:
+            self.rpc_url = constants.Network.TESTNET_RPC
+        elif network == constants.NetworkENV.MAINNET:
+            self.rpc_url = constants.Network.MAINNET_RPC
+        self.rpc_client = HttpRpcClient(self.rpc_url)
+        self.scan = ScanBlock()
         self.crud = Crud()
-        self.wss_url = ''
+
+    def process_block(self):
+        abci_info = self.rpc_client.get_abci_info()
+        latest_block_height = int(abci_info["response"]["last_block_height"])
+
+        """get last sync block height from sql"""
+        sql_block = self.crud.session.query(Block).order_by(Block.height.desc()).first()
+        if sql_block is None:
+            latest_block_height_cursor = 0
+        else:
+            latest_block_height_cursor = sql_block.height
+
+        for block_height in [latest_block_height_cursor, latest_block_height]:
+            block_result = self.rpc_client.get_block_results(latest_block_height)
+            if block_result[BlockResponse.Txs_results] is not None:
+                print(block_result[BlockResponse.Txs_results])
+            if block_result[BlockResponse.Begin_block_events] is not None:
+                self.scan.process_begin_block(block_result[BlockResponse.Begin_block_events], block_height)
+            if block_result[BlockResponse.End_block_events] is not None:
+                self.scan.process_end_block(block_result[BlockResponse.End_block_events], block_height)
+
+class WebsocketScan:
+    def __init__(self):
         network = os.environ[constants.EnvVar.NETWORK]
         if network == constants.NetworkENV.LOCAL:
             self.wss_url = constants.Network.LOCAL_WS
@@ -34,6 +68,7 @@ class DexScan:
         elif network == constants.NetworkENV.MAINNET:
             self.wss_url = constants.Network.MAINNET_WS
         self.ws_block = None
+        self.scan = ScanBlock()
         threading.Thread(target=self.subscribe_block()).start()
 
     def _get_ws_endpoint_url(self):
@@ -61,9 +96,9 @@ class DexScan:
         msg = json.loads(message)
         if str(msg[BlockResponse.RESULT]) != '{}':
             if msg[BlockResponse.RESULT][BlockResponse.QUERY] == tm_event_Tx:
-                self._process_tx(msg)
+                self.scan.process_tx(msg)
             elif msg[BlockResponse.RESULT][BlockResponse.QUERY] == tm_event_NewBlock:
-                self._process_block(msg)
+                self.scan.process_block(msg)
 
     def on_open(self):
         logging.info("connection to fxdex...")
@@ -75,7 +110,7 @@ class DexScan:
         }
         data = json.dumps(data).encode()
         self.ws_block.send(data)
-
+        
         data = {
             "jsonrpc": "2.0",
             "method": "subscribe",
@@ -103,7 +138,11 @@ class DexScan:
         except:
             self.ws_block.close()
 
-    def _process_block(self, message: str):
+class ScanBlock:
+    def __init__(self):
+        self.crud = Crud()
+
+    def process_block(self, message: str):
         try:
             if BlockResponse.DATA not in message[BlockResponse.RESULT]:
                 logging.info(f"data not in message: {message}")
@@ -129,16 +168,16 @@ class DexScan:
 
             begin_block_events = message[BlockResponse.RESULT][BlockResponse.DATA][BlockResponse.VALUE][
                 BlockResponse.RESULT_BEGIN_BLOCK][BlockResponse.EVENTS]
-            self._process_begin_block(begin_block_events, block_height)
+            self.process_begin_block(begin_block_events, block_height)
 
             end_block_events = message[BlockResponse.RESULT][BlockResponse.DATA][BlockResponse.VALUE][
                 BlockResponse.RESULT_END_BLOCK][BlockResponse.EVENTS]
-            self._process_end_block(end_block_events, block_height)
+            self.process_end_block(end_block_events, block_height)
 
         except Exception as e:
             logging.error("error process block: ", e)
 
-    def _process_end_block(self, events: str, block_height: int):
+    def process_end_block(self, events: str, block_height: int):
         for event in events:
             if event[BlockResponse.TYPE] == EventTypes.New_position:
                 position = Position()
@@ -244,13 +283,16 @@ class DexScan:
 
                 trade = self.get_trade(event[BlockResponse.Attributes])
                 trade.block_height = block_height
-                try:
-                    self.crud.insert(trade)
-                except Exception as e:
-                    logging.error("insert trade error: ", e)
+                sql_order = self.crud.filterone(Order, Order.order_id == order.order_id)
+                if sql_order is None:
+                    self.crud.insert(order)
+                else:
+                    order.id = sql_order.id
+                    self.crud.update(Order, filter=(Order.order_id == order.order_id),
+                                     updic=order.to_dict())
         return
 
-    def _process_begin_block(self, events: str, block_height: int):
+    def process_begin_block(self, events: str, block_height: int):
         for event in events:
             if event[BlockResponse.TYPE] == EventTypes.Forced_liquidation_position:
                 position = self.get_position(event[BlockResponse.Attributes])
@@ -287,7 +329,7 @@ class DexScan:
     """
     ************************ subscribe tx ************************
     """
-    def _process_tx(self, message: str):
+    def process_tx(self, message: str):
         try:
             if BlockResponse.RESULT not in message:
                 logging.debug(f"result not in message yet {message}")
@@ -394,10 +436,15 @@ class DexScan:
             elif key == EventKeys.remain_locked:
                 order.remain_locked = Decimal(value)
             elif key == EventKeys.created_at:
-                timestamp = Timestamp()
-                timestamp.FromJsonString(value),
-                block_datetime = datetime.datetime.utcfromtimestamp(timestamp.ToSeconds())
-                order.created_at = block_datetime
+                if value.__contains__('T') and value.__contains__('Z'):
+                    timestamp = Timestamp()
+                    timestamp.FromJsonString(value),
+                    block_datetime = datetime.datetime.utcfromtimestamp(timestamp.ToSeconds())
+                    order.created_at = block_datetime
+                else:
+                    UTC_FORMAT = "%Y-%m-%d %H:%M:%S.%f +0000 UTC"
+                    block_datetime = datetime.datetime.strptime(value, UTC_FORMAT)
+                    order.created_at = block_datetime
             elif key == EventKeys.leverage:
                 order.leverage = int(value)
             elif key == EventKeys.status:
