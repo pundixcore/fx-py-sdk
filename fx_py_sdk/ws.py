@@ -15,6 +15,8 @@ from sqlalchemy.orm.exc import NoResultFound
 
 reconnect_block_count = 0
 reconnect_tx_count = 0
+tm_event_NewBlock = "tm.event='NewBlock'"
+tm_event_Tx = "tm.event='Tx'"
 
 class DexScan:
     def __init__(self):
@@ -30,9 +32,7 @@ class DexScan:
         elif network_url == constants.NetworkENV.MAINNET:
             self.wss_url = constants.Network.MAINNET
         self.ws_block = None
-        self.ws_tx = None
         threading.Thread(target=self.subscribe_block()).start()
-        # threading.Thread(target=self.subscribe_tx()).start()
 
     def _get_ws_endpoint_url(self):
         return f"{self.wss_url}websocket"
@@ -57,14 +57,27 @@ class DexScan:
         global reconnect_block_count
         reconnect_block_count = 0
         msg = json.loads(message)
-        self._process_block(msg)
+        if str(msg[BlockResponse.RESULT]) != '{}':
+            if msg[BlockResponse.RESULT][BlockResponse.QUERY] == tm_event_Tx:
+                self._process_tx(msg)
+            elif msg[BlockResponse.RESULT][BlockResponse.QUERY] == tm_event_NewBlock:
+                self._process_block(msg)
 
     def on_open(self):
         logging.info("connection to fxdex...")
         data = {
             "jsonrpc": "2.0",
             "method": "subscribe",
-            "params": ["tm.event='NewBlock'"],
+            "params": [tm_event_NewBlock],
+            "id": 1
+        }
+        data = json.dumps(data).encode()
+        self.ws_block.send(data)
+
+        data = {
+            "jsonrpc": "2.0",
+            "method": "subscribe",
+            "params": [tm_event_Tx],
             "id": 1
         }
         data = json.dumps(data).encode()
@@ -181,6 +194,7 @@ class DexScan:
                 if sql_order is None:
                     self.crud.insert(order)
                 else:
+                    order.id = sql_order.id
                     self.crud.update(Order, filter=(Order.order_id == order.order_id),
                                      updic=order.to_dict())
 
@@ -192,6 +206,7 @@ class DexScan:
                 if sql_order is None:
                     self.crud.insert(order)
                 else:
+                    order.id = sql_order.id
                     self.crud.update(Order, filter=(Order.order_id == order.order_id),
                                      updic=order.to_dict())
 
@@ -217,49 +232,6 @@ class DexScan:
     """
     ************************ subscribe tx ************************
     """
-    def on_error_tx(self, error):
-        global reconnect_tx_count
-        print("tx websocket caught: ", error)
-        if type(error) == ConnectionRefusedError or \
-                type(error) == ConnectionResetError or \
-                type(error) == websocket._exceptions.WebSocketConnectionClosedException:
-            print("正在尝试第%d次重连" % reconnect_tx_count)
-            reconnect_tx_count += 1
-            if reconnect_tx_count < 10:
-                self.subscribe_tx()
-        else:
-            print("tx websocket error: ", error)
-
-    def on_message_tx(self, message):
-        global reconnect_tx_count
-        reconnect_tx_count = 0
-        self._process_tx(json.loads(message))
-
-    def on_open_tx(self):
-        logging.info("connection to fxdex...")
-        data = {
-            "jsonrpc": "2.0",
-            "method": "subscribe",
-            "params": ["tm.event='Tx'"],
-            "id": 1
-        }
-        data = json.dumps(data).encode()
-        self.ws_tx.send(data)
-
-    def subscribe_tx(self):
-        websocket.enableTrace(True)
-        self.ws_tx = websocket.WebSocketApp(self._get_ws_endpoint_url(),
-                                    on_message=self.on_message_tx,
-                                    on_error=self.on_error_tx,
-                                    on_close=self.on_close,
-                                    on_open=self.on_open_tx)
-        try:
-            self.ws_tx.run_forever()
-        except KeyboardInterrupt:
-            self.ws_tx.close()
-        except:
-            self.ws_tx.close()
-
     def _process_tx(self, message: str):
         try:
             if BlockResponse.RESULT not in message:
@@ -281,25 +253,24 @@ class DexScan:
             block_number = int(block_number)
             for event in tx_events:
                 if event[BlockResponse.TYPE] == EventTypes.Order or event[BlockResponse.TYPE] == EventTypes.Close_position_order:
+                    """only insert order, if sql order is none, then do not update"""
                     order = self.get_order(event[BlockResponse.Attributes])
                     order.block_number = block_number
-                    try:
-                        q = self.crud.session.query(Order).filter_by(order_id=order.order_id)
-                    except Exception as e:
-                        try:
-                            self.crud.insert(order)
-                        except Exception as e:
-                            logging.error("insert order: ", e)
+                    sql_order = self.crud.filterone(Order, Order.order_id == order.order_id)
+                    if sql_order is None:
+                        self.crud.insert(order)
+
                 elif event[BlockResponse.TYPE] == EventTypes.Cancel_order:
+                    """only update order, but in case of not listened create order"""
                     order = self.get_order(event[BlockResponse.Attributes])
                     order.block_number = block_number
-                    try:
-                        q = self.crud.session.query(Order).filter_by(order_id=order.order_id)
-                    except Exception as e:
+                    sql_order = self.crud.filterone(Order, Order.order_id == order.order_id)
+                    if sql_order is None:
                         self.crud.insert(order)
                     else:
-                        self.crud.update(Order, filter=(Order.order_id == order.order_id), updic=order.to_dict())
-
+                        order.id = sql_order.id
+                        self.crud.update(Order, filter=(Order.order_id == order.order_id),
+                                         updic=order.to_dict())
         except Exception as e:
             logging.error("error process tx: ", e)
 

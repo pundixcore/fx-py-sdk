@@ -3,6 +3,7 @@ from decimal import Decimal
 class BlockResponse:
     RESULT = "result"
     DATA = "data"
+    QUERY = "query"
     VALUE = "value"
     BLOCK = "block"
     HEADER = "header"
