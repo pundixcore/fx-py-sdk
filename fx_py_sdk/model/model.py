@@ -100,6 +100,7 @@ class Tx(Base):
 class Sql:
     def __init__(self, database: str = "postgres", user: str = "postgres", password: str = "123456", host: str = "localhost",
                  port: str = "5432"):
+
         self.database = database
         self.user = user
         self.password = password
@@ -109,6 +110,7 @@ class Sql:
 
     def connect(self, db: str):
         """ Connect to the PostgreSQL database server """
+
         url = 'postgresql://{}:{}@{}:{}/{}'
         url = url.format(self.user, self.password, self.host, self.port, db)
         print(url)
@@ -116,7 +118,7 @@ class Sql:
         self.meta = sqlalchemy.MetaData(bind=self.engine)
         self.session = sessionmaker(bind=self.engine)
 
-    def create_table_by_sqla(self):
+    def create_table(self):
         Base.metadata.create_all(self.engine)
 
     def drop_table(self):

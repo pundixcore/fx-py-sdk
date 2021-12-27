@@ -8,15 +8,15 @@ class MyTestCase(unittest.TestCase):
         sql = Sql()
         sql.create_db("fxdex")
 
+    # def test_create_table(self):
+    #     sql = Sql()
+    #     sql.create_table("fxdex")
+
     def test_create_table(self):
-        sql = Sql()
-        sql.create_table("fxdex")
-
-    def test_create_table_by_sqla(self):
         sql = Sql(database="fxdex")
-        sql.create_table_by_sqla()
+        sql.create_table()
 
-    def test_drop_table_by_sqla(self):
+    def test_drop_table(self):
         sql = Sql(database="fxdex")
         sql.drop_table()
 

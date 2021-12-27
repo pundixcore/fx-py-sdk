@@ -75,7 +75,6 @@ class RpcScan:
             if block_result[BlockResponse.End_block_events] is not None:
                 self.scan.process_end_block(block_result[BlockResponse.End_block_events], block_height)
 
-
 class WebsocketScan:
     """use websocket connect fxdex, scan block event"""
 
