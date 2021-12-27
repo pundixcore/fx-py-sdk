@@ -334,7 +334,6 @@ class GRPCClient:
 
             locked_fee = decimal.Decimal(order.locked_fee)
             locked_fee = locked_fee / decimal.Decimal(DEFAULT_DEC)
-
             new_order = Order(
                 order.tx_hash,
                 order.id,
@@ -352,8 +351,8 @@ class GRPCClient:
                 order.order_type,
                 cost_fee,
                 locked_fee,
-                order.ttl,
-                MessageToJson(order.created_at),)
+                order.created_at.ToSeconds(),
+                order.ttl,)
             return new_order
 
         except Exception as e:

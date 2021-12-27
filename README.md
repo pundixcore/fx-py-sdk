@@ -57,13 +57,7 @@ cd fx_py_sdk
 ./scripts/imports.sh
 ```
 
-### 5.跑个Demo~
-
-```
-python grpc_client_test.py
-```
-
-### 6. 安装sdk
+### 5. 安装sdk
 
 > 从其他开发仓库导入sdk包，需要安装sdk, 默认安装到本地python版本的site-packages
 
@@ -72,7 +66,7 @@ python grpc_client_test.py
 ```
 
 
-### 7.使用sdk
+### 6.使用sdk
 
 > 在开发仓库执行easy_install, 加载到venv环境
 
@@ -82,3 +76,107 @@ easy_install  --find-links="$Install_PATH/site-packages" fx_py_sdk
 from fx_py_sdk.grpc_client import GRPCClient
 
 ```
+
+### 7.使用GRPC
+
+```python
+from fx_py_sdk.grpc_client import GRPCClient
+client = GRPCClient('127.0.0.1:9090')
+
+balances = client.query_all_balances(address="dex1zgpzdf2uqla7hkx85wnn4p2r3duwqzd8cfus97")
+print(balances)
+
+balances = client.query_all_balances(address="dex1v0zwwfe3gw2fqdhdnx0hcurh2gzz98z8dagewy")
+print(balances)
+```
+
+### 8.使用RPC
+
+```python
+from fx_py_sdk.fx_rpc.rpc import HttpRpcClient
+
+rpc_client = HttpRpcClient('http://127.0.0.1:26657')
+
+abci_info = rpc_client.get_abci_info()
+print("abci_info:", abci_info)
+
+block_res = rpc_client.get_block_results(100)
+print(block_res)
+```
+
+### 8.使用Websocket
+
+```python
+import asyncio
+import json
+from fx_py_sdk.fx_rpc.ws import FxWebsocket
+
+async def main():
+    ws_url = "ws://127.0.0.1:26657/"
+    data = {
+        "jsonrpc": "2.0",
+        "method": "subscribe",
+        "params": ["tm.event='NewBlock'"],
+        "id": 1
+    }
+
+    event = json.dumps(data).encode()
+    wss = FxWebsocket(ws_url, event)
+
+if __name__ == "__main__":
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())
+```
+
+### 9.扫描fxdex区块数据，并记录到postgresql
+
+postgres docker运行
+
+```shell
+Docker安装PostgreSQL
+
+1.拉取镜像
+
+docker pull postgres
+
+2.启动镜像
+
+docker run --name postgres -d -p 5432:5432 -e POSTGRES_PASSWORD=123456 postgres
+
+3.进入容器
+
+docker exec -it postgres psql -U postgres -d postgres
+
+4.创建database
+
+create database fxdex
+```
+
+创建table
+
+```shell
+from fx_py_sdk.model.model import sql
+sql.drop_table()
+sql.create_table()
+```
+
+启动websocket和rpc同时同步区块
+>websocket从连接到区块链时的区块开始同步，rpc从数据库断点开始同步直到连接时的区块
+
+```shell
+import asyncio
+from fx_py_sdk import scan
+
+async def main():
+    """rpc and websocket should run on the same time"""
+
+    scan.RpcScan()
+    scan.WebsocketScan()
+
+if __name__ == "__main__":
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())
+```
+
+
+
