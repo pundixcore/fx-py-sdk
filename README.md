@@ -3,17 +3,14 @@
 ### 1. 克隆代码到本地
 
 ```shell
-git clone https://github.com/falcons-x/fx-py-sdk
+git clone git@github.com:falcons-x/fx-py-sdk.git
 
 cd fx-pay-sdk
 ```
 
-
 ### 2. 构建当前项目的Python虚拟环境
 
 1. 创建虚拟目录 venv
-
-Mac 电脑示例
 
 ```
 python3 -m venv venv
@@ -64,7 +61,6 @@ cd fx_py_sdk
 ```shell
  python setup.py install
 ```
-
 
 ### 6.使用sdk
 
@@ -130,7 +126,7 @@ if __name__ == "__main__":
 
 ### 9.扫描fxdex区块数据，并记录到postgresql
 
-postgres docker运行
+**postgres docker运行**
 
 ```shell
 Docker安装PostgreSQL
@@ -152,18 +148,19 @@ docker exec -it postgres psql -U postgres -d postgres
 create database fxdex
 ```
 
-创建table
+**创建table**
 
-```shell
-from fx_py_sdk.model.model import sql
+```python
+from fx_py_sdk.model.model import Sql
+sql = Sql(database="fxdex")
 sql.drop_table()
 sql.create_table()
 ```
 
-启动websocket和rpc同时同步区块
+**启动websocket和rpc同时同步区块**
 >websocket从连接到区块链时的区块开始同步，rpc从数据库断点开始同步直到连接时的区块
 
-```shell
+```python
 import asyncio
 from fx_py_sdk import scan
 
@@ -177,6 +174,3 @@ if __name__ == "__main__":
     loop = asyncio.get_event_loop()
     loop.run_until_complete(main())
 ```
-
-
-
