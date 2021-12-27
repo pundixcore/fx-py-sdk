@@ -11,11 +11,11 @@ rootPath = os.path.abspath(os.path.dirname(__file__))
 sys.path.append(rootPath)
 
 async def main():
-    logging.basicConfig(level=logging.DEBUG)
-    rpc_scan = scan.RpcScan()
-    rpc_scan.process_block()
+    """rpc and websocket should run on the same time"""
+    logging.basicConfig(level=logging.INFO)
 
-    # scan.WebsocketScan()
+    scan.RpcScan()
+    scan.WebsocketScan()
 
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()

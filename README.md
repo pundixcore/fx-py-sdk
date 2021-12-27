@@ -57,13 +57,7 @@ cd fx_py_sdk
 ./scripts/imports.sh
 ```
 
-### 5.跑个Demo~
-
-```
-python grpc_client_test.py
-```
-
-### 6. 安装sdk
+### 5. 安装sdk
 
 > 从其他开发仓库导入sdk包，需要安装sdk, 默认安装到本地python版本的site-packages
 
@@ -72,7 +66,7 @@ python grpc_client_test.py
 ```
 
 
-### 7.使用sdk
+### 6.使用sdk
 
 > 在开发仓库执行easy_install, 加载到venv环境
 
@@ -82,3 +76,4 @@ easy_install  --find-links="$Install_PATH/site-packages" fx_py_sdk
 from fx_py_sdk.grpc_client import GRPCClient
 
 ```
+

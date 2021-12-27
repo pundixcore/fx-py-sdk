@@ -22,6 +22,8 @@ tm_event_NewBlock = "tm.event='NewBlock'"
 tm_event_Tx = "tm.event='Tx'"
 
 class RpcScan:
+    """use rpc connect fxdex, scan block event"""
+
     def __init__(self):
         network = os.environ[constants.EnvVar.NETWORK]
         if network == constants.NetworkENV.LOCAL:
@@ -34,21 +36,38 @@ class RpcScan:
             self.rpc_url = constants.Network.MAINNET_RPC
         self.rpc_client = HttpRpcClient(self.rpc_url)
         self.scan = ScanBlock()
-        self.crud = Crud()
+        threading.Thread(target=self.process_block).start()
 
     def process_block(self):
+        """parse block data"""
+
         abci_info = self.rpc_client.get_abci_info()
         latest_block_height = int(abci_info["response"]["last_block_height"])
 
         """get last sync block height from sql"""
-        sql_block = self.crud.session.query(Block).order_by(Block.height.desc()).first()
+        sql_block = self.scan.crud.session.query(Block).order_by(Block.height.desc()).first()
         if sql_block is None:
             latest_block_height_cursor = 0
         else:
             latest_block_height_cursor = sql_block.height
 
-        for block_height in [latest_block_height_cursor, latest_block_height]:
-            block_result = self.rpc_client.get_block_results(latest_block_height)
+        logging.info("Rpc scan from %d to %d", latest_block_height_cursor, latest_block_height)
+        for block_height in range(latest_block_height_cursor, latest_block_height+1):
+            block_result = self.rpc_client.get_block_results(block_height)
+
+            block_rpc = self.rpc_client.get_block(block_height)
+            block_time = block_rpc[BlockResponse.BLOCK][BlockResponse.HEADER][BlockResponse.Time]
+            timestamp = Timestamp()
+            timestamp.FromJsonString(block_time),
+            block_datetime = datetime.datetime.utcfromtimestamp(timestamp.ToSeconds())
+            block = Block(height=block_height, time=block_datetime)
+            sql_block = self.scan.crud.filterone(Block, Block.height == block_height)
+            if sql_block is None:
+                self.scan.crud.insert(block)
+            else:
+                self.scan.crud.update(Block, filter=(Block.height == block_height),
+                                 updic=block.to_dict())
+
             if block_result[BlockResponse.Txs_results] is not None:
                 print(block_result[BlockResponse.Txs_results])
             if block_result[BlockResponse.Begin_block_events] is not None:
@@ -56,7 +75,10 @@ class RpcScan:
             if block_result[BlockResponse.End_block_events] is not None:
                 self.scan.process_end_block(block_result[BlockResponse.End_block_events], block_height)
 
+
 class WebsocketScan:
+    """use websocket connect fxdex, scan block event"""
+
     def __init__(self):
         network = os.environ[constants.EnvVar.NETWORK]
         if network == constants.NetworkENV.LOCAL:
@@ -69,14 +91,11 @@ class WebsocketScan:
             self.wss_url = constants.Network.MAINNET_WS
         self.ws_block = None
         self.scan = ScanBlock()
-        threading.Thread(target=self.subscribe_block()).start()
+        threading.Thread(target=self.subscribe_block).start()
 
     def _get_ws_endpoint_url(self):
         return f"{self.wss_url}websocket"
 
-    """
-    ************************ subscribe Block ************************
-    """
     def on_error(self, error):
         global reconnect_block_count
         print("websocket caught: ", error)
@@ -125,7 +144,7 @@ class WebsocketScan:
 
     def subscribe_block(self):
         websocket.enableTrace(True)
-        print(self._get_ws_endpoint_url())
+        logging.info(self._get_ws_endpoint_url())
         self.ws_block = websocket.WebSocketApp(self._get_ws_endpoint_url(),
                                     on_message=self.on_message,
                                     on_error=self.on_error,
@@ -139,9 +158,15 @@ class WebsocketScan:
             self.ws_block.close()
 
 class ScanBlock:
+
+    """process block event, then update to sql"""
+
     def __init__(self):
         self.crud = Crud()
 
+    """
+     ************************ process Block ************************
+     """
     def process_block(self, message: str):
         try:
             if BlockResponse.DATA not in message[BlockResponse.RESULT]:
@@ -163,7 +188,7 @@ class ScanBlock:
             if sql_block is None:
                 self.crud.insert(block)
             else:
-                self.crud.update(Position, filter=(Block.height == block_height),
+                self.crud.update(Block, filter=(Block.height == block_height),
                                  updic=block.to_dict())
 
             begin_block_events = message[BlockResponse.RESULT][BlockResponse.DATA][BlockResponse.VALUE][
@@ -178,6 +203,8 @@ class ScanBlock:
             logging.error("error process block: ", e)
 
     def process_end_block(self, events: str, block_height: int):
+        """process fxdex chain EndBlock events"""
+
         for event in events:
             if event[BlockResponse.TYPE] == EventTypes.New_position:
                 position = Position()
@@ -293,6 +320,8 @@ class ScanBlock:
         return
 
     def process_begin_block(self, events: str, block_height: int):
+        """process fxdex chain BeginBlock events"""
+
         for event in events:
             if event[BlockResponse.TYPE] == EventTypes.Forced_liquidation_position:
                 position = self.get_position(event[BlockResponse.Attributes])
@@ -327,9 +356,11 @@ class ScanBlock:
         return
 
     """
-    ************************ subscribe tx ************************
+    ************************ process tx ************************
     """
     def process_tx(self, message: str):
+        """process fxdex chain Transaction events"""
+
         try:
             if BlockResponse.RESULT not in message:
                 logging.debug(f"result not in message yet {message}")
@@ -373,6 +404,7 @@ class ScanBlock:
 
 
     def get_position(self, attributes: []) -> Position:
+        """decode position data"""
         position = Position()
         for attribute in attributes:
             key = base64.b64decode(attribute[BlockResponse.Key]).decode('utf8')
@@ -409,6 +441,8 @@ class ScanBlock:
 
 
     def get_order(self, attributes: []) -> Order:
+        """decode order data"""
+
         order = Order()
         for attribute in attributes:
             key = base64.b64decode(attribute[BlockResponse.Key]).decode('utf8')
@@ -463,6 +497,8 @@ class ScanBlock:
         return order
 
     def get_trade(self, attributes: []) -> Order:
+        """decode trade data"""
+
         trade = Trade()
         for attribute in attributes:
             key = base64.b64decode(attribute[BlockResponse.Key]).decode('utf8')
