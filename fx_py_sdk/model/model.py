@@ -63,6 +63,8 @@ class Orderbook(Base):
     id = Column('id', Integer, primary_key=True, autoincrement=True)
     price = Column(Numeric)
     quantity = Column(Numeric)
+    direction = Column(String(20))
+    pair_id = Column(String(20))
 
 class Trade(Base):
     __tablename__ = 'trade'

@@ -36,5 +36,15 @@ class MyTestCase(unittest.TestCase):
         assert order.block_number==order_sql.block_number
         print(order_sql.to_dict())
 
+    def test_orderbook_from_sql(self):
+        sql = Crud()
+        orderbook = sql.get_orderbook_from_orderbook("tsla:usdt")
+        print(orderbook)
+
+    def test_get_orderbook_from_order(self):
+        sql = Crud()
+        orderbook = sql.get_orderbook_from_order("tsla:usdt")
+        print(orderbook)
+
 if __name__ == '__main__':
     unittest.main()

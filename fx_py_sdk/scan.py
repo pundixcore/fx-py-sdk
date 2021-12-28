@@ -15,6 +15,7 @@ from decimal import Decimal
 import sqlalchemy
 from sqlalchemy.orm.exc import NoResultFound
 from google.protobuf.timestamp_pb2 import Timestamp
+from sqlalchemy import and_
 
 reconnect_block_count = 0
 reconnect_tx_count = 0
@@ -47,7 +48,7 @@ class RpcScan:
         """get last sync block height from sql"""
         sql_block = self.scan.crud.session.query(Block).order_by(Block.height.desc()).first()
         if sql_block is None:
-            latest_block_height_cursor = 0
+            latest_block_height_cursor = 1
         else:
             latest_block_height_cursor = sql_block.height
 
@@ -69,7 +70,10 @@ class RpcScan:
                                  updic=block.to_dict())
 
             if block_result[BlockResponse.Txs_results] is not None:
-                print(block_result[BlockResponse.Txs_results])
+                for tx_result in block_result[BlockResponse.Txs_results]:
+                    tx_events = tx_result[BlockResponse.EVENTS]
+                    self.scan.process_tx(tx_events, block_height)
+
             if block_result[BlockResponse.Begin_block_events] is not None:
                 self.scan.process_begin_block(block_result[BlockResponse.Begin_block_events], block_height)
             if block_result[BlockResponse.End_block_events] is not None:
@@ -114,7 +118,27 @@ class WebsocketScan:
         msg = json.loads(message)
         if str(msg[BlockResponse.RESULT]) != '{}':
             if msg[BlockResponse.RESULT][BlockResponse.QUERY] == tm_event_Tx:
-                self.scan.process_tx(msg)
+                if BlockResponse.RESULT not in message:
+                    logging.debug(f"result not in message yet {message}")
+                    return
+                if BlockResponse.DATA not in message[BlockResponse.RESULT]:
+                    logging.debug(f"data not in message yet {message}")
+                    return
+                if BlockResponse.VALUE not in message[BlockResponse.RESULT][BlockResponse.DATA]:
+                    logging.debug(f"value not in message yet {message}")
+                    return
+                if BlockResponse.TxResult not in message[BlockResponse.RESULT][BlockResponse.DATA][
+                    BlockResponse.VALUE]:
+                    logging.debug(f"tx_result not in message yet {message}")
+                    return
+                tx_events = \
+                message[BlockResponse.RESULT][BlockResponse.DATA][BlockResponse.VALUE][BlockResponse.TxResult][
+                    BlockResponse.RESULT][BlockResponse.EVENTS]
+                block_height = \
+                message[BlockResponse.RESULT][BlockResponse.DATA][BlockResponse.VALUE][BlockResponse.TxResult][
+                    BlockResponse.HEIGHT]
+                block_height = int(block_height)
+                self.scan.process_tx(tx_events, block_height)
             elif msg[BlockResponse.RESULT][BlockResponse.QUERY] == tm_event_NewBlock:
                 self.scan.process_block(msg)
 
@@ -294,6 +318,7 @@ class ScanBlock:
                     order.id = sql_order.id
                     self.crud.update(Order, filter=(Order.order_id == order.order_id),
                                      updic=order.to_dict())
+                self.process_orderbook(order, False)
 
             elif event[BlockResponse.TYPE] == EventTypes.Order_fill:
                 """store order & trade"""
@@ -304,6 +329,7 @@ class ScanBlock:
                     self.crud.insert(order)
                 else:
                     order.id = sql_order.id
+                    order.block_height = sql_order.block_height
                     self.crud.update(Order, filter=(Order.order_id == order.order_id),
                                      updic=order.to_dict())
 
@@ -316,6 +342,22 @@ class ScanBlock:
                     order.id = sql_order.id
                     self.crud.update(Order, filter=(Order.order_id == order.order_id),
                                      updic=order.to_dict())
+
+                """process orderbook"""
+                sql_orderbook = self.crud.filterone(Orderbook, and_(Orderbook.price==order.price, Orderbook.pair_id==order.pair_id))
+                orderbook = Orderbook(price=order.price, quantity=order.base_quantity,
+                                      direction=order.direction, pair_id=order.pair_id)
+                if sql_orderbook is None:
+                    self.crud.insert(orderbook)
+                else:
+                    quantity = sql_orderbook.quantity - order.filled_quantity
+                    if quantity == 0:
+                        self.crud.delete(sql_orderbook)
+                    else:
+                        orderbook.quantity = quantity
+                        orderbook.id = sql_orderbook.id
+                        self.crud.update(Orderbook, filter=(Orderbook.id==orderbook.id),
+                                         updic=orderbook.to_dict())
         return
 
     def process_begin_block(self, events: str, block_height: int):
@@ -345,6 +387,8 @@ class ScanBlock:
                     self.crud.update(Order, filter=(Order.order_id == order.order_id),
                                      updic=order.to_dict())
 
+                self.process_orderbook(order, False)
+
             elif event[BlockResponse.TYPE] == EventTypes.Liquidation_position_order:
                 """liquidation generate new order, only insert order"""
                 order = self.get_order(event[BlockResponse.Attributes])
@@ -352,55 +396,64 @@ class ScanBlock:
                 sql_order = self.crud.filterone(Order, Order.order_id == order.order_id)
                 if sql_order is None:
                     self.crud.insert(order)
+                self.process_orderbook(order, True)
         return
 
     """
     ************************ process tx ************************
     """
-    def process_tx(self, message: str):
+    def process_tx(self, tx_events, block_height):
         """process fxdex chain Transaction events"""
+        for event in tx_events:
+            if event[BlockResponse.TYPE] == EventTypes.Order or event[
+                BlockResponse.TYPE] == EventTypes.Close_position_order:
+                """only insert order, if sql order is none, then do not update"""
+                order = self.get_order(event[BlockResponse.Attributes])
+                order.block_height = block_height
+                sql_order = self.crud.filterone(Order, Order.order_id == order.order_id)
+                if sql_order is None:
+                    self.crud.insert(order)
+                self.process_orderbook(order, True)
 
-        try:
-            if BlockResponse.RESULT not in message:
-                logging.debug(f"result not in message yet {message}")
-                return
-            if BlockResponse.DATA not in message[BlockResponse.RESULT]:
-                logging.debug(f"data not in message yet {message}")
-                return
-            if BlockResponse.VALUE not in message[BlockResponse.RESULT][BlockResponse.DATA]:
-                logging.debug(f"value not in message yet {message}")
-                return
-            if BlockResponse.TxResult not in message[BlockResponse.RESULT][BlockResponse.DATA][BlockResponse.VALUE]:
-                logging.debug(f"tx_result not in message yet {message}")
-                return
-            tx_events = message[BlockResponse.RESULT][BlockResponse.DATA][BlockResponse.VALUE][BlockResponse.TxResult][
-                BlockResponse.RESULT][BlockResponse.EVENTS]
-            block_height = message[BlockResponse.RESULT][BlockResponse.DATA][BlockResponse.VALUE][BlockResponse.TxResult][
-                BlockResponse.HEIGHT]
-            block_height = int(block_height)
-            for event in tx_events:
-                if event[BlockResponse.TYPE] == EventTypes.Order or event[BlockResponse.TYPE] == EventTypes.Close_position_order:
-                    """only insert order, if sql order is none, then do not update"""
-                    order = self.get_order(event[BlockResponse.Attributes])
-                    order.block_height = block_height
-                    sql_order = self.crud.filterone(Order, Order.order_id == order.order_id)
-                    if sql_order is None:
-                        self.crud.insert(order)
+            elif event[BlockResponse.TYPE] == EventTypes.Cancel_order:
+                """only update order, but in case of not listened create order"""
+                order = self.get_order(event[BlockResponse.Attributes])
+                order.cancel_block_height = block_height
+                sql_order = self.crud.filterone(Order, Order.order_id == order.order_id)
+                if sql_order is None:
+                    self.crud.insert(order)
+                else:
+                    order.id = sql_order.id
+                    self.crud.update(Order, filter=(Order.order_id == order.order_id),
+                                     updic=order.to_dict())
+                self.process_orderbook(order, False)
 
-                elif event[BlockResponse.TYPE] == EventTypes.Cancel_order:
-                    """only update order, but in case of not listened create order"""
-                    order = self.get_order(event[BlockResponse.Attributes])
-                    order.cancel_block_height = block_height
-                    sql_order = self.crud.filterone(Order, Order.order_id == order.order_id)
-                    if sql_order is None:
-                        self.crud.insert(order)
-                    else:
-                        order.id = sql_order.id
-                        self.crud.update(Order, filter=(Order.order_id == order.order_id),
-                                         updic=order.to_dict())
-        except Exception as e:
-            logging.error("error process tx: ", e)
+    def process_orderbook(self, order: Order, add_or_cancel: bool):
 
+        sql_orderbook = self.crud.filterone(Orderbook,
+                                            and_(Orderbook.price == order.price, Orderbook.pair_id == order.pair_id))
+        orderbook = Orderbook(price=order.price, quantity=order.base_quantity,
+                              direction=order.direction, pair_id=order.pair_id)
+        if add_or_cancel:
+            if sql_orderbook is None:
+                self.crud.insert(orderbook)
+            else:
+                orderbook.id = sql_orderbook.id
+                orderbook.quantity = order.base_quantity + sql_orderbook.quantity
+                self.crud.update(Orderbook, filter=(Orderbook.id == orderbook.id),
+                                 updic=orderbook.to_dict())
+        else:
+            if sql_orderbook is None:
+                self.crud.insert(orderbook)
+            else:
+                quantity = sql_orderbook.quantity - order.base_quantity
+                if quantity == 0:
+                    self.crud.delete(sql_orderbook)
+                else:
+                    orderbook.id = sql_orderbook.id
+                    orderbook.quantity = quantity
+                    self.crud.update(Orderbook, filter=(Orderbook.id == orderbook.id),
+                                     updic=orderbook.to_dict())
 
     def get_position(self, attributes: []) -> Position:
         """decode position data"""

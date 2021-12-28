@@ -30,8 +30,7 @@ message MsgCreateOrder {
         (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
         (gogoproto.nullable) = false
     ];
-    int64 ttl = 6;
-    int64 leverage = 7;
+    int64 leverage = 6;
 }
 
 message MsgCreateOrderResponse {
