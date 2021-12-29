@@ -397,6 +397,32 @@ class ScanBlock:
                 if sql_order is None:
                     self.crud.insert(order)
                 self.process_orderbook(order, True)
+
+            elif event[BlockResponse.TYPE] == EventTypes.Settle_funding:
+                """parse settle funding rate log"""
+                funding_transfer = FundingTransfer()
+                funding_transfer.block_height = block_height
+                for attribute in event[BlockResponse.Attributes]:
+                    key = base64.b64decode(attribute[BlockResponse.Key]).decode('utf8')
+                    value = base64.b64decode(attribute[BlockResponse.VALUE]).decode('utf8')
+                    if key == EventKeys.position_id:
+                        funding_transfer.position_id = int(value)
+                    elif key == EventKeys.owner:
+                        funding_transfer.owner = value
+                    elif key == EventKeys.pair_id:
+                        funding_transfer.pair_id = value
+                    elif key == EventKeys.funding_fee:
+                        funding_transfer.funding_fee = Decimal(value)
+
+                """in case of duplicate"""
+                sql_transfer = self.crud.filterone(FundingTransfer, and_(FundingTransfer.pair_id == funding_transfer.pair_id,
+                                                                      FundingTransfer.block_height == funding_transfer.block_height,
+                                                                      FundingTransfer.owner == funding_transfer.owner,
+                                                                      FundingTransfer.position_id == funding_transfer.position_id,
+                                                                      ))
+                if sql_transfer is None:
+                    self.crud.insert(funding_transfer)
+                    """if exist, do not need to update"""
         return
 
     """

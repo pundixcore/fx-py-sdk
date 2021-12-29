@@ -23,7 +23,7 @@ class BlockResponse:
     End_block_events = "end_block_events"
 
 class EventTypes:
-    # EndBlock
+    """EndBlock"""
     Add_position = "dex.add_position"
     Order_fill = "dex.order_fill"
     New_position = "fx.dex.Position"
@@ -32,12 +32,13 @@ class EventTypes:
     Cancel_order_expire = "dex.cancel_order" # expire block
     Cancel_order_partial_order = "dex.cancel_order" # will not happen from 2021/12/21
 
-    # BeginBlock
+    """BeginBlock"""
     Forced_liquidation_position = "dex.forced_liquidation_position"
     Liq_cancel_order = "dex.liq_cancel_order"
     Liquidation_position_order = "dex.liquidation_position_order"
+    Settle_funding = "dex.settle_funding"
 
-    # Tx event
+    """Tx event"""
     Order = "fx.dex.Order"
     Cancel_order = "dex.cancel_order"
     Close_position_order = "dex.close_position_order"
@@ -78,6 +79,8 @@ class EventKeys:
 
     matched_quantity = "matched_quantity"
     unfilled_quantity = "unfilled_quantity"
+
+    funding_fee = "funding_fee"
 
 class PositionStatus:
     Open = "open"

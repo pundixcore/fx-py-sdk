@@ -85,6 +85,15 @@ class Trade(Base):
     cost_fee = Column(Numeric)
     locked_fee = Column(Numeric)
 
+class FundingTransfer(Base):
+    __tablename__ = 'funding_transfer'
+    id = Column('id', Integer, primary_key=True, autoincrement=True)
+    position_id = Column(Integer)
+    pair_id = Column(String(20))
+    owner = Column(String(42))
+    funding_fee = Column(Numeric)
+    block_height = Column(Integer)
+
 class Block(Base):
     __tablename__ = 'block'
     height = Column('height', Integer, primary_key=True, autoincrement=False)
