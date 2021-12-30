@@ -566,7 +566,7 @@ class GRPCClient:
 
         msg = MsgCreateOrder(owner=tx_builder.acc_address(), pair_id=pair_id, direction=direction, price=price_split[0],
                              base_quantity=base_quantity_split[0],
-                             ttl=1000, leverage=leverage)
+                             leverage=leverage)
 
         msg_any = Any(type_url='/fx.dex.MsgCreateOrder', value=msg.SerializeToString())
         # DEX 交易设置固定gas

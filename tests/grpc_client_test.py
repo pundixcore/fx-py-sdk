@@ -11,8 +11,8 @@ from google.protobuf.json_format import MessageToJson
 import json
 from google.protobuf.timestamp_pb2 import Timestamp
 
-# client = GRPCClient('44.196.199.119:9090')
-client = GRPCClient('127.0.0.1:9090')
+client = GRPCClient('44.196.199.119:9090')
+# client = GRPCClient('127.0.0.1:9090')
 
 
 class MyTestCase(unittest.TestCase):
@@ -78,43 +78,39 @@ class MyTestCase(unittest.TestCase):
         print(resp)
 
     def test_create_order(self):
-        cli = GRPCClient('44.196.199.119:9090')
-
         priv_key = wallet.seed_to_privkey(
             "dune antenna hood magic kit blouse film video another pioneer dilemma hobby message rug sail gas culture upgrade twin flag joke people general aunt")
 
         address = priv_key.to_address()
         print('address:', address)
 
-        chain_id = cli.query_chain_id()
+        chain_id = client.query_chain_id()
         print('chain_id:', chain_id)
 
-        account = cli.query_account_info(address)
+        account = client.query_account_info(address)
         print('account number:', account.account_number, 'sequence:', account.sequence)
 
         tx_builder = TxBuilder(priv_key, chain_id, account.account_number, Coin(amount='60000000', denom='FX'))
 
-        tx_response = cli.create_order(tx_builder, 'tsla:usdt', "BUY", decimal.Decimal(910.1), decimal.Decimal(1.2), 10, account.sequence, mode=BROADCAST_MODE_BLOCK)
+        tx_response = client.create_order(tx_builder, 'tsla:usdt', "BUY", decimal.Decimal(910.1), decimal.Decimal(1.2), 10, account.sequence, mode=BROADCAST_MODE_BLOCK)
         print(MessageToJson(tx_response))
 
     def test_cancel_order(self):
-        cli = GRPCClient('44.196.199.119:9090')
-
         priv_key = wallet.seed_to_privkey(
             "dune antenna hood magic kit blouse film video another pioneer dilemma hobby message rug sail gas culture upgrade twin flag joke people general aunt")
 
         address = priv_key.to_address()
         print('address:', address)
 
-        chain_id = cli.query_chain_id()
+        chain_id = client.query_chain_id()
         print('chain_id:', chain_id)
 
-        account = cli.query_account_info(address)
+        account = client.query_account_info(address)
         print('account number:', account.account_number, 'sequence:', account.sequence)
 
         tx_builder = TxBuilder(priv_key, chain_id, account.account_number, Coin(amount='60000000', denom='FX'))
 
-        create_tx_response = cli.create_order(tx_builder, 'tsla:dai', BUY, decimal.Decimal(1.1), decimal.Decimal(1.2), 10, account.sequence, mode=BROADCAST_MODE_BLOCK)
+        create_tx_response = client.create_order(tx_builder, 'tsla:dai', BUY, decimal.Decimal(1.1), decimal.Decimal(1.2), 10, account.sequence, mode=BROADCAST_MODE_BLOCK)
         res_str = MessageToJson(create_tx_response)
         res = json.loads(res_str)
         order_id = ''
@@ -127,11 +123,10 @@ class MyTestCase(unittest.TestCase):
 
         print("create order id = ", order_id)
 
-        tx_response = cli.cancel_order(tx_builder, order_id, account.sequence + 1, mode=BROADCAST_MODE_BLOCK)
+        tx_response = client.cancel_order(tx_builder, order_id, account.sequence + 1, mode=BROADCAST_MODE_BLOCK)
         print(tx_response)
 
     def test_close_position(self):
-        cli = GRPCClient('44.196.199.119:9090')
         pair_id = "tsla:usdt"
         priv_key = wallet.seed_to_privkey(
             "dune antenna hood magic kit blouse film video another pioneer dilemma hobby message rug sail gas culture upgrade twin flag joke people general aunt")
@@ -139,10 +134,10 @@ class MyTestCase(unittest.TestCase):
         address = priv_key.to_address()
         print('address:', address)
 
-        chain_id = cli.query_chain_id()
+        chain_id = client.query_chain_id()
         print('chain_id:', chain_id)
 
-        account = cli.query_account_info(address)
+        account = client.query_account_info(address)
         print('account number:', account.account_number, 'sequence:', account.sequence)
 
         positions = client.query_positions(owner='dex1zgpzdf2uqla7hkx85wnn4p2r3duwqzd8cfus97', pair_id=pair_id)
@@ -150,7 +145,7 @@ class MyTestCase(unittest.TestCase):
         self.assertNotEqual(len(positions), 0)
 
         tx_builder = TxBuilder(priv_key, chain_id, account.account_number, Coin(amount='60000000', denom='FX'))
-        tx_response = cli.close_position(tx_builder, pair_id, positions[0].Id, positions[0].MarkPrice, decimal.Decimal(0.1), True, account.sequence, mode=BROADCAST_MODE_BLOCK)
+        tx_response = client.close_position(tx_builder, pair_id, positions[0].Id, positions[0].MarkPrice, decimal.Decimal(0.1), True, account.sequence, mode=BROADCAST_MODE_BLOCK)
         print(tx_response)
 
 
