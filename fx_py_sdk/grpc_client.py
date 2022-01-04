@@ -297,7 +297,6 @@ class GRPCClient:
                 filled_quantity	string	订单已成交数量	
                 filled_avg_price	string	订单已成交均价	
                 remain_locked	string	订单剩余未成交数量
-                ttl	int64	到期时间（秒）
                 created_at	string	创建时间
                 leverage	int64	杠杆
                 status	OrderStatus	订单状态
@@ -306,7 +305,7 @@ class GRPCClient:
                 locked_fee	string｜ 锁定费用
 
                 example:
-                    Order(TxHash='F6EA065DD58257AE1AB2F22AE45040A1F8E747E5668F3E8DF857CA222B38B85A', Id='ID-706-1', Owner='dex1ggz598a4506llaglzsmhp3r23hfke6nw29wans', PairId='tsla:usdc', Direction=0, Price=1000.4, BaseQuantity=0.5, QuoteQuantity=50.02, FilledQuantity=0.0, FilledAvgPrice=0.0, RemainLocked=500.2, Leverage=10, Status=0, OrderType=0, CostFee=0.0, LockedFee=0.20008, Ttl=86400)
+                    Order(TxHash='F6EA065DD58257AE1AB2F22AE45040A1F8E747E5668F3E8DF857CA222B38B85A', Id='ID-706-1', Owner='dex1ggz598a4506llaglzsmhp3r23hfke6nw29wans', PairId='tsla:usdc', Direction=0, Price=1000.4, BaseQuantity=0.5, QuoteQuantity=50.02, FilledQuantity=0.0, FilledAvgPrice=0.0, RemainLocked=500.2, Leverage=10, Status=0, OrderType=0, CostFee=0.0, LockedFee=0.20008)
         """
         try:
             response = DexQuery(self.channel).QueryOrder(QueryOrderRequest(order_id=order_id))
@@ -352,10 +351,11 @@ class GRPCClient:
                 cost_fee,
                 locked_fee,
                 order.created_at.ToSeconds(),
-                order.ttl,)
+                )
             return new_order
 
         except Exception as e:
+            print(e)
             return None
 
 
@@ -369,8 +369,8 @@ class GRPCClient:
             Returns:
                 orders	Orders	订单列表
                 example:
-            [Order(TxHash='236A2424826BE4C3F75F33B2835E47063F1F7077D8AFC63CFAE73C31A9810BF9', Id='ID-5-1', Owner='dex1ggz598a4506llaglzsmhp3r23hfke6nw29wans', PairId='tsla:usdc', Direction=0, Price=1000.4, BaseQuantity=0.5, QuoteQuantity=50.02, FilledQuantity=0.0, FilledAvgPrice=0.0, RemainLocked=500.2, Leverage=10, Status=0, OrderType=0, CostFee=0.0, LockedFee=0.20008, Ttl=86400),
-            Order(TxHash='3F9656C61695AFCE827ADC19D5B2E51CA9B5682E1EC4020DD091E4C9DD1F83FF', Id='ID-7-1', Owner='dex1ggz598a4506llaglzsmhp3r23hfke6nw29wans', PairId='tsla:usdc', Direction=0, Price=1000.4, BaseQuantity=0.5, QuoteQuantity=50.02, FilledQuantity=0.0, FilledAvgPrice=0.0, RemainLocked=500.2, Leverage=10, Status=0, OrderType=0, CostFee=0.0, LockedFee=0.20008, Ttl=86400)]
+            [Order(TxHash='236A2424826BE4C3F75F33B2835E47063F1F7077D8AFC63CFAE73C31A9810BF9', Id='ID-5-1', Owner='dex1ggz598a4506llaglzsmhp3r23hfke6nw29wans', PairId='tsla:usdc', Direction=0, Price=1000.4, BaseQuantity=0.5, QuoteQuantity=50.02, FilledQuantity=0.0, FilledAvgPrice=0.0, RemainLocked=500.2, Leverage=10, Status=0, OrderType=0, CostFee=0.0, LockedFee=0.20008),
+            Order(TxHash='3F9656C61695AFCE827ADC19D5B2E51CA9B5682E1EC4020DD091E4C9DD1F83FF', Id='ID-7-1', Owner='dex1ggz598a4506llaglzsmhp3r23hfke6nw29wans', PairId='tsla:usdc', Direction=0, Price=1000.4, BaseQuantity=0.5, QuoteQuantity=50.02, FilledQuantity=0.0, FilledAvgPrice=0.0, RemainLocked=500.2, Leverage=10, Status=0, OrderType=0, CostFee=0.0, LockedFee=0.20008)]
         """
         orders = []
         try:
@@ -419,7 +419,6 @@ class GRPCClient:
                     order.order_type,
                     cost_fee,
                     locked_fee,
-                    order.ttl,
                     MessageToJson(order.created_at),)
 
                 orders.append(new_order)

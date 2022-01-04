@@ -47,7 +47,6 @@ class Order(NamedTuple):
     CostFee: Decimal
     LockedFee: Decimal
     Created_at: str
-    Ttl: int
 
 class Position(NamedTuple):
     Id: int

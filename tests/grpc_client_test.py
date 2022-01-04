@@ -49,7 +49,7 @@ class MyTestCase(unittest.TestCase):
         # print(owner.to_string())
 
     def test_query_order(self):
-        resp = client.query_order(order_id='ID-718-1')
+        resp = client.query_order(order_id='ID-429928-2')
         print(resp)
 
     def test_query_orders(self):
@@ -148,9 +148,8 @@ class MyTestCase(unittest.TestCase):
         tx_response = client.close_position(tx_builder, pair_id, positions[0].Id, positions[0].MarkPrice, decimal.Decimal(0.1), True, account.sequence, mode=BROADCAST_MODE_BLOCK)
         print(tx_response)
 
-
     def test_query_orders_by_account(self):
-        orders = client.query_orders_by_account('dex14xav7xz74lgrsfja36ak440kjwd7ga4wy2q6r6', 1, 20)
+        orders = client.query_orders_by_account('dex1n58mly6f7er0zs6swtetqgfqs36jaarqlhs528', 1, 20)
         print(orders)
 
     def test_decimal(self):
