@@ -32,6 +32,9 @@ class Crud:
         self.session.delete(object)
         self.session.commit()
 
+    def get_funding_transfer(self, address: str):
+        return self.session.query(FundingTransfer).filter(FundingTransfer.owner == address)
+
     def get_positions(self, address: str):
         return self.session.query(Position).filter(Position.owner == address)
 
