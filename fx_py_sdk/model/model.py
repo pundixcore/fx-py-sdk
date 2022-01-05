@@ -3,6 +3,8 @@ import sqlalchemy
 from sqlalchemy import Table, Column, Integer, String, ForeignKey, Numeric, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from fx_py_sdk import constants
+import os
 
 Base = declarative_base()
 
@@ -112,6 +114,21 @@ class Sql:
     def __init__(self, database: str = "postgres", user: str = "postgres", password: str = "123456", host: str = "localhost",
                  port: str = "5432"):
 
+        database_env = os.environ[constants.DB.Database]
+        user_env = os.environ[constants.DB.User]
+        password_env = os.environ[constants.DB.Password]
+        host_env = os.environ[constants.DB.Host]
+        port_env = os.environ[constants.DB.Port]
+        if len(database_env) > 0:
+            database = database_env
+        if len(user_env) > 0:
+            user = user_env
+        if len(password_env) > 0:
+            password = password_env
+        if len(host_env) > 0:
+            host = host_env
+        if len(port_env) > 0:
+            port = port_env
         self.database = database
         self.user = user
         self.password = password

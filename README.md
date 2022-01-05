@@ -160,6 +160,16 @@ sql.create_table()
 **启动websocket和rpc同时同步区块**
 >websocket从连接到区块链时的区块开始同步，rpc从数据库断点开始同步直到连接时的区块
 
+默认连接本地sql host和port，可以通过环境变量设置
+```shell
+export NETWORK=devnet
+export database=postgres
+export user=postgres
+export password=123456
+export host=localhost
+export port=5432
+```
+
 ```python
 import asyncio
 from fx_py_sdk import scan
