@@ -44,12 +44,10 @@ class Crud:
     def get_orderbook_from_orderbook(self, pair_id: str):
         """get orderbook from sql orderbook table"""
         orderbook_ask = self.session.query(Orderbook.price, Orderbook.quantity).filter(Orderbook.pair_id == pair_id,
-                                             Orderbook.direction == 'ASK').\
-            order_by(Orderbook.price).limit(100)
+                                             Orderbook.direction == 'ASK').order_by(Orderbook.price).limit(100)
 
         orderbook_bid = self.session.query(Orderbook.price, Orderbook.quantity).filter(Orderbook.pair_id == pair_id,
-                                             Orderbook.direction == 'BID'). \
-            order_by(Orderbook.price.desc()).limit(100)
+                                             Orderbook.direction == 'BID').order_by(Orderbook.price.desc()).limit(100)
         orderbook = dict()
         asks = []
         bids = []
