@@ -1,5 +1,6 @@
 import decimal
 import grpc
+import fx_py_sdk
 from fx_py_sdk.codec.cosmos.auth.v1beta1.auth_pb2 import BaseAccount
 from fx_py_sdk.codec.cosmos.auth.v1beta1.query_pb2 import QueryAccountRequest
 from fx_py_sdk.codec.cosmos.auth.v1beta1.query_pb2_grpc import QueryStub as AuthQuery
@@ -39,7 +40,7 @@ from google.protobuf.json_format import MessageToJson
 import json
 import requests
 from fx_py_sdk.model.crud import Crud
-from fx_py_sdk.model.model import *
+from fx_py_sdk.model.model import Order as CrudOrder
 
 
 DEFAULT_DEX_GAS = 5000000
@@ -453,7 +454,10 @@ class GRPCClient:
         #             order.created_at, )
         #
         #         orders.append(new_order)
-        sql_orders = self.crud.session.query(Order, Order.owner==owner, Order.pair_id==pair_id).limit(int(limit)).offset(int(page)).all()
+        sql_orders = (self.crud.session.query(CrudOrder, CrudOrder.owner==owner, CrudOrder.pair_id==pair_id)
+                                       .limit(int(limit))
+                                       .offset(int(page))
+                                       .all())
         for order in sql_orders:
             new_order = Order(
                 order.tx_hash,
