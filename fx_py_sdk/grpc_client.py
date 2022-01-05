@@ -134,28 +134,13 @@ class GRPCClient:
 
             for order in data['data']['data']:
                 base_quantity = decimal.Decimal(order['baseQuantity'])
-                base_quantity = base_quantity / decimal.Decimal(DEFAULT_DEC)
-
                 price = decimal.Decimal(order['price'])
-                price = price / decimal.Decimal(DEFAULT_DEC)
-
                 quote_quantity = decimal.Decimal(order['quoteQuantity'])
-                quote_quantity = quote_quantity / decimal.Decimal(DEFAULT_DEC)
-
                 filled_quantity = decimal.Decimal(order['filledQuantity'])
-                filled_quantity = filled_quantity / decimal.Decimal(DEFAULT_DEC)
-
                 filled_avg_price = decimal.Decimal(order['filledAvgPrice'])
-                filled_avg_price = filled_avg_price / decimal.Decimal(DEFAULT_DEC)
-
                 remain_locked = decimal.Decimal(order['remainLocked'])
-                remain_locked = remain_locked / decimal.Decimal(DEFAULT_DEC)
-
                 cost_fee = decimal.Decimal(order['costFee'])
-                cost_fee = cost_fee / decimal.Decimal(DEFAULT_DEC)
-
                 locked_fee = decimal.Decimal(order['lockedFee'])
-                locked_fee = locked_fee / decimal.Decimal(DEFAULT_DEC)
 
                 new_order = Order(
                     order['txHash'],
@@ -174,8 +159,7 @@ class GRPCClient:
                     order['orderTypeName'],
                     cost_fee,
                     locked_fee,
-                    order['blockTime'],
-                    order['expiredTime'],)
+                    order['blockTime'],)
 
                 orders.append(new_order)
 
