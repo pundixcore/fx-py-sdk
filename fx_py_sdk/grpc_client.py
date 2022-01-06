@@ -380,105 +380,91 @@ class GRPCClient:
             [Order(TxHash='236A2424826BE4C3F75F33B2835E47063F1F7077D8AFC63CFAE73C31A9810BF9', Id='ID-5-1', Owner='dex1ggz598a4506llaglzsmhp3r23hfke6nw29wans', PairId='tsla:usdc', Direction=0, Price=1000.4, BaseQuantity=0.5, QuoteQuantity=50.02, FilledQuantity=0.0, FilledAvgPrice=0.0, RemainLocked=500.2, Leverage=10, Status=0, OrderType=0, CostFee=0.0, LockedFee=0.20008),
             Order(TxHash='3F9656C61695AFCE827ADC19D5B2E51CA9B5682E1EC4020DD091E4C9DD1F83FF', Id='ID-7-1', Owner='dex1ggz598a4506llaglzsmhp3r23hfke6nw29wans', PairId='tsla:usdc', Direction=0, Price=1000.4, BaseQuantity=0.5, QuoteQuantity=50.02, FilledQuantity=0.0, FilledAvgPrice=0.0, RemainLocked=500.2, Leverage=10, Status=0, OrderType=0, CostFee=0.0, LockedFee=0.20008)]
         """
-        orders = []
-        # try:
-        #     response = DexQuery(self.channel).QueryOrders(QueryOrdersRequest(
-        #         owner=Address(owner).to_bytes(), pair_id=pair_id, page=page, limit=limit))
-        #
-        #     for order in response.orders:
-        #         price = decimal.Decimal(order.price)
-        #         price = price / decimal.Decimal(DEFAULT_DEC)
-        #
-        #         base_quantity = decimal.Decimal(order.base_quantity)
-        #         base_quantity = base_quantity / decimal.Decimal(DEFAULT_DEC)
-        #
-        #         quote_quantity = decimal.Decimal(order.quote_quantity)
-        #         quote_quantity = quote_quantity / decimal.Decimal(DEFAULT_DEC)
-        #
-        #         filled_quantity = decimal.Decimal(order.filled_quantity)
-        #         filled_quantity = filled_quantity / decimal.Decimal(DEFAULT_DEC)
-        #
-        #         filled_avg_price = decimal.Decimal(order.filled_avg_price)
-        #         filled_avg_price = filled_avg_price / decimal.Decimal(DEFAULT_DEC)
-        #
-        #         remain_locked = decimal.Decimal(order.remain_locked)
-        #         remain_locked = remain_locked / decimal.Decimal(DEFAULT_DEC)
-        #
-        #         cost_fee = decimal.Decimal(order.cost_fee)
-        #         cost_fee = cost_fee / decimal.Decimal(DEFAULT_DEC)
-        #
-        #         locked_fee = decimal.Decimal(order.locked_fee)
-        #         locked_fee = locked_fee / decimal.Decimal(DEFAULT_DEC)
-        #
-        #         new_order = Order(
-        #             order.tx_hash,
-        #             order.id,
-        #             Address(order.owner).to_string(),
-        #             order.pair_id,
-        #             order.direction,
-        #             price,
-        #             base_quantity,
-        #             quote_quantity,
-        #             filled_quantity,
-        #             filled_avg_price,
-        #             remain_locked,
-        #             order.leverage,
-        #             order.status,
-        #             order.order_type,
-        #             cost_fee,
-        #             locked_fee,
-        #             MessageToJson(order.created_at),)
-        #
-        #         orders.append(new_order)
-        #
-        # except Exception as e:
-        #     sql_orders = self.crud.session.query(Order, Order.owner==owner, Order.pair_id==pair_id).limit(int(limit)).offset(int(page)).all()
-        #     for order in sql_orders:
-        #         new_order = Order(
-        #             order.tx_hash,
-        #             order.id,
-        #             Address(order.owner).to_string(),
-        #             order.pair_id,
-        #             order.direction,
-        #             order.price,
-        #             order.base_quantity,
-        #             order.quote_quantity,
-        #             order.filled_quantity,
-        #             order.filled_avg_price,
-        #             order.remain_locked,
-        #             order.leverage,
-        #             order.status,
-        #             order.order_type,
-        #             order.cost_fee,
-        #             order.locked_fee,
-        #             order.created_at, )
-        #
-        #         orders.append(new_order)
-        sql_orders = (self.crud.session.query(CrudOrder, CrudOrder.owner==owner, CrudOrder.pair_id==pair_id)
-                                       .limit(int(limit))
-                                       .offset(int(page))
-                                       .all())
-        for order in sql_orders:
-            new_order = Order(
-                order.tx_hash,
-                order.id,
-                Address(order.owner).to_string(),
-                order.pair_id,
-                order.direction,
-                order.price,
-                order.base_quantity,
-                order.quote_quantity,
-                order.filled_quantity,
-                order.filled_avg_price,
-                order.remain_locked,
-                order.leverage,
-                order.status,
-                order.order_type,
-                order.cost_fee,
-                order.locked_fee,
-                order.created_at, )
 
-            orders.append(new_order)
+        orders = []
+        try:
+            response = DexQuery(self.channel).QueryOrders(QueryOrdersRequest(
+                owner=Address(owner).to_bytes(), pair_id=pair_id, page=page, limit=limit))
+        
+            for order in response.orders:
+                price = decimal.Decimal(order.price)
+                price = price / decimal.Decimal(DEFAULT_DEC)
+        
+                base_quantity = decimal.Decimal(order.base_quantity)
+                base_quantity = base_quantity / decimal.Decimal(DEFAULT_DEC)
+        
+                quote_quantity = decimal.Decimal(order.quote_quantity)
+                quote_quantity = quote_quantity / decimal.Decimal(DEFAULT_DEC)
+        
+                filled_quantity = decimal.Decimal(order.filled_quantity)
+                filled_quantity = filled_quantity / decimal.Decimal(DEFAULT_DEC)
+        
+                filled_avg_price = decimal.Decimal(order.filled_avg_price)
+                filled_avg_price = filled_avg_price / decimal.Decimal(DEFAULT_DEC)
+        
+                remain_locked = decimal.Decimal(order.remain_locked)
+                remain_locked = remain_locked / decimal.Decimal(DEFAULT_DEC)
+        
+                cost_fee = decimal.Decimal(order.cost_fee)
+                cost_fee = cost_fee / decimal.Decimal(DEFAULT_DEC)
+        
+                locked_fee = decimal.Decimal(order.locked_fee)
+                locked_fee = locked_fee / decimal.Decimal(DEFAULT_DEC)
+        
+                new_order = Order(
+                    order.tx_hash,
+                    order.id,
+                    Address(order.owner).to_string(),
+                    order.pair_id,
+                    order.direction,
+                    price,
+                    base_quantity,
+                    quote_quantity,
+                    filled_quantity,
+                    filled_avg_price,
+                    remain_locked,
+                    order.leverage,
+                    order.status,
+                    order.order_type,
+                    cost_fee,
+                    locked_fee,
+                    MessageToJson(order.created_at),)
+        
+                orders.append(new_order)
+        
+        except Exception as e:
+
+            if 'orders not found' in e.details():
+                logging.warn('No orders found in GRPC - returning empty list')
+                return []
+
+            sql_orders = (self.crud.session.query(CrudOrder, CrudOrder.owner==owner, CrudOrder.pair_id==pair_id)
+                                        .limit(int(limit))
+                                        .offset(int(page))
+                                        .all())
+                                        
+            for order in sql_orders:
+                new_order = Order(
+                    order.tx_hash,
+                    order.id,
+                    Address(order.owner).to_string(),
+                    order.pair_id,
+                    order.direction,
+                    order.price,
+                    order.base_quantity,
+                    order.quote_quantity,
+                    order.filled_quantity,
+                    order.filled_avg_price,
+                    order.remain_locked,
+                    order.leverage,
+                    order.status,
+                    order.order_type,
+                    order.cost_fee,
+                    order.locked_fee,
+                    order.created_at, )
+
+                orders.append(new_order)
+
         return orders
 
     def query_funding_info(self):
