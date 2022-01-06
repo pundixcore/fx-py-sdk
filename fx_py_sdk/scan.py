@@ -16,6 +16,7 @@ import sqlalchemy
 from sqlalchemy.orm.exc import NoResultFound
 from google.protobuf.timestamp_pb2 import Timestamp
 from sqlalchemy import and_
+import re
 
 reconnect_block_count = 0
 reconnect_tx_count = 0
@@ -118,24 +119,24 @@ class WebsocketScan:
         msg = json.loads(message)
         if str(msg[BlockResponse.RESULT]) != '{}':
             if msg[BlockResponse.RESULT][BlockResponse.QUERY] == tm_event_Tx:
-                if BlockResponse.RESULT not in message:
-                    logging.debug(f"result not in message yet {message}")
+                if BlockResponse.RESULT not in msg:
+                    logging.debug(f"result not in message yet {msg}")
                     return
-                if BlockResponse.DATA not in message[BlockResponse.RESULT]:
-                    logging.debug(f"data not in message yet {message}")
+                if BlockResponse.DATA not in msg[BlockResponse.RESULT]:
+                    logging.debug(f"data not in message yet {msg}")
                     return
-                if BlockResponse.VALUE not in message[BlockResponse.RESULT][BlockResponse.DATA]:
-                    logging.debug(f"value not in message yet {message}")
+                if BlockResponse.VALUE not in msg[BlockResponse.RESULT][BlockResponse.DATA]:
+                    logging.debug(f"value not in message yet {msg}")
                     return
-                if BlockResponse.TxResult not in message[BlockResponse.RESULT][BlockResponse.DATA][
+                if BlockResponse.TxResult not in msg[BlockResponse.RESULT][BlockResponse.DATA][
                     BlockResponse.VALUE]:
-                    logging.debug(f"tx_result not in message yet {message}")
+                    logging.debug(f"tx_result not in message yet {msg}")
                     return
                 tx_events = \
-                message[BlockResponse.RESULT][BlockResponse.DATA][BlockResponse.VALUE][BlockResponse.TxResult][
+                msg[BlockResponse.RESULT][BlockResponse.DATA][BlockResponse.VALUE][BlockResponse.TxResult][
                     BlockResponse.RESULT][BlockResponse.EVENTS]
                 block_height = \
-                message[BlockResponse.RESULT][BlockResponse.DATA][BlockResponse.VALUE][BlockResponse.TxResult][
+                msg[BlockResponse.RESULT][BlockResponse.DATA][BlockResponse.VALUE][BlockResponse.TxResult][
                     BlockResponse.HEIGHT]
                 block_height = int(block_height)
                 self.scan.process_tx(tx_events, block_height)
@@ -555,7 +556,8 @@ class ScanBlock:
                     order.created_at = block_datetime
                 else:
                     UTC_FORMAT = "%Y-%m-%d %H:%M:%S.%f +0000 UTC"
-                    block_datetime = datetime.datetime.strptime(value, UTC_FORMAT)
+                    date_value = re.sub('(\d{7,9})', lambda x: x.group()[:6], value)    # microseconds truncated to 6 decimals
+                    block_datetime = datetime.datetime.strptime(date_value, UTC_FORMAT)
                     order.created_at = block_datetime
             elif key == EventKeys.leverage:
                 order.leverage = int(value)
