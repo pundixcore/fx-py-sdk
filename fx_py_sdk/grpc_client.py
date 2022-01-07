@@ -270,7 +270,7 @@ class GRPCClient:
 
         return positions
 
-    def query_order(self, order_id: str):
+    def query_order(self, order_id: str, use_db: bool = False):
         """根据订单ID查询订单.
             Args:
                 order_id: 订单id
@@ -296,7 +296,7 @@ class GRPCClient:
                 example:
                     Order(TxHash='F6EA065DD58257AE1AB2F22AE45040A1F8E747E5668F3E8DF857CA222B38B85A', Id='ID-706-1', Owner='dex1ggz598a4506llaglzsmhp3r23hfke6nw29wans', PairId='tsla:usdc', Direction=0, Price=1000.4, BaseQuantity=0.5, QuoteQuantity=50.02, FilledQuantity=0.0, FilledAvgPrice=0.0, RemainLocked=500.2, Leverage=10, Status=0, OrderType=0, CostFee=0.0, LockedFee=0.20008)
         """
-        try:
+        if not use_db:
             response = DexQuery(self.channel).QueryOrder(QueryOrderRequest(order_id=order_id))
             order = response.order
             price = decimal.Decimal(order.price)
@@ -343,8 +343,8 @@ class GRPCClient:
                 )
             return new_order
 
-        except Exception as e:
-            order = self.crud.filterone(Order, Order.order_id == order_id)
+        else:
+            order = self.crud.filterone(CrudOrder, CrudOrder.order_id == order_id)
             new_order = Order(
                 order.tx_hash,
                 order.id,
@@ -367,7 +367,7 @@ class GRPCClient:
             return new_order
 
 
-    def query_orders(self, owner: str, pair_id: str, page=b"1".decode('utf-8'), limit=b"20".decode('utf-8')):
+    def query_orders(self, owner: str, pair_id: str, page=b"1".decode('utf-8'), limit=b"20".decode('utf-8'), use_db=False):
         """根据账户和交易对查询订单.
             Args:
                 owner: 仓位持有地址
@@ -382,7 +382,8 @@ class GRPCClient:
         """
 
         orders = []
-        try:
+
+        if not use_db:
             response = DexQuery(self.channel).QueryOrders(QueryOrdersRequest(
                 owner=Address(owner).to_bytes(), pair_id=pair_id, page=page, limit=limit))
         
@@ -432,16 +433,17 @@ class GRPCClient:
         
                 orders.append(new_order)
         
-        except Exception as e:
+        else:
 
-            if 'orders not found' in e.details():
-                logging.warn('No orders found in GRPC - returning empty list')
-                return []
+            # if 'orders not found' in e.details():
+            #     logging.warn('No orders found in GRPC - returning empty list')
+            #     return []
 
-            sql_orders = (self.crud.session.query(CrudOrder, CrudOrder.owner==owner, CrudOrder.pair_id==pair_id)
-                                        .limit(int(limit))
-                                        .offset(int(page))
-                                        .all())
+            sql_orders = (self.crud.session.query(CrudOrder)
+                                           .filter(CrudOrder.owner==owner, CrudOrder.pair_id==pair_id)
+                                           .limit(int(limit))
+                                           .offset(int(page))
+                                           .all())
                                         
             for order in sql_orders:
                 new_order = Order(

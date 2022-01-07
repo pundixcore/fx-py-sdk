@@ -1,14 +1,17 @@
+from typing import List
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
+from sqlalchemy.orm.session import Session
+from fx_py_sdk.codec.fx.dex.match_pb2 import OrderBook
 from fx_py_sdk.model.model import *
-from sqlalchemy import or_
+from sqlalchemy import or_, and_
 
 
 class Crud:
     def __init__(self):
         sql = Sql("fxdex")
         self.DBSession = sessionmaker(bind=sql.engine)
-        self.session=self.DBSession()
+        self.session: Session = self.DBSession()
 
     def insert(self, object):
         self.session.add(object)
@@ -38,8 +41,13 @@ class Crud:
     def get_positions(self, address: str):
         return self.session.query(Position).filter(Position.owner == address)
 
-    def get_orders_by_owner(self, owner: str) -> []:
+    def get_orders_by_owner(self, owner: str) -> List[Order]:
         return self.session.query(Order).filter(Order.owner == owner)
+
+    def get_latest_orderbook_record(self, price, pair_id):
+        return (self.session.query(Orderbook)
+                            .filter(and_(Orderbook.price==price, Orderbook.pair_id==pair_id))
+                            .order_by(Orderbook.block_height.desc()).first())
 
     def get_orderbook_from_orderbook(self, pair_id: str):
         """get orderbook from sql orderbook table"""
@@ -101,3 +109,6 @@ class Crud:
         orderbook['asks'] = asks
         orderbook['bids'] = bids
         return orderbook
+        
+    def count(self, object):
+        return self.session.query(object).count()
