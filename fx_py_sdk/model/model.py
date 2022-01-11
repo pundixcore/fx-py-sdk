@@ -10,7 +10,12 @@ import logging
 Base = declarative_base()
 
 def to_dict(self):
-    return {c.name: getattr(self, c.name, None) for c in self.__table__.columns}
+    dict_attrs = dict()
+    for col in self.__table__.columns:
+        attr = getattr(self, col.name, None)
+        if attr:
+            dict_attrs[col.name] = attr
+    return dict_attrs
 
 Base.to_dict = to_dict
 
@@ -20,7 +25,7 @@ class Order(Base):
     id = Column('id', Integer, primary_key=True, autoincrement=True)
     block_height = Column(Integer)
     tx_hash = Column(String(66))
-    order_id = Column(String(100), nullable=False, unique=True)
+    order_id = Column(String(100), nullable=False, unique=True, index=True)
     owner = Column(String(42))
     pair_id = Column(String(20))
     direction = Column(String(10))
@@ -36,8 +41,11 @@ class Order(Base):
     order_type = Column(String(50))
     cost_fee = Column(Numeric)
     locked_fee = Column(Numeric)
+    open_block_height = Column(Integer)
     cancel_block_height = Column(Integer)
+    filled_block_height = Column(Integer)
     cancel_time = Column(DateTime)
+    block_height = Column(Integer)
 
 class Position(Base):
     __tablename__ = 'position'
@@ -60,6 +68,7 @@ class Position(Base):
     status = Column(String(20))  # open, close
     open_height = Column(Integer)
     close_height = Column(Integer)
+    block_height = Column(Integer)
 
 class Orderbook(Base):
     __tablename__ = 'orderbook'
@@ -68,6 +77,7 @@ class Orderbook(Base):
     quantity = Column(Numeric)
     direction = Column(String(20))
     pair_id = Column(String(20))
+    block_height = Column(Integer)
 
 class Trade(Base):
     __tablename__ = 'trade'
@@ -75,7 +85,7 @@ class Trade(Base):
     block_height = Column(Integer)
     deal_price = Column(Numeric)
     matched_quantity = Column(Numeric)
-    order_id = Column(String(100), nullable=False, unique=True)
+    order_id = Column(String(100), nullable=False, unique=False)
     owner = Column(String(42))
     pair_id = Column(String(20))
     direction = Column(String(10))
@@ -87,6 +97,7 @@ class Trade(Base):
     order_type = Column(String(50))
     cost_fee = Column(Numeric)
     locked_fee = Column(Numeric)
+    block_height = Column(Integer)
 
 class FundingTransfer(Base):
     __tablename__ = 'funding_transfer'
@@ -111,6 +122,25 @@ class Tx(Base):
     tx_hash = Column(String(66))
     result = Column(String(66))  # error, success
 
+""" auxillary helper classes """
+class Positioning(Base):
+    __tablename__ = 'positioning'
+    id = Column('id', Integer, primary_key=True, autoincrement=True)
+    owner = Column(String(42))
+    pair_id = Column(String(20))
+    realized_pnl = Column(Numeric)
+    unrealized_pnl = Column(Numeric)
+    units_exposure = Column(Numeric)
+    block_height = Column(Integer)
+
+class OrderbookTop(Base):
+    __tablename__ = 'orderbook_top'
+    id = Column('id', Integer, primary_key=True, autoincrement=True)
+    pair_id = Column(String(20))
+    best_bid = Column(Numeric)
+    best_ask = Column(Numeric)
+    block_height = Column(Integer)
+
 class Sql:
     def __init__(self, database: str = "postgres", user: str = "postgres", password: str = "123456", host: str = "localhost",
                  port: str = "5432"):
@@ -133,13 +163,15 @@ class Sql:
                 port = port_env
         except Exception as e:
             logging.warn(f'Could not instantiate db from environment {e}')
-        
+
         self.database = database
         self.user = user
         self.password = password
         self.host = host
         self.port = port
         self.connect(database)
+
+        logging.info(f'Connected to database {database}')
 
     def connect(self, db: str):
         """ Connect to the PostgreSQL database server """
@@ -152,9 +184,17 @@ class Sql:
         self.session = sessionmaker(bind=self.engine)
 
     def create_table(self):
+        # Creates database schema
         Base.metadata.create_all(self.engine)
 
     def drop_table(self):
+        # Terminates all processes connected to db
+#         self.engine.execute(f"""SELECT pg_terminate_backend(pg_stat_activity.pid)
+# FROM pg_stat_activity
+# WHERE pg_stat_activity.datname = '{self.database}'
+# AND pid <> pg_backend_pid();""")
+
+        # Drop all tables
         Base.metadata.drop_all(self.engine)
 
     """

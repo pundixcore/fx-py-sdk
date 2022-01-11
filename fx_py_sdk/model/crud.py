@@ -44,10 +44,17 @@ class Crud:
     def get_orders_by_owner(self, owner: str) -> List[Order]:
         return self.session.query(Order).filter(Order.owner == owner)
 
-    def get_latest_orderbook_record(self, price, pair_id):
+    def get_latest_orderbook_record(self, price, pair_id, direction):
         return (self.session.query(Orderbook)
-                            .filter(and_(Orderbook.price==price, Orderbook.pair_id==pair_id))
-                            .order_by(Orderbook.block_height.desc()).first())
+                            .filter(and_(Orderbook.price==price, Orderbook.pair_id==pair_id, Orderbook.direction==direction))
+                            .order_by(Orderbook.block_height.desc(), Orderbook.id.desc())
+                            .first())
+
+    def get_latest_trade(self, order_id):
+        return (self.session.query(Trade)
+                            .filter(Trade.order_id==order_id)
+                            .order_by(Trade.block_height.desc(), Trade.id.desc())
+                            .first())
 
     def get_orderbook_from_orderbook(self, pair_id: str):
         """get orderbook from sql orderbook table"""

@@ -4,6 +4,7 @@ from typing import Optional, Dict
 
 import requests
 import aiohttp
+from requests.sessions import HTTPAdapter
 import ujson
 
 from fx_py_sdk.exceptions import FxdexRPCException, FxdexRequestException
@@ -62,6 +63,11 @@ class BaseHttpRpcClient:
 
 
 class HttpRpcClient(BaseHttpRpcClient):
+
+    def __init__(self, endpoint_url, requests_params: Optional[Dict]=None, max_retries=None):
+        super(HttpRpcClient, self).__init__(endpoint_url, requests_params)
+        if max_retries:
+            self.session.mount('http://', HTTPAdapter(max_retries=max_retries))
 
     def _request(self, path, **kwargs):
 

@@ -16,6 +16,7 @@ import sqlalchemy
 from sqlalchemy.orm.exc import NoResultFound
 from google.protobuf.timestamp_pb2 import Timestamp
 from sqlalchemy import and_
+import traceback
 import re
 
 reconnect_block_count = 0
@@ -26,7 +27,7 @@ tm_event_Tx = "tm.event='Tx'"
 class RpcScan:
     """use rpc connect fxdex, scan block event"""
 
-    def __init__(self):
+    def __init__(self, ws_scan):
         network = os.environ[constants.EnvVar.NETWORK]
         if network == constants.NetworkENV.LOCAL:
             self.rpc_url = constants.Network.LOCAL_RPC
@@ -38,47 +39,63 @@ class RpcScan:
             self.rpc_url = constants.Network.MAINNET_RPC
         self.rpc_client = HttpRpcClient(self.rpc_url)
         self.scan = ScanBlock()
+        self.ws_scan = ws_scan
         threading.Thread(target=self.process_block).start()
 
     def process_block(self):
-        """parse block data"""
+        start_block = None
 
-        abci_info = self.rpc_client.get_abci_info()
-        latest_block_height = int(abci_info["response"]["last_block_height"])
+        while True:
+            """parse block data"""
+            abci_info = self.rpc_client.get_abci_info()
+            latest_block_height = int(abci_info["response"]["last_block_height"])
 
-        """get last sync block height from sql"""
-        sql_block = self.scan.crud.session.query(Block).order_by(Block.height.desc()).first()
-        if sql_block is None:
-            latest_block_height_cursor = 1
-        else:
-            latest_block_height_cursor = sql_block.height
+            """get last sync block height from sql"""
+            if not start_block:
+                start_block = int(os.environ.get('START_BLOCK', '1'))
 
-        logging.info("Rpc scan from %d to %d", latest_block_height_cursor, latest_block_height)
-        for block_height in range(latest_block_height_cursor, latest_block_height+1):
-            block_result = self.rpc_client.get_block_results(block_height)
+            block_heights = [blk_ht for blk_ht, in (self.scan.crud.session.query(Block)
+                                                                        .filter(Block.height >= start_block)
+                                                                        .with_entities(Block.height)
+                                                                        .order_by(Block.height))]
+            missing_blocks = list(set(range(start_block, latest_block_height+1)).difference(set(block_heights)))
 
-            block_rpc = self.rpc_client.get_block(block_height)
-            block_time = block_rpc[BlockResponse.BLOCK][BlockResponse.HEADER][BlockResponse.Time]
-            timestamp = Timestamp()
-            timestamp.FromJsonString(block_time),
-            block_datetime = datetime.datetime.utcfromtimestamp(timestamp.ToSeconds())
-            block = Block(height=block_height, time=block_datetime)
-            sql_block = self.scan.crud.filterone(Block, Block.height == block_height)
-            if sql_block is None:
-                self.scan.crud.insert(block)
-            else:
-                self.scan.crud.update(Block, filter=(Block.height == block_height),
-                                 updic=block.to_dict())
+            """switch to WebSockets when synced with latest block"""
+            if not missing_blocks:  # use WebSockets if fully synced
+                logging.info('Synced with latest block. Switching to WebSockets...')
+                self.ws_scan.rpc_ready = True
+                return
 
-            if block_result[BlockResponse.Txs_results] is not None:
-                for tx_result in block_result[BlockResponse.Txs_results]:
-                    tx_events = tx_result[BlockResponse.EVENTS]
-                    self.scan.process_tx(tx_events, block_height)
+            first_block_height = missing_blocks[0]  # min
+            last_block_height = missing_blocks[-1]  # max
+            logging.info("Rpc scan from %d to %d (%d blocks)", first_block_height, last_block_height, len(missing_blocks))
 
-            if block_result[BlockResponse.Begin_block_events] is not None:
-                self.scan.process_begin_block(block_result[BlockResponse.Begin_block_events], block_height)
-            if block_result[BlockResponse.End_block_events] is not None:
-                self.scan.process_end_block(block_result[BlockResponse.End_block_events], block_height)
+            """loop through each missing block"""
+            for block_height in missing_blocks:
+                block_result = self.rpc_client.get_block_results(block_height)
+
+                block_rpc = self.rpc_client.get_block(block_height)
+                block_time = block_rpc[BlockResponse.BLOCK][BlockResponse.HEADER][BlockResponse.Time]
+                timestamp = Timestamp()
+                timestamp.FromJsonString(block_time),
+                block_datetime = datetime.datetime.utcfromtimestamp(timestamp.ToSeconds())
+                block = Block(height=block_height, time=block_datetime)
+                sql_block = self.scan.crud.filterone(Block, Block.height == block_height)
+                if sql_block is None:
+                    self.scan.crud.insert(block)
+                else:
+                    self.scan.crud.update(Block, filter=(Block.height == block_height),
+                                    updic=block.to_dict())
+
+                if block_result[BlockResponse.Txs_results] is not None:
+                    for tx_result in block_result[BlockResponse.Txs_results]:
+                        tx_events = tx_result[BlockResponse.EVENTS]
+                        self.scan.process_tx(tx_events, block_height)
+
+                if block_result[BlockResponse.Begin_block_events] is not None:
+                    self.scan.process_begin_block(block_result[BlockResponse.Begin_block_events], block_height)
+                if block_result[BlockResponse.End_block_events] is not None:
+                    self.scan.process_end_block(block_result[BlockResponse.End_block_events], block_height)
 
 class WebsocketScan:
     """use websocket connect fxdex, scan block event"""
@@ -95,6 +112,7 @@ class WebsocketScan:
             self.wss_url = constants.Network.MAINNET_WS
         self.ws_block = None
         self.scan = ScanBlock()
+        self.rpc_ready = False
         threading.Thread(target=self.subscribe_block).start()
 
     def _get_ws_endpoint_url(self):
@@ -108,12 +126,15 @@ class WebsocketScan:
                 type(error) == websocket._exceptions.WebSocketConnectionClosedException:
             print("正在尝试第 %d 次重连" % reconnect_block_count)
             reconnect_block_count += 1
-            if reconnect_block_count < 10:
-                self.subscribe_block()
+            #if reconnect_block_count < 10:
+            self.subscribe_block()
         else:
             print("error: ", error)
 
     def on_message(self, message):
+        if not self.rpc_ready:
+            return
+
         global reconnect_block_count
         reconnect_block_count = 0
         msg = json.loads(message)
@@ -224,7 +245,35 @@ class ScanBlock:
             self.process_end_block(end_block_events, block_height)
 
         except Exception as e:
-            logging.error("error process block: ", e)
+            logging.error(f"error process block: {traceback.format_exc()}")
+
+    def __update_position(self, position: Position, sql_position: Position):
+        # we want to keep only latest position in database
+        if position.block_height >= sql_position.block_height:
+            self.crud.update(Position, filter=(Position.position_id == position.position_id),
+                             updic=position.to_dict())
+        elif sql_position.open_height is None or position.block_height < sql_position.open_height:
+            self.crud.update(Position, filter=(Position.position_id == position.position_id),
+                             updic={'open_height': position.block_height})
+
+    def __update_order(self, order: Order, sql_order: Order):
+        # we want to keep only latest order in database
+        order.id = sql_order.id
+        #if (order.filled_quantity and sql_order.base_quantity) and order.filled_quantity > sql_order.base_quantity:
+        #    logging.warning("filled quantity higher than base quantity!")
+
+        if order.block_height >= sql_order.block_height:
+            self.crud.update(Order, filter=(Order.order_id == order.order_id),
+                             updic=order.to_dict())
+        else:
+            update_dict = {}
+            if order.created_at and not sql_order.created_at:
+                update_dict['created_at'] = order.created_at
+            if order.open_block_height and not sql_order.open_block_height:
+                update_dict['open_block_height'] = order.open_block_height
+
+            self.crud.update(Order, filter=(Order.order_id == order.order_id),
+                             updic=update_dict)
 
     def process_end_block(self, events: str, block_height: int):
         """process fxdex chain EndBlock events"""
@@ -270,95 +319,87 @@ class ScanBlock:
 
                 sql_position = self.crud.filterone(Position, Position.position_id==position.position_id)
                 position.status = PositionStatus.Open
+                position.block_height = block_height
                 position.open_height = block_height
+
                 if sql_position is None:
                     self.crud.insert(position)
                 else:
-                    self.crud.update(Position, filter=(Position.position_id==position.position_id),
-                                     updic=position.to_dict())
+                    self.__update_position(position, sql_position)
 
             elif event[BlockResponse.TYPE] == EventTypes.Add_position:
                 position = self.get_position(event[BlockResponse.Attributes])
                 position.status = PositionStatus.Open
+                position.block_height = block_height
+
                 sql_position = self.crud.filterone(Position, Position.position_id == position.position_id)
                 if sql_position is None:
                     self.crud.insert(position)
                 else:
-                    self.crud.update(Position, filter=(Position.position_id == position.position_id),
-                                     updic=position.to_dict())
-
+                    self.__update_position(position, sql_position)
+                
             elif event[BlockResponse.TYPE] == EventTypes.Full_close_position:
                 position = self.get_position(event[BlockResponse.Attributes])
                 position.status = PositionStatus.Close
+                position.block_height = block_height
                 position.close_height = block_height
+
                 sql_position = self.crud.filterone(Position, Position.position_id == position.position_id)
                 if sql_position is None:
                     self.crud.insert(position)
                 else:
-                    self.crud.update(Position, filter=(Position.position_id == position.position_id),
-                                     updic=position.to_dict())
+                    self.__update_position(position, sql_position)
 
             elif event[BlockResponse.TYPE] == EventTypes.Part_close_position:
                 position = self.get_position(event[BlockResponse.Attributes])
                 position.status = PositionStatus.Open
+                position.block_height = block_height
+
                 sql_position = self.crud.filterone(Position, Position.position_id == position.position_id)
                 if sql_position is None:
                     self.crud.insert(position)
                 else:
-                    self.crud.update(Position, filter=(Position.position_id == position.position_id),
-                                     updic=position.to_dict())
+                    self.__update_position(position, sql_position)
 
             elif event[BlockResponse.TYPE] == EventTypes.Cancel_order_expire:
                 """update order status to expiration"""
                 order = self.get_order(event[BlockResponse.Attributes])
+                order.block_height = block_height
                 order.cancel_block_height = block_height
+
                 sql_order = self.crud.filterone(Order, Order.order_id == order.order_id)
                 if sql_order is None:
                     self.crud.insert(order)
                 else:
-                    order.id = sql_order.id
-                    self.crud.update(Order, filter=(Order.order_id == order.order_id),
-                                     updic=order.to_dict())
-                self.process_orderbook(order, False)
+                    self.__update_order(order, sql_order)
+
+                self.process_orderbook(order, False, block_height)
 
             elif event[BlockResponse.TYPE] == EventTypes.Order_fill:
                 """store order & trade"""
                 order = self.get_order(event[BlockResponse.Attributes])
+                order.block_height = block_height
+                order.filled_block_height = block_height
                 sql_order = self.crud.filterone(Order, Order.order_id == order.order_id)
+
                 if sql_order is None:
-                    order.block_height = block_height
                     self.crud.insert(order)
                 else:
-                    order.id = sql_order.id
-                    order.block_height = sql_order.block_height
-                    self.crud.update(Order, filter=(Order.order_id == order.order_id),
-                                     updic=order.to_dict())
+                    self.__update_order(order, sql_order)
 
                 trade = self.get_trade(event[BlockResponse.Attributes])
                 trade.block_height = block_height
-                sql_order = self.crud.filterone(Order, Order.order_id == order.order_id)
-                if sql_order is None:
-                    self.crud.insert(order)
-                else:
-                    order.id = sql_order.id
-                    self.crud.update(Order, filter=(Order.order_id == order.order_id),
-                                     updic=order.to_dict())
+                self.crud.insert(trade)
 
                 """process orderbook"""
-                sql_orderbook = self.crud.filterone(Orderbook, and_(Orderbook.price==order.price, Orderbook.pair_id==order.pair_id))
+                sql_orderbook = self.crud.get_latest_orderbook_record(order.price, order.pair_id, order.direction)
                 orderbook = Orderbook(price=order.price, quantity=order.base_quantity,
-                                      direction=order.direction, pair_id=order.pair_id)
-                if sql_orderbook is None:
-                    self.crud.insert(orderbook)
-                else:
-                    quantity = sql_orderbook.quantity - order.filled_quantity
-                    if quantity == 0:
-                        self.crud.delete(sql_orderbook)
-                    else:
-                        orderbook.quantity = quantity
-                        orderbook.id = sql_orderbook.id
-                        self.crud.update(Orderbook, filter=(Orderbook.id==orderbook.id),
-                                         updic=orderbook.to_dict())
+                                      direction=order.direction, pair_id=order.pair_id,
+                                      block_height=block_height)
+                if sql_orderbook:
+                    orderbook.quantity = sql_orderbook.quantity - trade.matched_quantity
+                self.crud.insert(orderbook)
+
         return
 
     def process_begin_block(self, events: str, block_height: int):
@@ -368,36 +409,40 @@ class ScanBlock:
             if event[BlockResponse.TYPE] == EventTypes.Forced_liquidation_position:
                 position = self.get_position(event[BlockResponse.Attributes])
                 position.status = PositionStatus.Liquidated
+                position.block_height = block_height
                 position.close_height = block_height
+
                 sql_position = self.crud.filterone(Position, Position.position_id == position.position_id)
                 if sql_position is None:
                     self.crud.insert(position)
                 else:
-                    self.crud.update(Position, filter=(Position.position_id == position.position_id),
-                                     updic=position.to_dict())
+                    self.__update_position(position, sql_position)
 
             elif event[BlockResponse.TYPE] == EventTypes.Liq_cancel_order:
                 """liquidation cancel pending close-position order, only update order"""
                 order = self.get_order(event[BlockResponse.Attributes])
+                order.block_height = block_height
                 order.cancel_block_height = block_height
+
                 sql_order = self.crud.filterone(Order, Order.order_id == order.order_id)
                 if sql_order is None:
                     self.crud.insert(order)
                 else:
-                    order.id = sql_order.id
-                    self.crud.update(Order, filter=(Order.order_id == order.order_id),
-                                     updic=order.to_dict())
+                    self.__update_order(order, sql_order)
 
-                self.process_orderbook(order, False)
+                self.process_orderbook(order, False, block_height)
 
             elif event[BlockResponse.TYPE] == EventTypes.Liquidation_position_order:
                 """liquidation generate new order, only insert order"""
                 order = self.get_order(event[BlockResponse.Attributes])
+                order.open_block_height = block_height
                 order.block_height = block_height
+                order.filled_block_height = block_height
+
                 sql_order = self.crud.filterone(Order, Order.order_id == order.order_id)
                 if sql_order is None:
                     self.crud.insert(order)
-                self.process_orderbook(order, True)
+                self.process_orderbook(order, True, block_height)
 
             elif event[BlockResponse.TYPE] == EventTypes.Settle_funding:
                 """parse settle funding rate log"""
@@ -436,51 +481,50 @@ class ScanBlock:
                 BlockResponse.TYPE] == EventTypes.Close_position_order:
                 """only insert order, if sql order is none, then do not update"""
                 order = self.get_order(event[BlockResponse.Attributes])
+                order.open_block_height = block_height
                 order.block_height = block_height
+
                 sql_order = self.crud.filterone(Order, Order.order_id == order.order_id)
                 if sql_order is None:
                     self.crud.insert(order)
-                self.process_orderbook(order, True)
+                else:
+                    self.__update_order(order)  # updates open_block_height, created_at
+
+                self.process_orderbook(order, True, block_height)
 
             elif event[BlockResponse.TYPE] == EventTypes.Cancel_order:
                 """only update order, but in case of not listened create order"""
                 order = self.get_order(event[BlockResponse.Attributes])
+                order.block_height = block_height
                 order.cancel_block_height = block_height
+                
                 sql_order = self.crud.filterone(Order, Order.order_id == order.order_id)
                 if sql_order is None:
                     self.crud.insert(order)
                 else:
-                    order.id = sql_order.id
-                    self.crud.update(Order, filter=(Order.order_id == order.order_id),
-                                     updic=order.to_dict())
-                self.process_orderbook(order, False)
+                    self.__update_order(order, sql_order)
 
-    def process_orderbook(self, order: Order, add_or_cancel: bool):
+                self.process_orderbook(order, False, block_height)
 
-        sql_orderbook = self.crud.filterone(Orderbook,
-                                            and_(Orderbook.price == order.price, Orderbook.pair_id == order.pair_id))
+    """
+        add_or_cancel: True means add (append), False means cancel (subtract)
+    """
+
+    def process_orderbook(self, order: Order, add_or_cancel: bool, block_height):
+
+        sql_orderbook = self.crud.get_latest_orderbook_record(order.price, order.pair_id, order.direction)
+
         orderbook = Orderbook(price=order.price, quantity=order.base_quantity,
-                              direction=order.direction, pair_id=order.pair_id)
-        if add_or_cancel:
-            if sql_orderbook is None:
-                self.crud.insert(orderbook)
-            else:
-                orderbook.id = sql_orderbook.id
+                              direction=order.direction, pair_id=order.pair_id,
+                              block_height=block_height)
+
+        if sql_orderbook:
+            if add_or_cancel:
                 orderbook.quantity = order.base_quantity + sql_orderbook.quantity
-                self.crud.update(Orderbook, filter=(Orderbook.id == orderbook.id),
-                                 updic=orderbook.to_dict())
-        else:
-            if sql_orderbook is None:
-                self.crud.insert(orderbook)
             else:
-                quantity = sql_orderbook.quantity - order.base_quantity
-                if quantity == 0:
-                    self.crud.delete(sql_orderbook)
-                else:
-                    orderbook.id = sql_orderbook.id
-                    orderbook.quantity = quantity
-                    self.crud.update(Orderbook, filter=(Orderbook.id == orderbook.id),
-                                     updic=orderbook.to_dict())
+                orderbook.quantity = sql_orderbook.quantity - order.base_quantity
+
+        self.crud.insert(orderbook)
 
     def get_position(self, attributes: []) -> Position:
         """decode position data"""
@@ -574,9 +618,10 @@ class ScanBlock:
                 timestamp.FromJsonString(value),
                 block_datetime = datetime.datetime.utcfromtimestamp(timestamp.ToSeconds())
                 order.cancel_time = block_datetime
+
         return order
 
-    def get_trade(self, attributes: []) -> Order:
+    def get_trade(self, attributes: []) -> Trade:
         """decode trade data"""
 
         trade = Trade()

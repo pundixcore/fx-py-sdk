@@ -145,7 +145,7 @@ docker exec -it postgres psql -U postgres -d postgres
 
 4.创建database
 
-create database fxdex
+create database fxdex;
 ```
 
 **创建table**
@@ -177,8 +177,8 @@ from fx_py_sdk import scan
 async def main():
     """rpc and websocket should run on the same time"""
 
-    scan.RpcScan()
-    scan.WebsocketScan()
+    ws_scan = scan.WebsocketScan()
+    scan.RpcScan(ws_scan)
 
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()

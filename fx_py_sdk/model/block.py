@@ -76,6 +76,7 @@ class EventKeys:
     unrealized_pnl = "unrealized_pnl"
     initial_margin = "initial_margin"
     pending_order_quantity = "pending_order_quantity"
+    position_id = "position_id"
 
     matched_quantity = "matched_quantity"
     unfilled_quantity = "unfilled_quantity"
