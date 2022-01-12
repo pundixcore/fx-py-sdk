@@ -393,7 +393,7 @@ class ScanBlock:
 
                 """process orderbook"""
                 sql_orderbook = self.crud.get_latest_orderbook_record(trade.deal_price, order.pair_id, order.direction)
-                orderbook = Orderbook(price=trade.deal_price, quantity=trade.matched_quantity,
+                orderbook = Orderbook(price=trade.deal_price, quantity=order.base_quantity,
                                       direction=order.direction, pair_id=order.pair_id,
                                       block_height=block_height)
                 if sql_orderbook:
