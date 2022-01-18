@@ -41,15 +41,22 @@ import json
 import requests
 from fx_py_sdk.model.crud import Crud
 from fx_py_sdk.model.model import Order as CrudOrder
-
+import os
 
 DEFAULT_DEX_GAS = 5000000
 DEFAULT_GRPC_NONE = "Not found"
 DEFAULT_DEC = 1000000000000000000
 
 class GRPCClient:
-    def __init__(self, url: str = 'localhost:9090'):
-        self.channel = grpc.insecure_channel(url)
+    def __init__(self, url: str = 'localhost:9090', use_ssl = True):
+        if use_ssl:
+            cert_filepath = os.path.join(os.path.dirname(__file__), 'cert.pem')
+            with open(cert_filepath, 'rb') as f:
+                creds = grpc.ssl_channel_credentials(f.read())
+            self.channel = grpc.secure_channel(url, creds)
+        else:
+            self.channel = grpc.insecure_channel(url)
+
         self.crud = Crud()
 
     def query_account_info(self, address: str) -> BaseAccount:
