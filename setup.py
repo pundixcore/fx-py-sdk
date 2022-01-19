@@ -4,7 +4,7 @@
 
 from setuptools import setup, find_packages
 
-with open("README.md", "r", encoding = "UTF-8") as fh:
+with open("README.md", "r", encoding="UTF-8") as fh:
     long_description = fh.read()
 
 setup(
@@ -17,7 +17,8 @@ setup(
     packages=find_packages(),
     url='https://github.com/falcons-x/fx-py-sdk',
     keywords=["FX", "DEX", "BLOCKCHAIN"],
-    install_requires=["bech32", "hdwallets", "ecdsa", "mnemonic", "grpcio", "protobuf"],
+    install_requires=["bech32", "hdwallets",
+                      "ecdsa", "mnemonic", "grpcio", "protobuf"],
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",

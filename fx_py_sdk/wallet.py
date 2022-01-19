@@ -51,7 +51,8 @@ class PrivateKey:
         self._priv_key = key
 
     def to_public_key(self) -> PublicKey:
-        privkey_obj = ecdsa.SigningKey.from_string(self._priv_key, curve=ecdsa.SECP256k1)
+        privkey_obj = ecdsa.SigningKey.from_string(
+            self._priv_key, curve=ecdsa.SECP256k1)
         pubkey_obj = privkey_obj.get_verifying_key()
         return PublicKey(pubkey_obj.to_string("compressed"))
 
@@ -59,7 +60,8 @@ class PrivateKey:
         return self.to_public_key().to_address(hrp=hrp)
 
     def sign(self, message_bytes: bytes) -> bytes:
-        privkey = ecdsa.SigningKey.from_string(self._priv_key, curve=ecdsa.SECP256k1)
+        privkey = ecdsa.SigningKey.from_string(
+            self._priv_key, curve=ecdsa.SECP256k1)
         signature_compact = privkey.sign_deterministic(
             message_bytes, hashfunc=hashlib.sha256, sigencode=ecdsa.util.sigencode_string_canonize
         )

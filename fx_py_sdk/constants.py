@@ -1,15 +1,18 @@
 from typing import NamedTuple
 from decimal import Decimal
 
+
 class EnvVar:
     NETWORK = "NETWORK"
     DB_URI = "DB_URI"
+
 
 class NetworkENV:
     LOCAL = "local"
     DEVNET = "devnet"
     TESTNET = "testnet"
     MAINNET = "mainnet"
+
 
 class Network:
     LOCAL_RPC = "http://127.0.0.1:26657"
@@ -22,12 +25,14 @@ class Network:
     TESTNET_WS = ""
     MAINNET_WS = ""
 
+
 class DB:
     Database = "database"
     User = "user"
     Password = "password"
     Host = "host"
     Port = "port"
+
 
 class Order(NamedTuple):
     TxHash: str
@@ -48,6 +53,7 @@ class Order(NamedTuple):
     LockedFee: Decimal
     Created_at: str
 
+
 class Position(NamedTuple):
     Id: int
     Owner: str
@@ -63,6 +69,7 @@ class Position(NamedTuple):
     MarginRate: Decimal
     InitialMargin: Decimal
     PendingOrderQuantity: Decimal
+
 
 class BackEndApi:
     query_order_page = "http://44.195.213.51:30225/api/address/queryOrderPage"

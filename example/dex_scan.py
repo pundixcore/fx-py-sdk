@@ -11,6 +11,7 @@ import logging
 from fx_py_sdk.model.model import Sql
 import time
 
+
 async def main():
     """rpc and websocket should run at the same time"""
     logging.basicConfig(level=logging.INFO)

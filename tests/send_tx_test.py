@@ -7,6 +7,7 @@ from google.protobuf.any_pb2 import Any
 
 """转账交易测试"""
 
+
 def test_send_tx():
     """导入种子账户"""
     priv_key = wallet.seed_to_privkey(
@@ -25,14 +26,18 @@ def test_send_tx():
 
     """查询账户信息"""
     account = cli.query_account_info(address)
-    print('account, number:', account.account_number, 'sequence:', account.sequence)
+    print('account, number:', account.account_number,
+          'sequence:', account.sequence)
 
     """构造 tx_builder 对象"""
-    tx_builder = TxBuilder(priv_key, chain_id, account.account_number, Coin(amount='60000000', denom='FX'))
+    tx_builder = TxBuilder(priv_key, chain_id, account.account_number, Coin(
+        amount='60000000', denom='FX'))
 
     """构造转账交易msg"""
-    send_msg = MsgSend(from_address=address, to_address=address, amount=[Coin(amount='100', denom='FX')])
-    send_msg_any = Any(type_url='/cosmos.bank.v1beta1.MsgSend', value=send_msg.SerializeToString())
+    send_msg = MsgSend(from_address=address, to_address=address,
+                       amount=[Coin(amount='100', denom='FX')])
+    send_msg_any = Any(type_url='/cosmos.bank.v1beta1.MsgSend',
+                       value=send_msg.SerializeToString())
 
     """构造并签名交易"""
     tx = cli.build_tx(tx_builder, [send_msg_any], 5000000)

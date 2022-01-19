@@ -17,17 +17,21 @@ client = GRPCClient('44.196.199.119:9090')
 
 class MyTestCase(unittest.TestCase):
     def test_query_balances(self):
-        balances = client.query_all_balances(address="dex1zgpzdf2uqla7hkx85wnn4p2r3duwqzd8cfus97")
+        balances = client.query_all_balances(
+            address="dex1zgpzdf2uqla7hkx85wnn4p2r3duwqzd8cfus97")
         print(balances)
 
-        balances = client.query_all_balances(address="dex1v0zwwfe3gw2fqdhdnx0hcurh2gzz98z8dagewy")
+        balances = client.query_all_balances(
+            address="dex1v0zwwfe3gw2fqdhdnx0hcurh2gzz98z8dagewy")
         print(balances)
 
     def test_query_balance(self):
-        balance = client.query_balance(address="dex1waw8g8v3xw6549mvd476dvq6hwlvdry9a353ug", denom="FX")
+        balance = client.query_balance(
+            address="dex1waw8g8v3xw6549mvd476dvq6hwlvdry9a353ug", denom="FX")
         print(balance)
 
-        balances = client.query_balance(address="dex1v0zwwfe3gw2fqdhdnx0hcurh2gzz98z8dagewy", denom="FX")
+        balances = client.query_balance(
+            address="dex1v0zwwfe3gw2fqdhdnx0hcurh2gzz98z8dagewy", denom="FX")
         print(balances)
 
     def test_query_gas_price(self):
@@ -35,7 +39,8 @@ class MyTestCase(unittest.TestCase):
         print(res)
 
     def test_query_account(self):
-        account = client.query_account_info(address="dex1v0zwwfe3gw2fqdhdnx0hcurh2gzz98z8dagewy")
+        account = client.query_account_info(
+            address="dex1v0zwwfe3gw2fqdhdnx0hcurh2gzz98z8dagewy")
         print(account)
 
     def test_query_oracle_price(self):
@@ -43,7 +48,8 @@ class MyTestCase(unittest.TestCase):
         print(oracle_price)
 
     def test_query_positions(self):
-        positions = client.query_positions(owner='dex179q82e7fcck4ftfvf4vfpwkg86jmxf7upext3v', pair_id="tsla:usdt")
+        positions = client.query_positions(
+            owner='dex179q82e7fcck4ftfvf4vfpwkg86jmxf7upext3v', pair_id="tsla:usdt")
         print("positions: ", positions)
         # owner = Address(resp.positions[0].owner)
         # print(owner.to_string())
@@ -88,11 +94,14 @@ class MyTestCase(unittest.TestCase):
         print('chain_id:', chain_id)
 
         account = client.query_account_info(address)
-        print('account number:', account.account_number, 'sequence:', account.sequence)
+        print('account number:', account.account_number,
+              'sequence:', account.sequence)
 
-        tx_builder = TxBuilder(priv_key, chain_id, account.account_number, Coin(amount='60000000', denom='FX'))
+        tx_builder = TxBuilder(priv_key, chain_id, account.account_number, Coin(
+            amount='60000000', denom='FX'))
 
-        tx_response = client.create_order(tx_builder, 'tsla:usdt', "BUY", decimal.Decimal(910.1), decimal.Decimal(1.2), 10, account.sequence, mode=BROADCAST_MODE_BLOCK)
+        tx_response = client.create_order(tx_builder, 'tsla:usdt', "BUY", decimal.Decimal(
+            910.1), decimal.Decimal(1.2), 10, account.sequence, mode=BROADCAST_MODE_BLOCK)
         print(MessageToJson(tx_response))
 
     def test_cancel_order(self):
@@ -106,11 +115,14 @@ class MyTestCase(unittest.TestCase):
         print('chain_id:', chain_id)
 
         account = client.query_account_info(address)
-        print('account number:', account.account_number, 'sequence:', account.sequence)
+        print('account number:', account.account_number,
+              'sequence:', account.sequence)
 
-        tx_builder = TxBuilder(priv_key, chain_id, account.account_number, Coin(amount='60000000', denom='FX'))
+        tx_builder = TxBuilder(priv_key, chain_id, account.account_number, Coin(
+            amount='60000000', denom='FX'))
 
-        create_tx_response = client.create_order(tx_builder, 'tsla:dai', BUY, decimal.Decimal(1.1), decimal.Decimal(1.2), 10, account.sequence, mode=BROADCAST_MODE_BLOCK)
+        create_tx_response = client.create_order(tx_builder, 'tsla:dai', BUY, decimal.Decimal(
+            1.1), decimal.Decimal(1.2), 10, account.sequence, mode=BROADCAST_MODE_BLOCK)
         res_str = MessageToJson(create_tx_response)
         res = json.loads(res_str)
         order_id = ''
@@ -123,7 +135,8 @@ class MyTestCase(unittest.TestCase):
 
         print("create order id = ", order_id)
 
-        tx_response = client.cancel_order(tx_builder, order_id, account.sequence + 1, mode=BROADCAST_MODE_BLOCK)
+        tx_response = client.cancel_order(
+            tx_builder, order_id, account.sequence + 1, mode=BROADCAST_MODE_BLOCK)
         print(tx_response)
 
     def test_close_position(self):
@@ -138,18 +151,23 @@ class MyTestCase(unittest.TestCase):
         print('chain_id:', chain_id)
 
         account = client.query_account_info(address)
-        print('account number:', account.account_number, 'sequence:', account.sequence)
+        print('account number:', account.account_number,
+              'sequence:', account.sequence)
 
-        positions = client.query_positions(owner='dex1zgpzdf2uqla7hkx85wnn4p2r3duwqzd8cfus97', pair_id=pair_id)
+        positions = client.query_positions(
+            owner='dex1zgpzdf2uqla7hkx85wnn4p2r3duwqzd8cfus97', pair_id=pair_id)
         print("positions: ", positions)
         self.assertNotEqual(len(positions), 0)
 
-        tx_builder = TxBuilder(priv_key, chain_id, account.account_number, Coin(amount='60000000', denom='FX'))
-        tx_response = client.close_position(tx_builder, pair_id, positions[0].Id, positions[0].MarkPrice, decimal.Decimal(0.1), True, account.sequence, mode=BROADCAST_MODE_BLOCK)
+        tx_builder = TxBuilder(priv_key, chain_id, account.account_number, Coin(
+            amount='60000000', denom='FX'))
+        tx_response = client.close_position(tx_builder, pair_id, positions[0].Id, positions[0].MarkPrice, decimal.Decimal(
+            0.1), True, account.sequence, mode=BROADCAST_MODE_BLOCK)
         print(tx_response)
 
     def test_query_orders_by_account(self):
-        orders = client.query_orders_by_account('dex1n58mly6f7er0zs6swtetqgfqs36jaarqlhs528', 1, 20)
+        orders = client.query_orders_by_account(
+            'dex1n58mly6f7er0zs6swtetqgfqs36jaarqlhs528', 1, 20)
         print(orders)
 
     def test_decimal(self):
@@ -171,8 +189,9 @@ class MyTestCase(unittest.TestCase):
         time2 = Timestamp()
         time2.FromJsonString(time1)
         print(time2)
-        time3 = Timestamp().FromJsonString(time1) #return None
+        time3 = Timestamp().FromJsonString(time1)  # return None
         print(time3)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -13,8 +13,9 @@ elif network == constants.NetworkENV.TESTNET:
     rpc_url = constants.Network.TESTNET_RPC
 elif network == constants.NetworkENV.MAINNET:
     rpc_url = constants.Network.MAINNET_RPC
-            
+
 rpc_client = HttpRpcClient(rpc_url)
+
 
 class MyTestCase(unittest.TestCase):
 
@@ -52,11 +53,11 @@ class MyTestCase(unittest.TestCase):
         print(genesis)
         assert rpc_client.get_genesis()
 
-
     def test_get_block_result(self):
         block_res = rpc_client.get_block_results(100)
         print(block_res)
         assert block_res
+
 
 if __name__ == '__main__':
     unittest.main()

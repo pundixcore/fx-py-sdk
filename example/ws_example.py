@@ -8,6 +8,7 @@ import asyncio
 import json
 from fx_py_sdk.fx_rpc.ws import FxWebsocket
 
+
 async def main():
     ws_url = "ws://127.0.0.1:26657/"
     data = {
@@ -23,4 +24,3 @@ async def main():
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()
     loop.run_until_complete(main())
-

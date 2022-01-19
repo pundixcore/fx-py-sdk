@@ -1,7 +1,9 @@
 import ujson as json
 
+
 class FxdexRequestException(Exception):
     pass
+
 
 class FxdexRPCException(Exception):
     def __init__(self, response):
@@ -9,7 +11,8 @@ class FxdexRPCException(Exception):
         try:
             json_res = json.loads(response.content)
         except ValueError:
-            self.message = 'Invalid JSON error message from Chain: {}'.format(response.text)
+            self.message = 'Invalid JSON error message from Chain: {}'.format(
+                response.text)
         else:
             self.code = json_res['error']['code']
             self.message = json_res['error']['message']

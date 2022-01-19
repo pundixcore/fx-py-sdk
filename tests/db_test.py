@@ -3,6 +3,7 @@ import decimal
 from fx_py_sdk.model.model import *
 from fx_py_sdk.model.crud import *
 
+
 class MyTestCase(unittest.TestCase):
     def test_create_database(self):
         sql = Sql()
@@ -32,8 +33,8 @@ class MyTestCase(unittest.TestCase):
             price=decimal.Decimal(100)
         )
         sql.insert(order)
-        order_sql = sql.filterone(Order, Order.order_id==order_id)
-        assert order.block_number==order_sql.block_number
+        order_sql = sql.filterone(Order, Order.order_id == order_id)
+        assert order.block_number == order_sql.block_number
         print(order_sql.to_dict())
 
     def test_orderbook_from_sql(self):
@@ -45,6 +46,7 @@ class MyTestCase(unittest.TestCase):
         sql = Crud()
         orderbook = sql.get_orderbook_from_order("tsla:usdt")
         print(orderbook)
+
 
 if __name__ == '__main__':
     unittest.main()

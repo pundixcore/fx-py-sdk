@@ -37,14 +37,16 @@ class TxBuilder:
         return addr.to_bytes()
 
     def sign(self, sequence: int, msgs: [Any], fee: Fee, timeout_height: int = 0) -> Tx:
-        tx_body = TxBody(messages=msgs, memo=self._memo, timeout_height=timeout_height)
+        tx_body = TxBody(messages=msgs, memo=self._memo,
+                         timeout_height=timeout_height)
         tx_body_bytes = tx_body.SerializeToString()
 
         single = ModeInfo.Single(mode=SIGN_MODE_DIRECT)
         mode_info = ModeInfo(single=single)
         pub_key_any = self._private_key.to_public_key().to_secp256k1_any()
 
-        signer_info = SignerInfo(public_key=pub_key_any, mode_info=mode_info, sequence=sequence)
+        signer_info = SignerInfo(
+            public_key=pub_key_any, mode_info=mode_info, sequence=sequence)
         auth_info = AuthInfo(signer_infos=[signer_info], fee=fee)
         auth_info_bytes = auth_info.SerializeToString()
 
