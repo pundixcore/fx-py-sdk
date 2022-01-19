@@ -1,6 +1,7 @@
 import decimal
+from urllib.parse import urlparse
+
 import grpc
-import fx_py_sdk
 from fx_py_sdk.codec.cosmos.auth.v1beta1.auth_pb2 import BaseAccount
 from fx_py_sdk.codec.cosmos.auth.v1beta1.query_pb2 import QueryAccountRequest
 from fx_py_sdk.codec.cosmos.auth.v1beta1.query_pb2_grpc import QueryStub as AuthQuery
@@ -35,25 +36,21 @@ from fx_py_sdk.codec.fx.oracle.query_pb2 import QueryPriceRequest
 
 from fx_py_sdk.wallet import Address
 from fx_py_sdk.constants import *
-import logging
 from google.protobuf.json_format import MessageToJson
 import json
 import requests
 from fx_py_sdk.model.crud import Crud
 from fx_py_sdk.model.model import Order as CrudOrder
-import os
 
 DEFAULT_DEX_GAS = 5000000
 DEFAULT_GRPC_NONE = "Not found"
 DEFAULT_DEC = 1000000000000000000
 
+
 class GRPCClient:
-    def __init__(self, url: str = 'localhost:9090', use_ssl = True):
-        if use_ssl:
-            cert_filepath = os.path.join(os.path.dirname(__file__), 'cert.pem')
-            with open(cert_filepath, 'rb') as f:
-                creds = grpc.ssl_channel_credentials(f.read())
-            self.channel = grpc.secure_channel(url, creds)
+    def __init__(self, url: str = 'localhost:9090'):
+        if urlparse(url).scheme == "https":
+            self.channel = grpc.secure_channel(url, grpc.ssl_channel_credentials())
         else:
             self.channel = grpc.insecure_channel(url)
 
