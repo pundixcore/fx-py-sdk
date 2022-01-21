@@ -484,6 +484,17 @@ class GRPCClient:
 
         return orders
 
+    def query_open_order_count(self, client_address=None, pair_id=None):
+        """Gets count of open orders from database"""
+        return self.crud.query_open_order_count(client_address, pair_id)
+
+    def query_open_order_value(self, client_address=None, pair_id=None):
+        """
+        Gets total dollar value of open orders in database, where
+        value = base_quantity * price / leverage
+        """
+        return self.crud.query_open_order_value(client_address, pair_id)
+
     def query_funding_info(self):
         """查询资金费率.
             Args:

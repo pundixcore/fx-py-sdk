@@ -1,11 +1,11 @@
+from decimal import Decimal
 from typing import List
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from sqlalchemy.orm.session import Session
 from fx_py_sdk.codec.fx.dex.match_pb2 import OrderBook
 from fx_py_sdk.model.model import *
-from sqlalchemy import or_, and_
-
+from sqlalchemy import or_, and_, func
 
 class Crud:
     def __init__(self):
@@ -116,6 +116,25 @@ class Crud:
         orderbook['asks'] = asks
         orderbook['bids'] = bids
         return orderbook
-        
+
+    def __get_open_order_conditions(self, client_address=None, pair_id=None):
+        conditions = [Order.status.in_(('ORDER_PENDING', 'ORDER_PARTIAL_FILLED'))]
+        if client_address:
+            conditions.append(Order.owner==client_address)
+        if pair_id:
+            conditions.append(Order.pair_id==pair_id)
+        return conditions        
+
+    def query_open_order_count(self, client_address=None, pair_id=None) -> int:
+        conditions = self.__get_open_order_conditions(client_address, pair_id)
+        return self.session.query(Order).filter(and_(*conditions)).count()
+
+    def query_open_order_value(self, client_address=None, pair_id=None) -> Decimal:
+        conditions = self.__get_open_order_conditions(client_address, pair_id)
+        result = (self.session.query(func.sum(Order.base_quantity * Order.price / Order.leverage))
+                              .filter(and_(*conditions))
+                              .first())
+        return result[0]
+
     def count(self, object):
         return self.session.query(object).count()
