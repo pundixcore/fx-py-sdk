@@ -129,9 +129,10 @@ class Crud:
         conditions = self.__get_open_order_conditions(client_address, pair_id)
         return self.session.query(Order).filter(and_(*conditions)).count()
 
-    def query_open_order_value(self, client_address=None, pair_id=None) -> Decimal:
+    def query_open_order_lock_deposit(self, client_address=None, pair_id=None) -> Decimal:
         conditions = self.__get_open_order_conditions(client_address, pair_id)
-        result = (self.session.query(func.sum(Order.base_quantity * Order.price / Order.leverage))
+        conditions.append(Order.order_type=='ORDER_TYPE_OPEN_POSITION')
+        result = (self.session.query(func.sum(Order.base_quantity * Order.price / Order.leverage + Order.locked_fee))
                               .filter(and_(*conditions))
                               .first())
         return result[0]

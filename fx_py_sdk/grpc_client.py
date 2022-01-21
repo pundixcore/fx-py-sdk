@@ -488,12 +488,11 @@ class GRPCClient:
         """Gets count of open orders from database"""
         return self.crud.query_open_order_count(client_address, pair_id)
 
-    def query_open_order_value(self, client_address=None, pair_id=None):
+    def query_open_order_lock_deposit(self, client_address=None, pair_id=None):
         """
-        Gets total dollar value of open orders in database, where
-        value = base_quantity * price / leverage
+        Gets total locked deposit (including margin and locked fee) of open orders.
         """
-        return self.crud.query_open_order_value(client_address, pair_id)
+        return self.crud.query_open_order_lock_deposit(client_address, pair_id)
 
     def query_funding_info(self):
         """查询资金费率.
