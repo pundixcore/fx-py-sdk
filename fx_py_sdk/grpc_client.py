@@ -494,6 +494,14 @@ class GRPCClient:
         """
         return self.crud.query_open_order_lock_deposit(client_address, pair_id)
 
+    def get_contract_exposure(self, address=None, pair_id=None, is_bot=True):
+        """Current long-short exposure. Returns a single value if pair_id is provided; otherwise returns dictionary."""
+        return self.crud.get_contract_exposure(address, pair_id, is_bot)
+    
+    def get_dollar_exposure(self, address=None, pair_id=None, is_bot=True):
+        """Current long-short exposure * mark price. Returns a single value if pair_id is provided; otherwise returns dictionary."""
+        return self.crud.get_dollar_exposure(address, pair_id, is_bot)
+
     def query_funding_info(self):
         """查询资金费率.
             Args:

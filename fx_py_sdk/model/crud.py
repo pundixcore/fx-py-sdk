@@ -1,7 +1,7 @@
 from decimal import Decimal
-from typing import List
+from typing import Dict, List, Union
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import create_engine
+from sqlalchemy import case, create_engine
 from sqlalchemy.orm.session import Session
 from fx_py_sdk.codec.fx.dex.match_pb2 import OrderBook
 from fx_py_sdk.model.model import *
@@ -10,7 +10,7 @@ from sqlalchemy import or_, and_, func
 class Crud:
     def __init__(self):
         sql = Sql("fxdex")
-        self.DBSession = sessionmaker(bind=sql.engine)
+        self.DBSession = sessionmaker(bind=sql.engine, autocommit=False)
         self.session: Session = self.DBSession()
 
     def insert(self, object):
@@ -137,5 +137,90 @@ class Crud:
                               .first())
         return result[0]
 
+    def __query_best_price(self, block_height, direction):
+        conditions = [Order.block_height<=block_height,
+                      Order.direction==direction,
+                      Order.status.in_(('ORDER_PENDING', 'ORDER_PARTIAL_FILLED'))]
+
+        if direction=='BID':
+            price_order = Order.price.desc()
+        else:
+            price_order = Order.price.asc()
+
+        query = (self.session.query(Order.pair_id, Order.price, Order.block_height)
+                             .order_by(Order.pair_id, price_order)
+                             .distinct(Order.pair_id)
+                             .filter(*conditions))
+        return query
+
+    def query_mark_prices(self):
+        query = (self.session.query(Position.pair_id, Position.mark_price)
+                             .order_by(Position.pair_id, Position.block_height.desc())
+                             .distinct(Position.pair_id))
+        return query.all()
+
+    def query_best_bid_ask(self, block_height):
+        bid_query = self.__query_best_price(block_height, 'BID').subquery()
+        ask_query = self.__query_best_price(block_height, 'ASK').subquery()
+
+        query = self.session.query(
+            func.coalesce(bid_query.c.pair_id, ask_query.c.pair_id),
+            bid_query.c.price,
+            ask_query.c.price,
+            case(
+                [(bid_query.c.block_height > ask_query.c.block_height, bid_query.c.block_height)],
+                else_ = ask_query.c.block_height
+            )
+        ).join(
+            ask_query,
+            bid_query.c.pair_id==ask_query.c.pair_id,
+            full=True
+        )
+
+        return query.all()
+
     def count(self, object):
         return self.session.query(object).count()
+
+    # Exposure
+    def __get_exposure(self, address=None, pair_id=None, is_bot=True, as_dollar_value=False) -> Union[Decimal, Dict[str, Decimal]]:
+        # Apply SQL conditions based on parameters
+        conditions = [Position.status=='open']
+
+        if address:
+            conditions.append(Position.owner==address)
+        elif is_bot:
+            bot_addresses = self.session.query(Wallet.address)
+            conditions.append(Position.owner.in_(bot_addresses))
+
+        if pair_id:
+            conditions.append(Position.pair_id==pair_id)
+
+        # Retrieve from DB
+        result = (self.session.query(Position.pair_id, func.sum(Position.base_quantity * case([(Position.direction=='LONG', 1)], else_=-1)))
+                              .filter(*conditions)
+                              .group_by(Position.pair_id)
+                              .all())
+        result_dict = { trade_pair: exposure for trade_pair, exposure in result }
+
+        # Mark quantities to latest mark prices
+        if as_dollar_value and result_dict:
+            mark_prices = self.query_mark_prices()  # latest mark prices
+            for trade_pair, exposure in result_dict.items():
+                for mark_pair, mark_price in mark_prices:
+                    if trade_pair==mark_pair:
+                        result_dict[pair_id] = exposure * mark_price
+                        break
+
+        if pair_id:
+            return result_dict.get(pair_id, Decimal('0'))
+        else:
+            return result_dict
+
+    def get_contract_exposure(self, address=None, pair_id=None, is_bot=True):
+        """Returns a single net contract quantity exposure if pair_id is provided. Otherwise, returns dictionary."""
+        return self.__get_exposure(address, pair_id, is_bot)
+    
+    def get_dollar_exposure(self, address=None, pair_id=None, is_bot=True):
+        """Returns a single exposure marked to mark price if pair_id is provided. Otherwise, returns dictionary."""
+        return self.__get_exposure(address, pair_id, is_bot, as_dollar_value=True)
