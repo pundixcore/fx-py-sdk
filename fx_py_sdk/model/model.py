@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 import sqlalchemy
-from sqlalchemy import Table, Column, Integer, String, ForeignKey, Numeric, DateTime
+from sqlalchemy import Index, Table, Column, Integer, String, Boolean, ForeignKey, Numeric, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from fx_py_sdk import constants
 import os
 import logging
+import pandas as pd
 
 Base = declarative_base()
 
@@ -13,7 +14,7 @@ def to_dict(self):
     dict_attrs = dict()
     for col in self.__table__.columns:
         attr = getattr(self, col.name, None)
-        if attr:
+        if attr is not None:
             dict_attrs[col.name] = attr
     return dict_attrs
 
@@ -23,11 +24,12 @@ class Order(Base):
     __tablename__ = 'orders'
 
     id = Column('id', Integer, primary_key=True, autoincrement=True)
-    block_height = Column(Integer)
+    block_height = Column(Integer, index=True)
     tx_hash = Column(String(66))
-    order_id = Column(String(100), nullable=False, unique=True, index=True)
+    order_id = Column(String(100), nullable=False, unique=True)
     owner = Column(String(42))
-    pair_id = Column(String(20))
+    liquidation_owner = Column(String(42))
+    pair_id = Column(String(20), index=True)
     direction = Column(String(10))
     price = Column(Numeric)
     base_quantity = Column(Numeric)
@@ -37,7 +39,7 @@ class Order(Base):
     remain_locked = Column(Numeric)
     created_at = Column(DateTime)
     leverage = Column(Integer)
-    status = Column(String(50))
+    status = Column(String(50), index=True)
     order_type = Column(String(50))
     cost_fee = Column(Numeric)
     locked_fee = Column(Numeric)
@@ -46,6 +48,7 @@ class Order(Base):
     filled_block_height = Column(Integer)
     cancel_time = Column(DateTime)
     block_height = Column(Integer)
+    initial_base_quantity = Column(Numeric)
 
 class Position(Base):
     __tablename__ = 'position'
@@ -61,6 +64,7 @@ class Position(Base):
     base_quantity = Column(Numeric)
     margin = Column(Numeric)
     leverage = Column(Integer)
+    realized_pnl = Column(Numeric)
     unrealized_pnl = Column(Numeric)
     margin_rate = Column(Numeric)
     initial_margin = Column(Numeric)
@@ -87,6 +91,7 @@ class Trade(Base):
     matched_quantity = Column(Numeric)
     order_id = Column(String(100), nullable=False, unique=False)
     owner = Column(String(42))
+    liquidation_owner = Column(String(42))
     pair_id = Column(String(20))
     direction = Column(String(10))
     price = Column(Numeric)  #entry price
@@ -101,6 +106,10 @@ class Trade(Base):
 
 class FundingTransfer(Base):
     __tablename__ = 'funding_transfer'
+    __table_args__ = (
+        Index('ix_funding_transfer_owner_pairid_height', 'owner', 'pair_id', 'block_height'),
+    )
+
     id = Column('id', Integer, primary_key=True, autoincrement=True)
     position_id = Column(Integer)
     pair_id = Column(String(20))
@@ -111,7 +120,7 @@ class FundingTransfer(Base):
 class Block(Base):
     __tablename__ = 'block'
     height = Column('height', Integer, primary_key=True, autoincrement=False)
-    time = Column(DateTime)
+    time = Column(DateTime, index=True)
 
 class Tx(Base):
     __tablename__ = 'tx'
@@ -125,53 +134,131 @@ class Tx(Base):
 """ auxillary helper classes """
 class Positioning(Base):
     __tablename__ = 'positioning'
+    __table_args__ = (
+        Index('ix_positioning_owner_pairid_height', 'owner', 'pair_id', 'block_height'),
+    )
+
     id = Column('id', Integer, primary_key=True, autoincrement=True)
     owner = Column(String(42))
     pair_id = Column(String(20))
+    entry_price = Column(Numeric)
+    mark_price = Column(Numeric)
+    base_quantity = Column(Numeric)
     realized_pnl = Column(Numeric)
     unrealized_pnl = Column(Numeric)
-    units_exposure = Column(Numeric)
+    margin = Column(Numeric)
+    direction = Column(String(10))
+    position_id = Column(Integer)
+    locked_fees = Column(Numeric)
     block_height = Column(Integer)
+    is_batch_update = Column(Boolean, default=False)
+
+class Balance(Base):
+    __tablename__ = 'balance'
+    id = Column('id', Integer, primary_key=True, autoincrement=True)
+    owner = Column(String(42))
+    token = Column(String(70), index=True)
+    amount = Column(Numeric)
+    batch_time = Column(DateTime)
+    time = Column(DateTime)
 
 class OrderbookTop(Base):
     __tablename__ = 'orderbook_top'
     id = Column('id', Integer, primary_key=True, autoincrement=True)
-    pair_id = Column(String(20))
+    pair_id = Column(String(20), index=True)
     best_bid = Column(Numeric)
     best_ask = Column(Numeric)
     block_height = Column(Integer)
+
+class FundingRate(Base):
+    __tablename__ = 'funding_rate'
+    id = Column('id', Integer, primary_key=True, autoincrement=True)
+    pair_id = Column(String(20), index=True)
+    rate = Column(Numeric)
+    funding_times = Column(Integer)
+    block_height = Column(Integer)
+
+class Wallet(Base):
+    __tablename__ = 'wallet'
+    id = Column('id', Integer, primary_key=True, autoincrement=True)
+    address = Column(String(42), unique=True)
+    owner = Column(String(100))
+    pair_id = Column(String(20))
+    comment = Column(String(256))
+
+class Margin(Base):
+    __tablename__ = 'margin'
+    id = Column('id', Integer, primary_key=True, autoincrement=True)
+    add_amount = Column(Numeric)
+    tx_hash = Column(String(66))
+    position_id = Column(Integer, index=True)
+    pair_id = Column(String(20), index=True)
+    mark_price = Column(Numeric)
+    base_quantity = Column(Numeric)
+    direction = Column(String(10))
+    owner = Column(String(100), index=True)
+    leverage = Column(Integer)
+    entry_price = Column(Numeric)
+    liquidation_price = Column(Numeric)
+    margin_rate = Column(Numeric)
+    margin = Column(Numeric)
+    block_height = Column(Integer)
+
+class LockedFee(Base):
+    __tablename__ = 'locked_fee'
+    id = Column('id', Integer, primary_key=True, autoincrement=True)
+    pair_id = Column(String(20), index=True)
+    owner = Column(String(100), index=True)
+    direction = Column(String(10))
+    fees = Column(Numeric)
+    block_height = Column(Integer)
+
+class Error(Base):
+    __tablename__ = 'error'
+    id = Column('id', Integer, primary_key=True, autoincrement=True)
+    sender = Column(String(42), index=True)
+    log = Column(String(1024))
+    block_height = Column(Integer, index=True)
+
+class ErrorLog(Base):
+    __tablename__ = 'error_log'
+    id = Column('id', Integer, primary_key=True, autoincrement=True)
+    height = Column(Integer)
+
+class Transfer(Base):
+    __tablename__ = 'transfer'
+    id = Column('id', Integer, primary_key=True, autoincrement=True)
+    sender = Column(String(100), index=True)
+    recipient = Column(String(100), index=True)
+    amount = Column(Numeric)
+    token = Column(String(70), index=True)
+    block_height = Column(Integer, index=True)
+
+class TradePair(Base):
+    __tablename__ = 'trade_pair'
+    pair_id = Column(String(20), primary_key=True)
 
 class Sql:
     def __init__(self, database: str = "postgres", user: str = "postgres", password: str = "123456", host: str = "localhost",
                  port: str = "5432"):
 
-        try:
-            database_env = os.environ[constants.DB.Database]
-            user_env = os.environ[constants.DB.User]
-            password_env = os.environ[constants.DB.Password]
-            host_env = os.environ[constants.DB.Host]
-            port_env = os.environ[constants.DB.Port]
-            if len(database_env) > 0:
-                database = database_env
-            if len(user_env) > 0:
-                user = user_env
-            if len(password_env) > 0:
-                password = password_env
-            if len(host_env) > 0:
-                host = host_env
-            if len(port_env) > 0:
-                port = port_env
-        except Exception as e:
-            logging.warn(f'Could not instantiate db from environment {e}')
+        database = os.environ.get(constants.DB.Database, database)
+        user = os.environ.get(constants.DB.User, user)
+        password = os.environ.get(constants.DB.Password, password)
+        host = os.environ.get(constants.DB.Host, host)
+        port = os.environ.get(constants.DB.Port, port)
 
         self.database = database
         self.user = user
         self.password = password
         self.host = host
         self.port = port
-        self.connect(database)
 
-        logging.info(f'Connected to database {database}')
+        try:
+            self.connect(database)
+            logging.info(f'Connected to database {database}')
+        except Exception as ex:
+            logging.error(f'Failed connecting to database {database}: {ex}')
 
     def connect(self, db: str):
         """ Connect to the PostgreSQL database server """
@@ -189,13 +276,36 @@ class Sql:
 
     def drop_table(self):
         # Terminates all processes connected to db
-#         self.engine.execute(f"""SELECT pg_terminate_backend(pg_stat_activity.pid)
-# FROM pg_stat_activity
-# WHERE pg_stat_activity.datname = '{self.database}'
-# AND pid <> pg_backend_pid();""")
+        self.engine.execute(f'''
+SELECT pg_terminate_backend(pg_stat_activity.pid)
+FROM pg_stat_activity
+WHERE pg_stat_activity.datname = '{self.database}'
+AND pid <> pg_backend_pid();''')
 
         # Drop all tables
         Base.metadata.drop_all(self.engine)
+
+    def initialize_table(self, csv_filename: str, table_name: str):
+        try:
+            df = pd.read_csv(csv_filename)
+            df.to_sql(table_name, self.engine, if_exists='append', index=False)
+        except:
+            return
+
+    def initialize_wallets(self):
+        self.initialize_table('wallets.csv', 'wallet')
+
+    def initialize_trade_pairs(self):
+        self.initialize_table('trade_pairs.csv', 'trade_pair')
+
+    def initialize_error_log_height(self, starting_height=None):
+        if not starting_height:
+            starting_height = self.engine.execute('SELECT MAX(height) FROM block').first()[0] or 1
+
+        self.engine.execute(f'''
+INSERT INTO error_log (height)
+SELECT {starting_height}
+WHERE NOT EXISTS (SELECT * FROM error_log)''')
 
     """
     Below is create database and table use psycopg2, require your computer install postgresql
