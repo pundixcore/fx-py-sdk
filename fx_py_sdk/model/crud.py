@@ -1,5 +1,5 @@
 from decimal import Decimal
-from typing import Dict, List, Union
+from typing import Dict, Iterable, List, Union
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import case, create_engine
 from sqlalchemy.orm.session import Session
@@ -129,13 +129,38 @@ class Crud:
         conditions = self.__get_open_order_conditions(client_address, pair_id)
         return self.session.query(Order).filter(and_(*conditions)).count()
 
+    def query_all_locked_fees(self) -> Iterable:
+        order_conditions = self.__get_open_order_conditions()
+        order_conditions.append(Order.order_type=='ORDER_TYPE_OPEN_POSITION')
+        locked_fees = (self.session.query(Order.pair_id, Order.owner, Order.direction, func.sum(Order.locked_fee))
+                          .filter(and_(*order_conditions))
+                          .group_by(Order.pair_id, Order.owner, Order.direction)
+                          .all())
+        return locked_fees
+
     def query_open_order_lock_deposit(self, client_address=None, pair_id=None) -> Decimal:
-        conditions = self.__get_open_order_conditions(client_address, pair_id)
-        conditions.append(Order.order_type=='ORDER_TYPE_OPEN_POSITION')
-        result = (self.session.query(func.sum(Order.base_quantity * Order.price / Order.leverage + Order.locked_fee))
-                              .filter(and_(*conditions))
-                              .first())
-        return result[0]
+        # Locked fee
+        order_conditions = self.__get_open_order_conditions(client_address, pair_id)
+        order_conditions.append(Order.order_type=='ORDER_TYPE_OPEN_POSITION')
+        locked_fee = (self.session.query(func.sum(Order.locked_fee))
+                                  .filter(and_(*order_conditions))
+                                  .first())[0]
+
+        # Margin = SUM(Order.base_quantity * Order.price / Order.leverage) + Added Margin
+        position_conditions = self.__get_open_position_conditions(client_address, pair_id)
+        margin = (self.session.query(func.sum(Position.margin))
+                              .filter(and_(*position_conditions))
+                              .first())[0]
+
+        return locked_fee + margin
+
+    def __get_position_conditions(self, client_address=None, pair_id=None):
+        conditions = [Position.status=='open']
+        if client_address:
+            conditions.append(Position.owner==client_address)
+        if pair_id:
+            conditions.append(Position.pair_id==pair_id)
+        return conditions        
 
     def __query_best_price(self, block_height, direction):
         conditions = [Order.block_height<=block_height,
@@ -209,7 +234,7 @@ class Crud:
             for trade_pair, exposure in result_dict.items():
                 for mark_pair, mark_price in mark_prices:
                     if trade_pair==mark_pair:
-                        result_dict[pair_id] = exposure * mark_price
+                        result_dict[trade_pair] = exposure * mark_price
                         break
 
         if pair_id:
