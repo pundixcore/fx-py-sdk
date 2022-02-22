@@ -35,6 +35,7 @@ class Order(Base):
     base_quantity = Column(Numeric)
     quote_quantity = Column(Numeric)
     filled_quantity = Column(Numeric)
+    last_filled_quantity = Column(Numeric)
     filled_avg_price = Column(Numeric)
     remain_locked = Column(Numeric)
     created_at = Column(DateTime)
@@ -86,14 +87,14 @@ class Orderbook(Base):
 class Trade(Base):
     __tablename__ = 'trade'
     id = Column('id', Integer, primary_key=True, autoincrement=True)
-    block_height = Column(Integer)
+    block_height = Column(Integer, index=True)
     deal_price = Column(Numeric)
     matched_quantity = Column(Numeric)
     order_id = Column(String(100), nullable=False, unique=False)
-    owner = Column(String(42))
+    owner = Column(String(42), index=True)
     liquidation_owner = Column(String(42))
-    pair_id = Column(String(20))
-    direction = Column(String(10))
+    pair_id = Column(String(20), index=True)
+    direction = Column(String(10), index=True)
     price = Column(Numeric)  #entry price
     base_quantity = Column(Numeric)
     quote_quantity = Column(Numeric)

@@ -40,7 +40,7 @@ from google.protobuf.json_format import MessageToJson
 import json
 import requests
 from fx_py_sdk.model.crud import Crud
-from fx_py_sdk.model.model import Order as CrudOrder
+from fx_py_sdk.model.model import Order as CrudOrder, Trade as CrudTrade, Block
 
 DEFAULT_DEX_GAS = 5000000
 DEFAULT_GRPC_NONE = "Not found"
@@ -282,7 +282,8 @@ class GRPCClient:
 
         return positions
 
-    def query_order(self, order_id: str, use_db: bool = False):
+    # include_trades only works if use_db=True
+    def query_order(self, order_id: str, use_db: bool = False, include_trades: bool = False):
         """根据订单ID查询订单.
             Args:
                 order_id: 订单id
@@ -352,16 +353,20 @@ class GRPCClient:
                 order.order_type,
                 cost_fee,
                 locked_fee,
-                order.created_at.ToSeconds(),
+                order.created_at.ToSeconds()
             )
-            return new_order
 
         else:
-            order = self.crud.filterone(
-                CrudOrder, CrudOrder.order_id == order_id)
+            response = (self.crud.session.query(CrudOrder, Block.time)
+                            .join(CrudOrder, CrudOrder.block_height==Block.height)
+                            .filter(CrudOrder.order_id==order_id)
+                            .one())
+            trades = self.query_trades(order_id) if include_trades else None
+
+            order = response.Order
             new_order = Order(
                 order.tx_hash,
-                order.id,
+                order.order_id,
                 Address(order.owner).to_string(),
                 order.pair_id,
                 order.direction,
@@ -377,10 +382,30 @@ class GRPCClient:
                 order.cost_fee,
                 order.locked_fee,
                 order.created_at,
+                order.last_filled_quantity,
+                response.time,
+                trades
             )
-            return new_order
 
-    def query_orders(self, owner: str, pair_id: str, page=b"1".decode('utf-8'), limit=b"20".decode('utf-8'), use_db=False):
+        return new_order
+
+    def query_trades(self, order_id):
+        """Queries trades from database given an order ID, sorted by time."""
+        response = (self.crud.session.query(CrudTrade.deal_price, CrudTrade.matched_quantity, Block.time)
+                           .join(Block, CrudTrade.block_height==Block.height)
+                           .filter(CrudTrade.order_id==order_id)
+                           .order_by(CrudTrade.block_height)
+                           .all())
+
+        trades = []
+        for trade in response:
+            new_trade = Trade(trade.deal_price, trade.matched_quantity, trade.time)
+            trades.append(new_trade)
+
+        return trades
+
+    # include_trades only works if use_db=True
+    def query_orders(self, owner: str, pair_id: str, page=b"1".decode('utf-8'), limit=b"20".decode('utf-8'), use_db=False, include_trades=False):
         """根据账户和交易对查询订单.
             Args:
                 owner: 仓位持有地址
@@ -454,16 +479,32 @@ class GRPCClient:
             #     logging.warn('No orders found in GRPC - returning empty list')
             #     return []
 
-            sql_orders = (self.crud.session.query(CrudOrder)
+            sql_orders = (self.crud.session.query(CrudOrder, Block.time)
+                                           .join(CrudOrder, CrudOrder.block_height==Block.height)
                                            .filter(CrudOrder.owner == owner, CrudOrder.pair_id == pair_id)
                                            .limit(int(limit))
                                            .offset(int(page))
                                            .all())
 
-            for order in sql_orders:
+            if include_trades:
+                order_trades = { res.Order.order_id: [] for res in sql_orders }
+                order_ids = order_trades.keys()
+
+                sql_trades = (self.crud.session.query(CrudTrade.order_id, CrudTrade.deal_price, CrudTrade.matched_quantity, Block.time)
+                                  .join(Block, CrudTrade.block_height==Block.height)
+                                  .filter(CrudTrade.order_id.in_(order_ids))
+                                  .order_by(CrudTrade.block_height)
+                                  .all())
+
+                for response in sql_trades:
+                    trade = Trade(response.deal_price, response.matched_quantity, response.time)
+                    order_trades[response.order_id].append(trade)
+
+            for response in sql_orders:
+                order: CrudOrder = response.Order
                 new_order = Order(
                     order.tx_hash,
-                    order.id,
+                    order.order_id,
                     Address(order.owner).to_string(),
                     order.pair_id,
                     order.direction,
@@ -478,7 +519,11 @@ class GRPCClient:
                     order.order_type,
                     order.cost_fee,
                     order.locked_fee,
-                    order.created_at, )
+                    order.created_at,
+                    order.last_filled_quantity,
+                    response.time,
+                    order_trades[order.order_id] if include_trades else None
+                )
 
                 orders.append(new_order)
 

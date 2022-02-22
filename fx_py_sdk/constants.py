@@ -1,6 +1,8 @@
-from typing import NamedTuple
+from typing import Iterable, NamedTuple
 from decimal import Decimal
-
+import os
+import logging
+from datetime import datetime
 
 class EnvVar:
     NETWORK = "NETWORK"
@@ -20,11 +22,57 @@ class Network:
     TESTNET_RPC = ""
     MAINNET_RPC = ""
 
+    LOCAL_GRPC = "127.0.0.1:9090"
+    DEVNET_GRPC = "44.196.199.119:9090"
+    TESTNET_GRPC = ""
+    MAINNET_GRPC = ""
+
     LOCAL_WS = "ws://127.0.0.1:26657/"
     DEVNET_WS = "ws://44.196.199.119:26657/"
     TESTNET_WS = ""
     MAINNET_WS = ""
 
+    @staticmethod
+    def get_rpc_url() -> str:
+        network = os.environ.get(EnvVar.NETWORK, NetworkENV.DEVNET)
+        if network == NetworkENV.LOCAL:
+            rpc_url = Network.LOCAL_RPC
+        elif network == NetworkENV.DEVNET:
+            rpc_url = Network.DEVNET_RPC
+        elif network == NetworkENV.TESTNET:
+            rpc_url = os.environ.get('TESTNET_RPC_URL', Network.TESTNET_RPC)
+            logging.info(rpc_url)
+        elif network == NetworkENV.MAINNET:
+            rpc_url = Network.MAINNET_RPC
+        return rpc_url
+
+    @staticmethod
+    def get_grpc_url() -> str:
+        network = os.environ.get(EnvVar.NETWORK, NetworkENV.DEVNET)
+        if network == NetworkENV.LOCAL:
+            grpc_url = Network.LOCAL_GRPC
+        elif network == NetworkENV.DEVNET:
+            grpc_url = Network.DEVNET_GRPC
+        elif network == NetworkENV.TESTNET:
+            grpc_url = os.environ.get('TESTNET_GRPC_URL', Network.TESTNET_GRPC)
+            logging.info(grpc_url)
+        elif network == NetworkENV.MAINNET:
+            grpc_url = Network.MAINNET_GRPC
+        return grpc_url
+
+    @staticmethod
+    def get_ws_url() -> str:
+        network = os.environ.get(EnvVar.NETWORK, NetworkENV.DEVNET)
+        if network == NetworkENV.LOCAL:
+            wss_url = Network.LOCAL_WS
+        elif network == NetworkENV.DEVNET:
+            wss_url = Network.DEVNET_WS
+        elif network == NetworkENV.TESTNET:
+            wss_url = os.environ.get('TESTNET_WS_URL', Network.TESTNET_WS)
+            logging.info(wss_url)
+        elif network == NetworkENV.MAINNET:
+            wss_url = Network.MAINNET_WS
+        return wss_url
 
 class DB:
     Database = "database"
@@ -52,7 +100,9 @@ class Order(NamedTuple):
     CostFee: Decimal
     LockedFee: Decimal
     Created_at: str
-
+    LastFilledQuantity: Decimal
+    LastUpdated: datetime
+    Trades: Iterable
 
 class Position(NamedTuple):
     Id: int
@@ -70,6 +120,10 @@ class Position(NamedTuple):
     InitialMargin: Decimal
     PendingOrderQuantity: Decimal
 
+class Trade(NamedTuple):
+    DealPrice: Decimal
+    MatchedQuantity: Decimal
+    FilledTime: datetime
 
 class BackEndApi:
     query_order_page = "http://44.195.213.51:30225/api/address/queryOrderPage"
