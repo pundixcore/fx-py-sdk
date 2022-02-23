@@ -100,9 +100,9 @@ class Order(NamedTuple):
     CostFee: Decimal
     LockedFee: Decimal
     Created_at: str
-    LastFilledQuantity: Decimal
-    LastUpdated: datetime
-    Trades: Iterable
+    LastFilledQuantity: Decimal = None
+    LastUpdated: datetime = None
+    Trades: Iterable = None
 
 class Position(NamedTuple):
     Id: int
