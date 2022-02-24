@@ -158,7 +158,7 @@ class Balance(Base):
     __tablename__ = 'balance'
     id = Column('id', Integer, primary_key=True, autoincrement=True)
     owner = Column(String(42))
-    token = Column(String(70), index=True)
+    token = Column('pair_id', String(70), index=True)
     amount = Column(Numeric)
     batch_time = Column(DateTime)
     time = Column(DateTime)

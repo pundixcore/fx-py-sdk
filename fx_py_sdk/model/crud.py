@@ -180,6 +180,7 @@ class Crud:
 
     def query_mark_prices(self):
         query = (self.session.query(Position.pair_id, Position.mark_price)
+                             .filter(and_(Position.mark_price!=0, Position.mark_price!=None))
                              .order_by(Position.pair_id, Position.block_height.desc())
                              .distinct(Position.pair_id))
         return query.all()

@@ -1,14 +1,17 @@
 import asyncio
 import itertools
+import json
+import traceback
 from typing import Optional, Dict
 
 import requests
 import aiohttp
-from requests.sessions import HTTPAdapter
+from requests.sessions import ChunkedEncodingError, HTTPAdapter
 import ujson
 
 from fx_py_sdk.exceptions import FxdexRPCException, FxdexRequestException
 from fx_py_sdk.fx_rpc.request import RpcRequest
+from urllib3.util.retry import Retry
 
 requests.models.json = ujson
 
@@ -61,18 +64,24 @@ class BaseHttpRpcClient:
 
         return kwargs
 
-
 class HttpRpcClient(BaseHttpRpcClient):
 
-    def __init__(self, endpoint_url, requests_params: Optional[Dict]=None, max_retries=None):
+    def __init__(self, endpoint_url, requests_params: Optional[Dict]=None, max_retries=3):
         super(HttpRpcClient, self).__init__(endpoint_url, requests_params)
         if max_retries:
-            self.session.mount('http://', HTTPAdapter(max_retries=max_retries))
+            retries = Retry(total=max_retries,
+                            backoff_factor=.5,
+                            status_forcelist=[500, 502, 503, 504])
+            self.session.mount('http://', HTTPAdapter(max_retries=retries))
 
     def _request(self, path, **kwargs):
 
         rpc_request = self._get_rpc_request(path, **kwargs)
-        response = self.session.post(self._endpoint_url, data=rpc_request.encode(), headers=self._get_headers())
+        try:
+            response = self.session.post(self._endpoint_url, data=rpc_request.encode(), headers=self._get_headers())
+        except ChunkedEncodingError as ex:
+            print(f'Error getting {json.loads(rpc_request)["params"]["height"]}')
+            traceback.print_exc()
 
         return self._handle_response(response)
 

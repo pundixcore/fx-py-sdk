@@ -22,6 +22,9 @@ class BlockResponse:
     Begin_block_events = "begin_block_events"
     End_block_events = "end_block_events"
 
+    Code = "code"
+    Log = "log"
+
 class EventTypes:
     """EndBlock"""
     Add_position = "dex.add_position"
@@ -36,12 +39,16 @@ class EventTypes:
     Forced_liquidation_position = "dex.forced_liquidation_position"
     Liq_cancel_order = "dex.liq_cancel_order"
     Liquidation_position_order = "dex.liquidation_position_order"
+    Log_funding_rate = "dex.log_funding_rate"
     Settle_funding = "dex.settle_funding"
+    Transfer = "transfer"
 
     """Tx event"""
     Order = "fx.dex.Order"
     Cancel_order = "dex.cancel_order"
     Close_position_order = "dex.close_position_order"
+    Message = "message"
+    Add_margin = 'dex.add_margin'
 
 class EventKeys:
     """orders"""
@@ -74,6 +81,7 @@ class EventKeys:
     margin_rate = "margin_rate"
     deal_price = "deal_price"
     unrealized_pnl = "unrealized_pnl"
+    realized_pnl = "realized_pnl"
     initial_margin = "initial_margin"
     pending_order_quantity = "pending_order_quantity"
     position_id = "position_id"
@@ -82,6 +90,15 @@ class EventKeys:
     unfilled_quantity = "unfilled_quantity"
 
     funding_fee = "funding_fee"
+
+    """funding rate"""
+    funding_rate = "funding_rate"
+    funding_times = "funding_times"
+
+    """transfer"""
+    recipient = "recipient"
+    sender = "sender"
+    amount = "amount"
 
 class PositionStatus:
     Open = "open"
