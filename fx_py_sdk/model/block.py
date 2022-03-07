@@ -49,6 +49,7 @@ class EventTypes:
     Close_position_order = "dex.close_position_order"
     Message = "message"
     Add_margin = 'dex.add_margin'
+    Oracle_updated_price = 'oracle_updated_price'
 
 class EventKeys:
     """orders"""
@@ -99,6 +100,10 @@ class EventKeys:
     recipient = "recipient"
     sender = "sender"
     amount = "amount"
+
+    """oracle_updated_price"""
+    market_id = "market_id"
+    oracle_price = "oracle_price"
 
 class PositionStatus:
     Open = "open"

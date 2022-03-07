@@ -1,5 +1,6 @@
 import base64
 import datetime
+from sqlite3 import IntegrityError
 from numpy import block
 
 import logging
@@ -75,14 +76,21 @@ class ScanBlockBase:
     def process_best_bid_ask(self, block_height, process_positioning=False):
         pass
 
-    def get_position(self, attributes: []) -> Position:
+    position_id_keys = set([EventKeys.id, EventKeys.position_id])
+    def get_position(self, attributes: [], is_new_position=False) -> Position:
         """decode position data"""
         position = Position()
         for attribute in attributes:
             key = base64.b64decode(attribute[BlockResponse.Key]).decode('utf8')
             value = base64.b64decode(
                 attribute[BlockResponse.VALUE]).decode('utf8')
-            if key == EventKeys.position_id:
+
+            # fx.dex.position is proto generate, different from other events
+            if is_new_position:
+                try:    value = eval(value)
+                except: pass
+
+            if key in self.position_id_keys:
                 position.position_id = int(value)
             elif key == EventKeys.owner:
                 position.owner = value
@@ -279,6 +287,20 @@ class ScanBlockBase:
     def get_margin(self, attributes: []):
         return self.decode_attributes(attributes, Margin)
 
+    def get_oracle_price(self, attributes: []):
+        oracle_price = OraclePrice()
+
+        for attribute in attributes:
+            key = base64.b64decode(attribute[BlockResponse.Key]).decode('utf8')
+            value = base64.b64decode(attribute[BlockResponse.VALUE]).decode('utf8')
+
+            if key == EventKeys.market_id:
+                oracle_price.market_id = value
+            elif key == EventKeys.oracle_price:
+                oracle_price.price = value
+
+        return oracle_price
+
 
 # Implements business logic for handling block events
 class ScanBlock(ScanBlockBase):
@@ -356,51 +378,13 @@ class ScanBlock(ScanBlockBase):
             """
 
             if event[BlockResponse.TYPE] == EventTypes.New_position:
-                position = Position()
-                for attribute in event[BlockResponse.Attributes]:
-                    key = base64.b64decode(
-                        attribute[BlockResponse.Key]).decode('utf8')
-                    value = base64.b64decode(
-                        attribute[BlockResponse.VALUE]).decode('utf8')
-
-                    # fx.dex.position is proto generate, different from other events
-                    try:    value = eval(value)
-                    except: pass
-
-                    if key == EventKeys.id:
-                        position.position_id = int(value)
-                    elif key == EventKeys.owner:
-                        position.owner = value
-                    elif key == EventKeys.pair_id:
-                        position.pair_id = value
-                    elif key == EventKeys.direction:
-                        position.direction = value
-                    elif key == EventKeys.entry_price:
-                        position.entry_price = Decimal(value)
-                    elif key == EventKeys.mark_price:
-                        position.mark_price = Decimal(value)
-                    elif key == EventKeys.liquidation_price:
-                        position.liquidation_price = Decimal(value)
-                    elif key == EventKeys.base_quantity:
-                        position.base_quantity = Decimal(value)
-                    elif key == EventKeys.margin:
-                        position.margin = Decimal(value)
-                    elif key == EventKeys.leverage:
-                        position.leverage = int(value)
-                    elif key == EventKeys.unrealized_pnl:
-                        position.unrealized_pnl = Decimal(value)
-                    elif key == EventKeys.margin_rate:
-                        position.margin_rate = Decimal(value)
-                    elif key == EventKeys.initial_margin:
-                        position.initial_margin = Decimal(value)
-                    elif key == EventKeys.pending_order_quantity:
-                        position.pending_order_quantity = Decimal(value)
-
-                sql_position = self.crud.filterone(
-                    Position, Position.position_id == position.position_id)
+                position = self.get_position(event[BlockResponse.Attributes], is_new_position=True)
                 position.status = PositionStatus.Open
                 position.block_height = block_height
                 position.open_height = block_height
+
+                sql_position = self.crud.filterone(
+                    Position, Position.position_id == position.position_id)
 
                 if sql_position is None:
                     self.crud.insert(position)
@@ -697,6 +681,14 @@ class ScanBlock(ScanBlockBase):
                 margin.block_height = block_height
                 self.crud.insert(margin)
 
+            elif event[BlockResponse.TYPE] == EventTypes.Oracle_updated_price:
+                oracle_price = self.get_oracle_price(event[BlockResponse.Attributes])
+                oracle_price.block_height = block_height
+                try:
+                    self.crud.insert(oracle_price)
+                except IntegrityError:  # duplicate
+                    pass
+
     """
         add_or_cancel: True means add (append), False means cancel (subtract)
     """
@@ -857,19 +849,89 @@ class TradingScanBlock(ScanBlockBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+    def on_new_order(self, order: Order, block_height: int):
+        pass
+
+    def on_new_position(self, position: Position, block_height: int):
+        pass
+
+    def on_position_change(self, position: Position, block_height: int):
+        pass
+
+    def on_position_close(self, position: Position, block_height: int):
+        pass
+
     def on_order_fill(self, order: Order, trade: Trade, block_height: int):
         pass
 
     def on_order_cancel(self, order: Order, block_height: int):
         pass
 
-    def process_end_block(self, events: str, block_height: int):
-        """process fxdex chain EndBlock events"""
+    def on_oracle_price_change(self, oracle_price: OraclePrice, block_height: int):
+        pass
 
+    def process_tx_events(self, tx_events, block_height):
+        for event in tx_events:
+            if event[BlockResponse.TYPE] == EventTypes.Order or event[
+                    BlockResponse.TYPE] == EventTypes.Close_position_order:
+                """new order on chain (both open & closing position"""
+                order = self.get_order(event[BlockResponse.Attributes])
+                order.open_block_height = block_height
+                order.block_height = block_height
+                order.initial_base_quantity = order.base_quantity
+
+                self.on_new_order(order, block_height)
+            elif event[BlockResponse.TYPE] == EventTypes.Cancel_order:
+                """order cancelled"""
+                order = self.get_order(event[BlockResponse.Attributes])
+                order.block_height = block_height
+                order.cancel_block_height = block_height
+
+                self.on_order_cancel(order, block_height)
+            elif event[BlockResponse.TYPE] == EventTypes.Oracle_updated_price:
+                """change in oracle price"""
+                oracle_price = self.get_oracle_price(event[BlockResponse.Attributes])
+                oracle_price.block_height = block_height
+                self.on_oracle_price_change(oracle_price, block_height)
+
+    def process_end_block(self, events: str, block_height: int):
         for event in events:
             event_type = event[BlockResponse.TYPE]
 
-            if event_type == EventTypes.Order_fill:
+            if event[BlockResponse.TYPE] == EventTypes.New_position:
+                """new position created"""
+                position = self.get_position(event[BlockResponse.Attributes], is_new_position=True)
+                position.status = PositionStatus.Open
+                position.block_height = position.open_height = block_height
+
+                self.on_new_position(position, block_height)
+
+            elif event[BlockResponse.TYPE] in (EventTypes.Add_position, EventTypes.Part_close_position):
+                """position change (qty increased or decreased)"""
+                position = self.get_position(event[BlockResponse.Attributes])
+                position.status = PositionStatus.Open
+                position.block_height = block_height
+
+                self.on_position_change(position, block_height)
+
+            elif event[BlockResponse.TYPE] == EventTypes.Full_close_position:
+                """position fully closed"""
+                position = self.get_position(event[BlockResponse.Attributes])
+                position.status = PositionStatus.Close
+                position.block_height = block_height
+                position.close_height = block_height
+
+                self.on_position_close(position, block_height)
+
+            elif event_type == EventTypes.Cancel_order_expire:
+                """order cancelled (on expiration)"""
+                order = self.get_order(event[BlockResponse.Attributes])
+                order.block_height = block_height
+                order.cancel_block_height = block_height
+
+                self.on_order_cancel(order, block_height)
+
+            elif event_type == EventTypes.Order_fill:
                 """order fill (including partial fills)"""
                 order = self.get_order(event[BlockResponse.Attributes])
                 trade = self.get_trade(event[BlockResponse.Attributes])
@@ -887,10 +949,4 @@ class TradingScanBlock(ScanBlockBase):
 
                 self.on_order_fill(order, trade, block_height)
 
-            elif event_type == EventTypes.Cancel_order:
-                """cancel order"""
-                order = self.get_order(event[BlockResponse.Attributes])
-                order.block_height = block_height
-                order.cancel_block_height = block_height
 
-                self.on_order_cancel(order, block_height)

@@ -235,6 +235,12 @@ class Transfer(Base):
     token = Column(String(70), index=True)
     block_height = Column(Integer, index=True)
 
+class OraclePrice(Base):
+    __tablename__ = 'oracle_price'
+    market_id = Column(String(20), primary_key=True, index=True)
+    price = Column(Numeric)
+    block_height = Column(Integer, primary_key=True, index=True)
+
 class TradePair(Base):
     __tablename__ = 'trade_pair'
     pair_id = Column(String(20), primary_key=True)
