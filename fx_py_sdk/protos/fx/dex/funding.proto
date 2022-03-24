@@ -6,7 +6,7 @@ import "gogoproto/gogo.proto";
 option go_package = "git.wokoworks.com/blockchain/fx-chain/x/dex/types";
 
 //cumulative funding rates
-message PairFundingRates {
+message PairFundingRate {
   string pair_id = 1;
   string funding_rate = 2 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
@@ -23,6 +23,9 @@ message Funding {
   int64 next_log_time = 4;
   int64 log_funding_period = 5;
   int64 max_funding_per_block = 6;
+  int64 crypto_funding_period = 7 [(gogoproto.nullable) = true];
+  int64 crypto_next_funding_time = 8 [(gogoproto.nullable) = true];
+  int64 crypto_funding_times = 9 [(gogoproto.nullable) = true];
 }
 
 message FundingTime {
@@ -39,6 +42,7 @@ message SettleFunding {
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint",
     (gogoproto.nullable) = false
   ];
+  string market_type = 3 [(gogoproto.nullable) = true];
 }
 
 // 溢价指数配置信息
@@ -48,6 +52,12 @@ message PremiumIndexConf {
   int64 round_start_time = 3;
   int64 next_round_time = 4;
   int32 round_index = 5;
+
+  int64 crypto_update_period = 6 [(gogoproto.nullable) = true];
+  int64 crypto_next_update_time = 7 [(gogoproto.nullable) = true];
+  int64 crypto_round_start_time = 8 [(gogoproto.nullable) = true];
+  int64 crypto_next_round_time = 9 [(gogoproto.nullable) = true];
+  int32 crypto_round_index = 10 [(gogoproto.nullable) = true];
 }
 
 // get/set -> key_prefix:pair_id:roundTimestamp
@@ -70,4 +80,16 @@ message PremiumIndex {
     ];
     int64 ts = 2;
   }
+}
+
+message MovingAverageParams {
+  int64 update_period = 1;
+  int64 next_update_time = 2;
+}
+
+message MovingAverage {
+  repeated string average_price = 1 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
 }

@@ -22,7 +22,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=b'Z1git.wokoworks.com/blockchain/fx-chain/x/dex/types',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x12\x66x/dex/order.proto\x12\x06\x66x.dex\x1a\x14gogoproto/gogo.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x17\n\x08OrderIDs\x12\x0b\n\x03ids\x18\x01 \x03(\t\"\xe3\x06\n\x05Order\x12\x0f\n\x07tx_hash\x18\x01 \x01(\t\x12\n\n\x02id\x18\x02 \x01(\t\x12@\n\x05owner\x18\x03 \x01(\x0c\x42\x31\xfa\xde\x1f-github.com/cosmos/cosmos-sdk/types.AccAddress\x12\x0f\n\x07pair_id\x18\x04 \x01(\t\x12$\n\tdirection\x18\x05 \x01(\x0e\x32\x11.fx.dex.Direction\x12=\n\x05price\x18\x06 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x45\n\rbase_quantity\x18\x07 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x46\n\x0equote_quantity\x18\x08 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12G\n\x0f\x66illed_quantity\x18\t \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12H\n\x10\x66illed_avg_price\x18\n \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x45\n\rremain_locked\x18\x0b \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x38\n\ncreated_at\x18\x0c \x01(\x0b\x32\x1a.google.protobuf.TimestampB\x08\xc8\xde\x1f\x00\x90\xdf\x1f\x01\x12\x10\n\x08leverage\x18\r \x01(\x03\x12#\n\x06status\x18\x0e \x01(\x0e\x32\x13.fx.dex.OrderStatus\x12%\n\norder_type\x18\x0f \x01(\x0e\x32\x11.fx.dex.OrderType\x12@\n\x08\x63ost_fee\x18\x10 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x42\n\nlocked_fee\x18\x11 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"-\n\x06Orders\x12#\n\x06orders\x18\x01 \x03(\x0b\x32\r.fx.dex.OrderB\x04\xc8\xde\x1f\x00*N\n\tDirection\x12\x10\n\x03\x42UY\x10\x00\x1a\x07\x8a\x9d \x03\x42ID\x12\x11\n\x04SELL\x10\x01\x1a\x07\x8a\x9d \x03\x41SK\x12\x12\n\x04\x42OTH\x10\x02\x1a\x08\x8a\x9d \x04\x42OTH\x1a\x08\xa8\xa4\x1e\x01\x88\xa3\x1e\x00*\xf1\x02\n\x0bOrderStatus\x12$\n\rORDER_PENDING\x10\x00\x1a\x11\x8a\x9d \rORDER_PENDING\x12\"\n\x0cORDER_FILLED\x10\x01\x1a\x10\x8a\x9d \x0cORDER_FILLED\x12\x32\n\x14ORDER_PARTIAL_FILLED\x10\x02\x1a\x18\x8a\x9d \x14ORDER_PARTIAL_FILLED\x12(\n\x0fORDER_CANCELLED\x10\x03\x1a\x13\x8a\x9d \x0fORDER_CANCELLED\x12\x46\n\x1eORDER_PARTIAL_FILLED_CANCELLED\x10\x04\x1a\"\x8a\x9d \x1eORDER_PARTIAL_FILLED_CANCELLED\x12\x42\n\x1cORDER_PARTIAL_FILLED_EXPIRED\x10\x05\x1a \x8a\x9d \x1cORDER_PARTIAL_FILLED_EXPIRED\x12$\n\rORDER_EXPIRED\x10\x06\x1a\x11\x8a\x9d \rORDER_EXPIRED\x1a\x08\xa8\xa4\x1e\x01\x88\xa3\x1e\x00*\xf7\x01\n\tOrderType\x12:\n\x18ORDER_TYPE_OPEN_POSITION\x10\x00\x1a\x1c\x8a\x9d \x18ORDER_TYPE_OPEN_POSITION\x12\x34\n\x15ORDER_TYPE_CLOSE_LONG\x10\x01\x1a\x19\x8a\x9d \x15ORDER_TYPE_CLOSE_LONG\x12\x36\n\x16ORDER_TYPE_CLOSE_SHORT\x10\x02\x1a\x1a\x8a\x9d \x16ORDER_TYPE_CLOSE_SHORT\x12\x36\n\x16ORDER_TYPE_LIQUIDATION\x10\x03\x1a\x1a\x8a\x9d \x16ORDER_TYPE_LIQUIDATION\x1a\x08\xa8\xa4\x1e\x01\x88\xa3\x1e\x00\x42\x33Z1git.wokoworks.com/blockchain/fx-chain/x/dex/typesb\x06proto3'
+  serialized_pb=b'\n\x12\x66x/dex/order.proto\x12\x06\x66x.dex\x1a\x14gogoproto/gogo.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x17\n\x08OrderIDs\x12\x0b\n\x03ids\x18\x01 \x03(\t\"\x98\x06\n\x05Order\x12\n\n\x02id\x18\x01 \x01(\t\x12@\n\x05owner\x18\x02 \x01(\x0c\x42\x31\xfa\xde\x1f-github.com/cosmos/cosmos-sdk/types.AccAddress\x12\x0f\n\x07pair_id\x18\x03 \x01(\t\x12$\n\tdirection\x18\x04 \x01(\x0e\x32\x11.fx.dex.Direction\x12=\n\x05price\x18\x05 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x45\n\rbase_quantity\x18\x06 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x46\n\x0equote_quantity\x18\x07 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12G\n\x0f\x66illed_quantity\x18\x08 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12H\n\x10\x66illed_avg_price\x18\t \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x45\n\rremain_locked\x18\n \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x10\n\x08leverage\x18\x0b \x01(\x03\x12#\n\x06status\x18\x0c \x01(\x0e\x32\x13.fx.dex.OrderStatus\x12%\n\norder_type\x18\r \x01(\x0e\x32\x11.fx.dex.OrderType\x12@\n\x08\x63ost_fee\x18\x0e \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x42\n\nlocked_fee\x18\x0f \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"-\n\x06Orders\x12#\n\x06orders\x18\x01 \x03(\x0b\x32\r.fx.dex.OrderB\x04\xc8\xde\x1f\x00*O\n\tDirection\x12\x12\n\x04\x42OTH\x10\x00\x1a\x08\x8a\x9d \x04\x42OTH\x12\x10\n\x03\x42UY\x10\x01\x1a\x07\x8a\x9d \x03\x42UY\x12\x12\n\x04SELL\x10\x02\x1a\x08\x8a\x9d \x04SELL\x1a\x08\xa8\xa4\x1e\x01\x88\xa3\x1e\x00*\xf1\x02\n\x0bOrderStatus\x12$\n\rORDER_PENDING\x10\x00\x1a\x11\x8a\x9d \rORDER_PENDING\x12\"\n\x0cORDER_FILLED\x10\x01\x1a\x10\x8a\x9d \x0cORDER_FILLED\x12\x32\n\x14ORDER_PARTIAL_FILLED\x10\x02\x1a\x18\x8a\x9d \x14ORDER_PARTIAL_FILLED\x12(\n\x0fORDER_CANCELLED\x10\x03\x1a\x13\x8a\x9d \x0fORDER_CANCELLED\x12\x46\n\x1eORDER_PARTIAL_FILLED_CANCELLED\x10\x04\x1a\"\x8a\x9d \x1eORDER_PARTIAL_FILLED_CANCELLED\x12\x42\n\x1cORDER_PARTIAL_FILLED_EXPIRED\x10\x05\x1a \x8a\x9d \x1cORDER_PARTIAL_FILLED_EXPIRED\x12$\n\rORDER_EXPIRED\x10\x06\x1a\x11\x8a\x9d \rORDER_EXPIRED\x1a\x08\xa8\xa4\x1e\x01\x88\xa3\x1e\x00*\xf7\x01\n\tOrderType\x12:\n\x18ORDER_TYPE_OPEN_POSITION\x10\x00\x1a\x1c\x8a\x9d \x18ORDER_TYPE_OPEN_POSITION\x12\x34\n\x15ORDER_TYPE_CLOSE_LONG\x10\x01\x1a\x19\x8a\x9d \x15ORDER_TYPE_CLOSE_LONG\x12\x36\n\x16ORDER_TYPE_CLOSE_SHORT\x10\x02\x1a\x1a\x8a\x9d \x16ORDER_TYPE_CLOSE_SHORT\x12\x36\n\x16ORDER_TYPE_LIQUIDATION\x10\x03\x1a\x1a\x8a\x9d \x16ORDER_TYPE_LIQUIDATION\x1a\x08\xa8\xa4\x1e\x01\x88\xa3\x1e\x00\x42\x33Z1git.wokoworks.com/blockchain/fx-chain/x/dex/typesb\x06proto3'
   ,
   dependencies=[gogoproto_dot_gogo__pb2.DESCRIPTOR,google_dot_protobuf_dot_timestamp__pb2.DESCRIPTOR,])
 
@@ -34,25 +34,25 @@ _DIRECTION = _descriptor.EnumDescriptor(
   create_key=_descriptor._internal_create_key,
   values=[
     _descriptor.EnumValueDescriptor(
-      name='BUY', index=0, number=0,
-      serialized_options=b'\212\235 \003BID',
-      type=None,
-      create_key=_descriptor._internal_create_key),
-    _descriptor.EnumValueDescriptor(
-      name='SELL', index=1, number=1,
-      serialized_options=b'\212\235 \003ASK',
-      type=None,
-      create_key=_descriptor._internal_create_key),
-    _descriptor.EnumValueDescriptor(
-      name='BOTH', index=2, number=2,
+      name='BOTH', index=0, number=0,
       serialized_options=b'\212\235 \004BOTH',
+      type=None,
+      create_key=_descriptor._internal_create_key),
+    _descriptor.EnumValueDescriptor(
+      name='BUY', index=1, number=1,
+      serialized_options=b'\212\235 \003BUY',
+      type=None,
+      create_key=_descriptor._internal_create_key),
+    _descriptor.EnumValueDescriptor(
+      name='SELL', index=2, number=2,
+      serialized_options=b'\212\235 \004SELL',
       type=None,
       create_key=_descriptor._internal_create_key),
   ],
   containing_type=None,
   serialized_options=b'\250\244\036\001\210\243\036\000',
-  serialized_start=1027,
-  serialized_end=1105,
+  serialized_start=952,
+  serialized_end=1031,
 )
 _sym_db.RegisterEnumDescriptor(_DIRECTION)
 
@@ -102,8 +102,8 @@ _ORDERSTATUS = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=b'\250\244\036\001\210\243\036\000',
-  serialized_start=1108,
-  serialized_end=1477,
+  serialized_start=1034,
+  serialized_end=1403,
 )
 _sym_db.RegisterEnumDescriptor(_ORDERSTATUS)
 
@@ -138,15 +138,15 @@ _ORDERTYPE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=b'\250\244\036\001\210\243\036\000',
-  serialized_start=1480,
-  serialized_end=1727,
+  serialized_start=1406,
+  serialized_end=1653,
 )
 _sym_db.RegisterEnumDescriptor(_ORDERTYPE)
 
 OrderType = enum_type_wrapper.EnumTypeWrapper(_ORDERTYPE)
-BUY = 0
-SELL = 1
-BOTH = 2
+BOTH = 0
+BUY = 1
+SELL = 2
 ORDER_PENDING = 0
 ORDER_FILLED = 1
 ORDER_PARTIAL_FILLED = 2
@@ -202,120 +202,106 @@ _ORDER = _descriptor.Descriptor(
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='tx_hash', full_name='fx.dex.Order.tx_hash', index=0,
+      name='id', full_name='fx.dex.Order.id', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='id', full_name='fx.dex.Order.id', index=1,
-      number=2, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='owner', full_name='fx.dex.Order.owner', index=2,
-      number=3, type=12, cpp_type=9, label=1,
+      name='owner', full_name='fx.dex.Order.owner', index=1,
+      number=2, type=12, cpp_type=9, label=1,
       has_default_value=False, default_value=b"",
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=b'\372\336\037-github.com/cosmos/cosmos-sdk/types.AccAddress', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='pair_id', full_name='fx.dex.Order.pair_id', index=3,
-      number=4, type=9, cpp_type=9, label=1,
+      name='pair_id', full_name='fx.dex.Order.pair_id', index=2,
+      number=3, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='direction', full_name='fx.dex.Order.direction', index=4,
-      number=5, type=14, cpp_type=8, label=1,
+      name='direction', full_name='fx.dex.Order.direction', index=3,
+      number=4, type=14, cpp_type=8, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='price', full_name='fx.dex.Order.price', index=5,
+      name='price', full_name='fx.dex.Order.price', index=4,
+      number=5, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=b'\332\336\037&github.com/cosmos/cosmos-sdk/types.Dec\310\336\037\000', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='base_quantity', full_name='fx.dex.Order.base_quantity', index=5,
       number=6, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=b'\332\336\037&github.com/cosmos/cosmos-sdk/types.Dec\310\336\037\000', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='base_quantity', full_name='fx.dex.Order.base_quantity', index=6,
+      name='quote_quantity', full_name='fx.dex.Order.quote_quantity', index=6,
       number=7, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=b'\332\336\037&github.com/cosmos/cosmos-sdk/types.Dec\310\336\037\000', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='quote_quantity', full_name='fx.dex.Order.quote_quantity', index=7,
+      name='filled_quantity', full_name='fx.dex.Order.filled_quantity', index=7,
       number=8, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=b'\332\336\037&github.com/cosmos/cosmos-sdk/types.Dec\310\336\037\000', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='filled_quantity', full_name='fx.dex.Order.filled_quantity', index=8,
+      name='filled_avg_price', full_name='fx.dex.Order.filled_avg_price', index=8,
       number=9, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=b'\332\336\037&github.com/cosmos/cosmos-sdk/types.Dec\310\336\037\000', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='filled_avg_price', full_name='fx.dex.Order.filled_avg_price', index=9,
+      name='remain_locked', full_name='fx.dex.Order.remain_locked', index=9,
       number=10, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=b'\332\336\037&github.com/cosmos/cosmos-sdk/types.Dec\310\336\037\000', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='remain_locked', full_name='fx.dex.Order.remain_locked', index=10,
-      number=11, type=9, cpp_type=9, label=1,
+      name='leverage', full_name='fx.dex.Order.leverage', index=10,
+      number=11, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='status', full_name='fx.dex.Order.status', index=11,
+      number=12, type=14, cpp_type=8, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='order_type', full_name='fx.dex.Order.order_type', index=12,
+      number=13, type=14, cpp_type=8, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='cost_fee', full_name='fx.dex.Order.cost_fee', index=13,
+      number=14, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=b'\332\336\037&github.com/cosmos/cosmos-sdk/types.Dec\310\336\037\000', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='created_at', full_name='fx.dex.Order.created_at', index=11,
-      number=12, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=b'\310\336\037\000\220\337\037\001', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='leverage', full_name='fx.dex.Order.leverage', index=12,
-      number=13, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='status', full_name='fx.dex.Order.status', index=13,
-      number=14, type=14, cpp_type=8, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='order_type', full_name='fx.dex.Order.order_type', index=14,
-      number=15, type=14, cpp_type=8, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='cost_fee', full_name='fx.dex.Order.cost_fee', index=15,
-      number=16, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=b'\332\336\037&github.com/cosmos/cosmos-sdk/types.Dec\310\336\037\000', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='locked_fee', full_name='fx.dex.Order.locked_fee', index=16,
-      number=17, type=9, cpp_type=9, label=1,
+      name='locked_fee', full_name='fx.dex.Order.locked_fee', index=14,
+      number=15, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -333,7 +319,7 @@ _ORDER = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=111,
-  serialized_end=978,
+  serialized_end=903,
 )
 
 
@@ -364,12 +350,11 @@ _ORDERS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=980,
-  serialized_end=1025,
+  serialized_start=905,
+  serialized_end=950,
 )
 
 _ORDER.fields_by_name['direction'].enum_type = _DIRECTION
-_ORDER.fields_by_name['created_at'].message_type = google_dot_protobuf_dot_timestamp__pb2._TIMESTAMP
 _ORDER.fields_by_name['status'].enum_type = _ORDERSTATUS
 _ORDER.fields_by_name['order_type'].enum_type = _ORDERTYPE
 _ORDERS.fields_by_name['orders'].message_type = _ORDER
@@ -405,9 +390,9 @@ _sym_db.RegisterMessage(Orders)
 
 DESCRIPTOR._options = None
 _DIRECTION._options = None
+_DIRECTION.values_by_name["BOTH"]._options = None
 _DIRECTION.values_by_name["BUY"]._options = None
 _DIRECTION.values_by_name["SELL"]._options = None
-_DIRECTION.values_by_name["BOTH"]._options = None
 _ORDERSTATUS._options = None
 _ORDERSTATUS.values_by_name["ORDER_PENDING"]._options = None
 _ORDERSTATUS.values_by_name["ORDER_FILLED"]._options = None
@@ -428,7 +413,6 @@ _ORDER.fields_by_name['quote_quantity']._options = None
 _ORDER.fields_by_name['filled_quantity']._options = None
 _ORDER.fields_by_name['filled_avg_price']._options = None
 _ORDER.fields_by_name['remain_locked']._options = None
-_ORDER.fields_by_name['created_at']._options = None
 _ORDER.fields_by_name['cost_fee']._options = None
 _ORDER.fields_by_name['locked_fee']._options = None
 _ORDERS.fields_by_name['orders']._options = None

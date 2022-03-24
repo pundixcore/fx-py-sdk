@@ -53,7 +53,6 @@ class EventTypes:
 
 class EventKeys:
     """orders"""
-    tx_hash = "tx_hash"
     order_id = "order_id"
     owner = "owner"
     pair_id = "pair_id"
@@ -129,7 +128,6 @@ class OrderFilledFields:
     DEAL_PRICE = "deal_price"
     UNFILLED_QUANTITY = "unfilled_quantity"
     STATUS = "status"
-    TX_HASH = "tx_hash"
     FILLED_QUANTITY = "filled_quantity"
     COST_FEE = "cost_fee"
     LEVERAGE = "leverage"

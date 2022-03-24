@@ -11,9 +11,9 @@ enum Direction {
     option (gogoproto.goproto_enum_stringer) = true;
     option (gogoproto.goproto_enum_prefix)   = false;
 
-    BUY = 0 [(gogoproto.enumvalue_customname) = "BID"];
-    SELL  = 1 [(gogoproto.enumvalue_customname) = "ASK"];
-    BOTH  = 2 [(gogoproto.enumvalue_customname) = "BOTH"];
+  BOTH  = 0 [(gogoproto.enumvalue_customname) = "BOTH"];
+  BUY = 1 [(gogoproto.enumvalue_customname) = "BUY"];
+  SELL  = 2 [(gogoproto.enumvalue_customname) = "SELL"];
 }
 
 enum OrderStatus {
@@ -44,45 +44,42 @@ message OrderIDs {
 }
 
 message Order {
-    string tx_hash = 1;
-    string id = 2 ;
-    bytes owner = 3 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
-    string pair_id = 4;
-    Direction direction = 5;
-    string price = 6 [
+    string id = 1 ;
+    bytes owner = 2 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
+    string pair_id = 3;
+    Direction direction = 4;
+    string price = 5 [
         (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
         (gogoproto.nullable) = false
     ];
-    string base_quantity = 7 [
+    string base_quantity = 6 [
         (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
         (gogoproto.nullable) = false
     ];
-    string quote_quantity = 8 [
+    string quote_quantity = 7 [
         (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
         (gogoproto.nullable) = false
     ];
-    string filled_quantity = 9 [
+    string filled_quantity = 8 [
         (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
         (gogoproto.nullable) = false
     ];
-    string filled_avg_price = 10 [
+    string filled_avg_price = 9 [
         (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
         (gogoproto.nullable) = false
     ];
-    string remain_locked = 11 [
+    string remain_locked = 10 [
         (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
         (gogoproto.nullable) = false
     ];
-    google.protobuf.Timestamp created_at = 12
-    [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
-    int64 leverage = 13;
-    OrderStatus status = 14;
-    OrderType order_type = 15;
-    string cost_fee = 16 [
+    int64 leverage = 11;
+    OrderStatus status = 12;
+    OrderType order_type = 13;
+    string cost_fee = 14 [
         (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
         (gogoproto.nullable) = false
     ];
-    string locked_fee = 17 [
+    string locked_fee = 15 [
         (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
         (gogoproto.nullable) = false
     ];

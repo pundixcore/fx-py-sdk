@@ -20,37 +20,37 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=b'Z1git.wokoworks.com/blockchain/fx-chain/x/dex/types',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x14\x66x/dex/funding.proto\x12\x06\x66x.dex\x1a\x14gogoproto/gogo.proto\"\x7f\n\x10PairFundingRates\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12\x44\n\x0c\x66unding_rate\x18\x02 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x14\n\x0c\x66unding_time\x18\x03 \x01(\x03\"\xa5\x01\n\x07\x46unding\x12\x16\n\x0e\x66unding_period\x18\x01 \x01(\x03\x12\x19\n\x11next_funding_time\x18\x02 \x01(\x03\x12\x15\n\rfunding_times\x18\x03 \x01(\x03\x12\x15\n\rnext_log_time\x18\x04 \x01(\x03\x12\x1a\n\x12log_funding_period\x18\x05 \x01(\x03\x12\x1d\n\x15max_funding_per_block\x18\x06 \x01(\x03\"w\n\x0b\x46undingTime\x12\x13\n\x0bsummer_time\x18\x01 \x01(\x03\x12\x13\n\x0bwinter_time\x18\x02 \x01(\x03\x12\x15\n\rsummer_clocks\x18\x03 \x03(\t\x12\x15\n\rwinter_clocks\x18\x04 \x03(\t\x12\x10\n\x08holidays\x18\x05 \x03(\t\"n\n\rSettleFunding\x12\x12\n\nis_funding\x18\x01 \x01(\x08\x12I\n\x10next_position_id\x18\x02 \x01(\tB/\xda\xde\x1f\'github.com/cosmos/cosmos-sdk/types.Uint\xc8\xde\x1f\x00\"\x8b\x01\n\x10PremiumIndexConf\x12\x15\n\rupdate_period\x18\x01 \x01(\x03\x12\x18\n\x10next_update_time\x18\x02 \x01(\x03\x12\x18\n\x10round_start_time\x18\x03 \x01(\x03\x12\x17\n\x0fnext_round_time\x18\x04 \x01(\x03\x12\x13\n\x0bround_index\x18\x05 \x01(\x05\"\xbb\x01\n\x0cPremiumIndex\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12\x17\n\x0fround_timestamp\x18\x02 \x01(\x03\x12.\n\x05ticks\x18\x03 \x03(\x0b\x32\x19.fx.dex.PremiumIndex.TickB\x04\xc8\xde\x1f\x00\x1aQ\n\x04Tick\x12=\n\x05value\x18\x01 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\n\n\x02ts\x18\x02 \x01(\x03\x42\x33Z1git.wokoworks.com/blockchain/fx-chain/x/dex/typesb\x06proto3'
+  serialized_pb=b'\n\x14\x66x/dex/funding.proto\x12\x06\x66x.dex\x1a\x14gogoproto/gogo.proto\"~\n\x0fPairFundingRate\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12\x44\n\x0c\x66unding_rate\x18\x02 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x14\n\x0c\x66unding_time\x18\x03 \x01(\x03\"\x96\x02\n\x07\x46unding\x12\x16\n\x0e\x66unding_period\x18\x01 \x01(\x03\x12\x19\n\x11next_funding_time\x18\x02 \x01(\x03\x12\x15\n\rfunding_times\x18\x03 \x01(\x03\x12\x15\n\rnext_log_time\x18\x04 \x01(\x03\x12\x1a\n\x12log_funding_period\x18\x05 \x01(\x03\x12\x1d\n\x15max_funding_per_block\x18\x06 \x01(\x03\x12#\n\x15\x63rypto_funding_period\x18\x07 \x01(\x03\x42\x04\xc8\xde\x1f\x01\x12&\n\x18\x63rypto_next_funding_time\x18\x08 \x01(\x03\x42\x04\xc8\xde\x1f\x01\x12\"\n\x14\x63rypto_funding_times\x18\t \x01(\x03\x42\x04\xc8\xde\x1f\x01\"w\n\x0b\x46undingTime\x12\x13\n\x0bsummer_time\x18\x01 \x01(\x03\x12\x13\n\x0bwinter_time\x18\x02 \x01(\x03\x12\x15\n\rsummer_clocks\x18\x03 \x03(\t\x12\x15\n\rwinter_clocks\x18\x04 \x03(\t\x12\x10\n\x08holidays\x18\x05 \x03(\t\"\x89\x01\n\rSettleFunding\x12\x12\n\nis_funding\x18\x01 \x01(\x08\x12I\n\x10next_position_id\x18\x02 \x01(\tB/\xda\xde\x1f\'github.com/cosmos/cosmos-sdk/types.Uint\xc8\xde\x1f\x00\x12\x19\n\x0bmarket_type\x18\x03 \x01(\tB\x04\xc8\xde\x1f\x01\"\xc5\x02\n\x10PremiumIndexConf\x12\x15\n\rupdate_period\x18\x01 \x01(\x03\x12\x18\n\x10next_update_time\x18\x02 \x01(\x03\x12\x18\n\x10round_start_time\x18\x03 \x01(\x03\x12\x17\n\x0fnext_round_time\x18\x04 \x01(\x03\x12\x13\n\x0bround_index\x18\x05 \x01(\x05\x12\"\n\x14\x63rypto_update_period\x18\x06 \x01(\x03\x42\x04\xc8\xde\x1f\x01\x12%\n\x17\x63rypto_next_update_time\x18\x07 \x01(\x03\x42\x04\xc8\xde\x1f\x01\x12%\n\x17\x63rypto_round_start_time\x18\x08 \x01(\x03\x42\x04\xc8\xde\x1f\x01\x12$\n\x16\x63rypto_next_round_time\x18\t \x01(\x03\x42\x04\xc8\xde\x1f\x01\x12 \n\x12\x63rypto_round_index\x18\n \x01(\x05\x42\x04\xc8\xde\x1f\x01\"\xbb\x01\n\x0cPremiumIndex\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12\x17\n\x0fround_timestamp\x18\x02 \x01(\x03\x12.\n\x05ticks\x18\x03 \x03(\x0b\x32\x19.fx.dex.PremiumIndex.TickB\x04\xc8\xde\x1f\x00\x1aQ\n\x04Tick\x12=\n\x05value\x18\x01 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\n\n\x02ts\x18\x02 \x01(\x03\"F\n\x13MovingAverageParams\x12\x15\n\rupdate_period\x18\x01 \x01(\x03\x12\x18\n\x10next_update_time\x18\x02 \x01(\x03\"V\n\rMovingAverage\x12\x45\n\raverage_price\x18\x01 \x03(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x42\x33Z1git.wokoworks.com/blockchain/fx-chain/x/dex/typesb\x06proto3'
   ,
   dependencies=[gogoproto_dot_gogo__pb2.DESCRIPTOR,])
 
 
 
 
-_PAIRFUNDINGRATES = _descriptor.Descriptor(
-  name='PairFundingRates',
-  full_name='fx.dex.PairFundingRates',
+_PAIRFUNDINGRATE = _descriptor.Descriptor(
+  name='PairFundingRate',
+  full_name='fx.dex.PairFundingRate',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='pair_id', full_name='fx.dex.PairFundingRates.pair_id', index=0,
+      name='pair_id', full_name='fx.dex.PairFundingRate.pair_id', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='funding_rate', full_name='fx.dex.PairFundingRates.funding_rate', index=1,
+      name='funding_rate', full_name='fx.dex.PairFundingRate.funding_rate', index=1,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=b'\332\336\037&github.com/cosmos/cosmos-sdk/types.Dec\310\336\037\000', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='funding_time', full_name='fx.dex.PairFundingRates.funding_time', index=2,
+      name='funding_time', full_name='fx.dex.PairFundingRate.funding_time', index=2,
       number=3, type=3, cpp_type=2, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
@@ -69,7 +69,7 @@ _PAIRFUNDINGRATES = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=54,
-  serialized_end=181,
+  serialized_end=180,
 )
 
 
@@ -123,6 +123,27 @@ _FUNDING = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='crypto_funding_period', full_name='fx.dex.Funding.crypto_funding_period', index=6,
+      number=7, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=b'\310\336\037\001', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='crypto_next_funding_time', full_name='fx.dex.Funding.crypto_next_funding_time', index=7,
+      number=8, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=b'\310\336\037\001', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='crypto_funding_times', full_name='fx.dex.Funding.crypto_funding_times', index=8,
+      number=9, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=b'\310\336\037\001', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -135,8 +156,8 @@ _FUNDING = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=184,
-  serialized_end=349,
+  serialized_start=183,
+  serialized_end=461,
 )
 
 
@@ -195,8 +216,8 @@ _FUNDINGTIME = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=351,
-  serialized_end=470,
+  serialized_start=463,
+  serialized_end=582,
 )
 
 
@@ -222,6 +243,13 @@ _SETTLEFUNDING = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=b'\332\336\037\'github.com/cosmos/cosmos-sdk/types.Uint\310\336\037\000', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='market_type', full_name='fx.dex.SettleFunding.market_type', index=2,
+      number=3, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=b'\310\336\037\001', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -234,8 +262,8 @@ _SETTLEFUNDING = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=472,
-  serialized_end=582,
+  serialized_start=585,
+  serialized_end=722,
 )
 
 
@@ -282,6 +310,41 @@ _PREMIUMINDEXCONF = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='crypto_update_period', full_name='fx.dex.PremiumIndexConf.crypto_update_period', index=5,
+      number=6, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=b'\310\336\037\001', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='crypto_next_update_time', full_name='fx.dex.PremiumIndexConf.crypto_next_update_time', index=6,
+      number=7, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=b'\310\336\037\001', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='crypto_round_start_time', full_name='fx.dex.PremiumIndexConf.crypto_round_start_time', index=7,
+      number=8, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=b'\310\336\037\001', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='crypto_next_round_time', full_name='fx.dex.PremiumIndexConf.crypto_next_round_time', index=8,
+      number=9, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=b'\310\336\037\001', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='crypto_round_index', full_name='fx.dex.PremiumIndexConf.crypto_round_index', index=9,
+      number=10, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=b'\310\336\037\001', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -294,8 +357,8 @@ _PREMIUMINDEXCONF = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=585,
-  serialized_end=724,
+  serialized_start=725,
+  serialized_end=1050,
 )
 
 
@@ -333,8 +396,8 @@ _PREMIUMINDEX_TICK = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=833,
-  serialized_end=914,
+  serialized_start=1159,
+  serialized_end=1240,
 )
 
 _PREMIUMINDEX = _descriptor.Descriptor(
@@ -378,26 +441,99 @@ _PREMIUMINDEX = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=727,
-  serialized_end=914,
+  serialized_start=1053,
+  serialized_end=1240,
+)
+
+
+_MOVINGAVERAGEPARAMS = _descriptor.Descriptor(
+  name='MovingAverageParams',
+  full_name='fx.dex.MovingAverageParams',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='update_period', full_name='fx.dex.MovingAverageParams.update_period', index=0,
+      number=1, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='next_update_time', full_name='fx.dex.MovingAverageParams.next_update_time', index=1,
+      number=2, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1242,
+  serialized_end=1312,
+)
+
+
+_MOVINGAVERAGE = _descriptor.Descriptor(
+  name='MovingAverage',
+  full_name='fx.dex.MovingAverage',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='average_price', full_name='fx.dex.MovingAverage.average_price', index=0,
+      number=1, type=9, cpp_type=9, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=b'\332\336\037&github.com/cosmos/cosmos-sdk/types.Dec\310\336\037\000', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1314,
+  serialized_end=1400,
 )
 
 _PREMIUMINDEX_TICK.containing_type = _PREMIUMINDEX
 _PREMIUMINDEX.fields_by_name['ticks'].message_type = _PREMIUMINDEX_TICK
-DESCRIPTOR.message_types_by_name['PairFundingRates'] = _PAIRFUNDINGRATES
+DESCRIPTOR.message_types_by_name['PairFundingRate'] = _PAIRFUNDINGRATE
 DESCRIPTOR.message_types_by_name['Funding'] = _FUNDING
 DESCRIPTOR.message_types_by_name['FundingTime'] = _FUNDINGTIME
 DESCRIPTOR.message_types_by_name['SettleFunding'] = _SETTLEFUNDING
 DESCRIPTOR.message_types_by_name['PremiumIndexConf'] = _PREMIUMINDEXCONF
 DESCRIPTOR.message_types_by_name['PremiumIndex'] = _PREMIUMINDEX
+DESCRIPTOR.message_types_by_name['MovingAverageParams'] = _MOVINGAVERAGEPARAMS
+DESCRIPTOR.message_types_by_name['MovingAverage'] = _MOVINGAVERAGE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
-PairFundingRates = _reflection.GeneratedProtocolMessageType('PairFundingRates', (_message.Message,), {
-  'DESCRIPTOR' : _PAIRFUNDINGRATES,
+PairFundingRate = _reflection.GeneratedProtocolMessageType('PairFundingRate', (_message.Message,), {
+  'DESCRIPTOR' : _PAIRFUNDINGRATE,
   '__module__' : 'fx.dex.funding_pb2'
-  # @@protoc_insertion_point(class_scope:fx.dex.PairFundingRates)
+  # @@protoc_insertion_point(class_scope:fx.dex.PairFundingRate)
   })
-_sym_db.RegisterMessage(PairFundingRates)
+_sym_db.RegisterMessage(PairFundingRate)
 
 Funding = _reflection.GeneratedProtocolMessageType('Funding', (_message.Message,), {
   'DESCRIPTOR' : _FUNDING,
@@ -442,10 +578,34 @@ PremiumIndex = _reflection.GeneratedProtocolMessageType('PremiumIndex', (_messag
 _sym_db.RegisterMessage(PremiumIndex)
 _sym_db.RegisterMessage(PremiumIndex.Tick)
 
+MovingAverageParams = _reflection.GeneratedProtocolMessageType('MovingAverageParams', (_message.Message,), {
+  'DESCRIPTOR' : _MOVINGAVERAGEPARAMS,
+  '__module__' : 'fx.dex.funding_pb2'
+  # @@protoc_insertion_point(class_scope:fx.dex.MovingAverageParams)
+  })
+_sym_db.RegisterMessage(MovingAverageParams)
+
+MovingAverage = _reflection.GeneratedProtocolMessageType('MovingAverage', (_message.Message,), {
+  'DESCRIPTOR' : _MOVINGAVERAGE,
+  '__module__' : 'fx.dex.funding_pb2'
+  # @@protoc_insertion_point(class_scope:fx.dex.MovingAverage)
+  })
+_sym_db.RegisterMessage(MovingAverage)
+
 
 DESCRIPTOR._options = None
-_PAIRFUNDINGRATES.fields_by_name['funding_rate']._options = None
+_PAIRFUNDINGRATE.fields_by_name['funding_rate']._options = None
+_FUNDING.fields_by_name['crypto_funding_period']._options = None
+_FUNDING.fields_by_name['crypto_next_funding_time']._options = None
+_FUNDING.fields_by_name['crypto_funding_times']._options = None
 _SETTLEFUNDING.fields_by_name['next_position_id']._options = None
+_SETTLEFUNDING.fields_by_name['market_type']._options = None
+_PREMIUMINDEXCONF.fields_by_name['crypto_update_period']._options = None
+_PREMIUMINDEXCONF.fields_by_name['crypto_next_update_time']._options = None
+_PREMIUMINDEXCONF.fields_by_name['crypto_round_start_time']._options = None
+_PREMIUMINDEXCONF.fields_by_name['crypto_next_round_time']._options = None
+_PREMIUMINDEXCONF.fields_by_name['crypto_round_index']._options = None
 _PREMIUMINDEX_TICK.fields_by_name['value']._options = None
 _PREMIUMINDEX.fields_by_name['ticks']._options = None
+_MOVINGAVERAGE.fields_by_name['average_price']._options = None
 # @@protoc_insertion_point(module_scope)

@@ -21,7 +21,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=b'Z1git.wokoworks.com/blockchain/fx-chain/x/dex/types',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x15\x66x/dex/position.proto\x12\x06\x66x.dex\x1a\x14gogoproto/gogo.proto\"Q\n\x11TotalPositionSize\x12<\n\x04size\x18\x01 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"I\n\nPositionID\x12;\n\x02id\x18\x01 \x01(\tB/\xda\xde\x1f\'github.com/cosmos/cosmos-sdk/types.Uint\xc8\xde\x1f\x00\"=\n\x0bPositionIDs\x12.\n\x0cposition_ids\x18\x01 \x03(\x0b\x32\x12.fx.dex.PositionIDB\x04\xc8\xde\x1f\x00\"\xd5\x06\n\x08Position\x12;\n\x02id\x18\x01 \x01(\tB/\xda\xde\x1f\'github.com/cosmos/cosmos-sdk/types.Uint\xc8\xde\x1f\x00\x12@\n\x05owner\x18\x02 \x01(\x0c\x42\x31\xfa\xde\x1f-github.com/cosmos/cosmos-sdk/types.AccAddress\x12\x0f\n\x07pair_id\x18\x03 \x01(\t\x12\'\n\tdirection\x18\x04 \x01(\x0e\x32\x14.fx.dex.PosDirection\x12\x43\n\x0b\x65ntry_price\x18\x05 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x42\n\nmark_price\x18\x06 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12I\n\x11liquidation_price\x18\x07 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x45\n\rbase_quantity\x18\x08 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12>\n\x06margin\x18\t \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x10\n\x08leverage\x18\n \x01(\x03\x12\x46\n\x0eunrealized_pnl\x18\x0b \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x43\n\x0bmargin_rate\x18\x0c \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x46\n\x0einitial_margin\x18\r \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12N\n\x16pending_order_quantity\x18\x0e \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"6\n\tPositions\x12)\n\tpositions\x18\x01 \x03(\x0b\x32\x10.fx.dex.PositionB\x04\xc8\xde\x1f\x00*T\n\x0cPosDirection\x12\x12\n\x04LONG\x10\x00\x1a\x08\x8a\x9d \x04LONG\x12\x14\n\x05SHORT\x10\x01\x1a\t\x8a\x9d \x05SHORT\x12\x10\n\x03\x41LL\x10\x02\x1a\x07\x8a\x9d \x03\x41LL\x1a\x08\xa8\xa4\x1e\x01\x88\xa3\x1e\x00\x42\x33Z1git.wokoworks.com/blockchain/fx-chain/x/dex/typesb\x06proto3'
+  serialized_pb=b'\n\x15\x66x/dex/position.proto\x12\x06\x66x.dex\x1a\x14gogoproto/gogo.proto\"Q\n\x11TotalPositionSize\x12<\n\x04size\x18\x01 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"I\n\nPositionID\x12;\n\x02id\x18\x01 \x01(\tB/\xda\xde\x1f\'github.com/cosmos/cosmos-sdk/types.Uint\xc8\xde\x1f\x00\"=\n\x0bPositionIDs\x12.\n\x0cposition_ids\x18\x01 \x03(\x0b\x32\x12.fx.dex.PositionIDB\x04\xc8\xde\x1f\x00\"\xd5\x06\n\x08Position\x12;\n\x02id\x18\x01 \x01(\tB/\xda\xde\x1f\'github.com/cosmos/cosmos-sdk/types.Uint\xc8\xde\x1f\x00\x12@\n\x05owner\x18\x02 \x01(\x0c\x42\x31\xfa\xde\x1f-github.com/cosmos/cosmos-sdk/types.AccAddress\x12\x0f\n\x07pair_id\x18\x03 \x01(\t\x12\'\n\tdirection\x18\x04 \x01(\x0e\x32\x14.fx.dex.PosDirection\x12\x43\n\x0b\x65ntry_price\x18\x05 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x42\n\nmark_price\x18\x06 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12I\n\x11liquidation_price\x18\x07 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x45\n\rbase_quantity\x18\x08 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12>\n\x06margin\x18\t \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x10\n\x08leverage\x18\n \x01(\x03\x12\x46\n\x0eunrealized_pnl\x18\x0b \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x43\n\x0bmargin_rate\x18\x0c \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x46\n\x0einitial_margin\x18\r \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12N\n\x16pending_order_quantity\x18\x0e \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"6\n\tPositions\x12)\n\tpositions\x18\x01 \x03(\x0b\x32\x10.fx.dex.PositionB\x04\xc8\xde\x1f\x00*f\n\x0cPosDirection\x12\"\n\x0cPOSITIONBOTH\x10\x00\x1a\x10\x8a\x9d \x0cPOSITIONBOTH\x12\x12\n\x04LONG\x10\x01\x1a\x08\x8a\x9d \x04LONG\x12\x14\n\x05SHORT\x10\x02\x1a\t\x8a\x9d \x05SHORT\x1a\x08\xa8\xa4\x1e\x01\x88\xa3\x1e\x00\x42\x33Z1git.wokoworks.com/blockchain/fx-chain/x/dex/typesb\x06proto3'
   ,
   dependencies=[gogoproto_dot_gogo__pb2.DESCRIPTOR,])
 
@@ -33,32 +33,32 @@ _POSDIRECTION = _descriptor.EnumDescriptor(
   create_key=_descriptor._internal_create_key,
   values=[
     _descriptor.EnumValueDescriptor(
-      name='LONG', index=0, number=0,
+      name='POSITIONBOTH', index=0, number=0,
+      serialized_options=b'\212\235 \014POSITIONBOTH',
+      type=None,
+      create_key=_descriptor._internal_create_key),
+    _descriptor.EnumValueDescriptor(
+      name='LONG', index=1, number=1,
       serialized_options=b'\212\235 \004LONG',
       type=None,
       create_key=_descriptor._internal_create_key),
     _descriptor.EnumValueDescriptor(
-      name='SHORT', index=1, number=1,
+      name='SHORT', index=2, number=2,
       serialized_options=b'\212\235 \005SHORT',
-      type=None,
-      create_key=_descriptor._internal_create_key),
-    _descriptor.EnumValueDescriptor(
-      name='ALL', index=2, number=2,
-      serialized_options=b'\212\235 \003ALL',
       type=None,
       create_key=_descriptor._internal_create_key),
   ],
   containing_type=None,
   serialized_options=b'\250\244\036\001\210\243\036\000',
   serialized_start=1188,
-  serialized_end=1272,
+  serialized_end=1290,
 )
 _sym_db.RegisterEnumDescriptor(_POSDIRECTION)
 
 PosDirection = enum_type_wrapper.EnumTypeWrapper(_POSDIRECTION)
-LONG = 0
-SHORT = 1
-ALL = 2
+POSITIONBOTH = 0
+LONG = 1
+SHORT = 2
 
 
 
@@ -361,9 +361,9 @@ _sym_db.RegisterMessage(Positions)
 
 DESCRIPTOR._options = None
 _POSDIRECTION._options = None
+_POSDIRECTION.values_by_name["POSITIONBOTH"]._options = None
 _POSDIRECTION.values_by_name["LONG"]._options = None
 _POSDIRECTION.values_by_name["SHORT"]._options = None
-_POSDIRECTION.values_by_name["ALL"]._options = None
 _TOTALPOSITIONSIZE.fields_by_name['size']._options = None
 _POSITIONID.fields_by_name['id']._options = None
 _POSITIONIDS.fields_by_name['position_ids']._options = None

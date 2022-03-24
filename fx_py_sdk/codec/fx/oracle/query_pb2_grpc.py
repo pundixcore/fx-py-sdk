@@ -45,8 +45,8 @@ class QueryStub(object):
                 request_serializer=fx_dot_oracle_dot_query__pb2.QueryLatestOracleRequest.SerializeToString,
                 response_deserializer=fx_dot_oracle_dot_query__pb2.BandOracleRequest.FromString,
                 )
-        self.GetAggrators = channel.unary_unary(
-                '/fx.oracle.Query/GetAggrators',
+        self.GetAggregators = channel.unary_unary(
+                '/fx.oracle.Query/GetAggregators',
                 request_serializer=fx_dot_oracle_dot_query__pb2.QueryAggregatorsRequest.SerializeToString,
                 response_deserializer=fx_dot_oracle_dot_query__pb2.QueryAggregatorsResponse.FromString,
                 )
@@ -92,7 +92,7 @@ class QueryServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def GetAggrators(self, request, context):
+    def GetAggregators(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -131,8 +131,8 @@ def add_QueryServicer_to_server(servicer, server):
                     request_deserializer=fx_dot_oracle_dot_query__pb2.QueryLatestOracleRequest.FromString,
                     response_serializer=fx_dot_oracle_dot_query__pb2.BandOracleRequest.SerializeToString,
             ),
-            'GetAggrators': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetAggrators,
+            'GetAggregators': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetAggregators,
                     request_deserializer=fx_dot_oracle_dot_query__pb2.QueryAggregatorsRequest.FromString,
                     response_serializer=fx_dot_oracle_dot_query__pb2.QueryAggregatorsResponse.SerializeToString,
             ),
@@ -250,7 +250,7 @@ class Query(object):
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def GetAggrators(request,
+    def GetAggregators(request,
             target,
             options=(),
             channel_credentials=None,
@@ -260,7 +260,7 @@ class Query(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/fx.oracle.Query/GetAggrators',
+        return grpc.experimental.unary_unary(request, target, '/fx.oracle.Query/GetAggregators',
             fx_dot_oracle_dot_query__pb2.QueryAggregatorsRequest.SerializeToString,
             fx_dot_oracle_dot_query__pb2.QueryAggregatorsResponse.FromString,
             options, channel_credentials,
