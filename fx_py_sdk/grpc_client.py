@@ -1,4 +1,5 @@
 import decimal
+from datetime import datetime
 from urllib.parse import urlparse
 
 import grpc
@@ -40,7 +41,7 @@ from google.protobuf.json_format import MessageToJson
 import json
 import requests
 from fx_py_sdk.model.crud import Crud
-from fx_py_sdk.model.model import Order as CrudOrder, Trade as CrudTrade, Block
+from fx_py_sdk.model.model import HedgingOrder, HedgingTrade, Order as CrudOrder, Trade as CrudTrade, Block
 
 DEFAULT_DEX_GAS = 5000000
 DEFAULT_GRPC_NONE = "Not found"
@@ -645,6 +646,13 @@ class GRPCClient:
             print("query error: ", e)
             return e
 
+    def query_funding_payments(self, address: str=None, pair_id: str=None, from_datetime: datetime=None):
+        return self.crud.get_funding_transfers(
+            address=address,
+            pair_id=pair_id,
+            from_datetime=from_datetime
+        )
+
     # 查询标记价格
     #   pair_id: 交易对
     #   query_all: 否查询全部
@@ -775,3 +783,27 @@ class GRPCClient:
         response = TxClient(self.channel).BroadcastTx(
             BroadcastTxRequest(tx_bytes=tx_bytes, mode=mode))
         return response.tx_response
+
+    ### Database insertion functions ###
+    def insert_hedging_order(self, order: HedgingOrder):
+        """Inserts hedging order into database"""
+        self.crud.insert(order)
+
+    def insert_hedging_trade(self, trade: HedgingTrade):
+        """Inserts hedging trade into database"""
+        self.crud.insert(trade)
+    
+    def insert_hedging_trades(self, trades: Iterable[HedgingTrade]):
+        """Inserts multiple hedging trades into database"""
+        self.crud.insert_many(trades)
+
+    def query_funding_transfers(self, address: str = None, pair_id: str = None, from_ts: float = None):
+        """Queries funding transfers from database.
+            Args:
+                address: owner of positions of these funding transfers
+                pair_id: related pair_id
+                from_ts: timestamp to query from
+            Returns:
+
+        """
+        self.crud

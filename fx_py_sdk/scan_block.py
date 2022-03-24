@@ -1,4 +1,5 @@
 import base64
+from collections import deque
 import datetime
 from sqlite3 import IntegrityError
 from numpy import block
@@ -17,8 +18,11 @@ from fx_py_sdk.grpc_client import GRPCClient
 import traceback
 import re
 
+from fx_py_sdk.notify_service import send_mail
+
 class ScanBlockBase:
     """process block event, then update to sql"""
+    max_block_height: int = None
 
     def __init__(self):
         pass
@@ -43,18 +47,22 @@ class ScanBlockBase:
             block_datetime = datetime.datetime.utcfromtimestamp(
                 timestamp.ToSeconds())
 
-            block = Block(height=block_height, time=block_datetime)
-            self.process_block_height(block)
-
             begin_block_events = message[BlockResponse.RESULT][BlockResponse.DATA][BlockResponse.VALUE][
                 BlockResponse.RESULT_BEGIN_BLOCK][BlockResponse.EVENTS]
             self.process_begin_block(begin_block_events, block_height)
 
             end_block_events = message[BlockResponse.RESULT][BlockResponse.DATA][BlockResponse.VALUE][
                 BlockResponse.RESULT_END_BLOCK][BlockResponse.EVENTS]
-            self.process_end_block(end_block_events, block_height)
 
+            self.realized_positions[block_height] = deque()
+            self.process_end_block(end_block_events, block_height)
             self.process_best_bid_ask(block_height, True)
+            self.process_cumulative_realized_pnl(block_height)
+            self.integrity_check(block_height)
+
+            # Update latest block on chain
+            block = Block(height=block_height, time=block_datetime, block_processed=True)
+            self.process_block_height(block)
 
         except Exception as e:
             #logging.error(f"error process block: {e}")
@@ -74,6 +82,12 @@ class ScanBlockBase:
         pass
 
     def process_best_bid_ask(self, block_height, process_positioning=False):
+        pass
+
+    def process_cumulative_realized_pnl(self, block_height):
+        pass
+
+    def integrity_check(self, block_height):
         pass
 
     position_id_keys = set([EventKeys.id, EventKeys.position_id])
@@ -310,6 +324,9 @@ class ScanBlock(ScanBlockBase):
         self.client = GRPCClient(constants.Network.get_grpc_url())
         self.crud = self.client.crud
 
+        # maps block height to deque
+        self.realized_positions: Dict[int, deque] = dict()
+
     def process_block_height(self, block: Block):
         sql_block = self.crud.filterone(
             Block, Block.height == block.height)
@@ -317,7 +334,10 @@ class ScanBlock(ScanBlockBase):
             self.crud.insert(block)
         else:
             self.crud.update(Block, filter=(Block.height == block.height),
-                                updic=block.to_dict())
+                             updic=block.to_dict())
+
+        try:    self.max_block_height = max(self.max_block_height or -1, block.height)
+        except: pass
 
     def __update_position(self, position: Position, sql_position: Position):
         # we want to keep only latest position in database
@@ -363,7 +383,6 @@ class ScanBlock(ScanBlockBase):
 
     def process_end_block(self, events: str, block_height: int):
         """process fxdex chain EndBlock events"""
-
         for event in events:
             """
             if 'position' in event[BlockResponse.TYPE].lower():
@@ -416,10 +435,13 @@ class ScanBlock(ScanBlockBase):
                 else:
                     self.__update_position(position, sql_position)
 
+                self.realized_positions[block_height].append(position)
+
             elif event[BlockResponse.TYPE] == EventTypes.Part_close_position:
                 position = self.get_position(event[BlockResponse.Attributes])
                 position.status = PositionStatus.Open
                 position.block_height = block_height
+                position.last_order_fill_height = block_height
 
                 sql_position = self.crud.filterone(
                     Position, Position.position_id == position.position_id)
@@ -427,6 +449,8 @@ class ScanBlock(ScanBlockBase):
                     self.crud.insert(position)
                 else:
                     self.__update_position(position, sql_position)
+
+                self.realized_positions[block_height].append(position)
 
             elif event[BlockResponse.TYPE] == EventTypes.Cancel_order_expire:
                 """update order status to expiration"""
@@ -471,7 +495,7 @@ class ScanBlock(ScanBlockBase):
                 trade.block_height = block_height
                 if order.order_type=='ORDER_TYPE_LIQUIDATION':
                     trade.liquidation_owner = trade.owner
-                    trade.owner = order.owner
+                    trade.owner = sql_order.owner if sql_order else order.owner
                 self.crud.insert(trade)
 
                 """process orderbook"""
@@ -689,6 +713,9 @@ class ScanBlock(ScanBlockBase):
                 except IntegrityError:  # duplicate
                     pass
 
+        block = Block(height=block_height, tx_events_processed=True)
+        self.process_block_height(block)
+
     """
         add_or_cancel: True means add (append), False means cancel (subtract)
     """
@@ -731,26 +758,19 @@ class ScanBlock(ScanBlockBase):
             if block_height==update_block_height:
                 orderbook_tops.append(best_bid_ask)
 
-        # Process positionings (i.e. record historical realized & unrealized P&L)
+        """Process positionings (i.e. record historical realized & unrealized P&L)"""
+        # Realized P&L
+        realized_positions = self.realized_positions[block_height]
         if process_positioning:
-            positions = self.crud.filter_many(Position, Position.block_height==block_height)
+            while realized_positions:
+                position = realized_positions.pop()
 
-            for position in positions:
                 is_long = position.direction=='LONG'
-
-                """
-                try:
-                    best_bid_ask = best_bid_asks[position.pair_id]
-                    if is_long:
-                        best_price = best_bid_ask.best_bid or position.mark_price
-                    else:
-                        best_price = best_bid_ask.best_ask or position.mark_price
-                except:
-                    best_price = position.mark_price
-                """
                 best_price = position.mark_price
 
                 unrealized_pnl = position.base_quantity * (1 if is_long else -1) * (best_price - position.entry_price)
+
+                # is_batch_update = False
                 positioning = Positioning(owner=position.owner, pair_id=position.pair_id, 
                                           entry_price=position.entry_price, mark_price=position.mark_price,
                                           base_quantity=position.base_quantity, realized_pnl=position.realized_pnl,
@@ -762,44 +782,20 @@ class ScanBlock(ScanBlockBase):
 
                 positionings.append(positioning)
 
-            """
-            positions = self.crud.filter_many(Position, Position.block_height==block_height,
-                                                        Position.status=='open'])
-
-            for position in positions:
-                is_long = position.direction=='LONG'
-                key = (position.owner, position.pair_id)
-                units_exposure = position.base_quantity * (1 if is_long else -1)
-
-                best_price = getattr(records[position.pair_id], 'best_bid' if is_long else 'best_ask')
-                unrealized_pnl = position.units_exposure * (best_price - position.entry_price)
-
-                if key in positionings:
-                    positionings[key].unrealized_pnl += unrealized_pnl
-                    positionings[key].units_exposure += units_exposure
-                else:
-                    positions[key] = Positioning(owner=position.owner, pair_id=position.pair_id,
-                                                 unrealized_pnl=unrealized_pnl, units_exposure=position.base_quantity,
-                                                 block_height=block_height)
-            """
-
+            # Unrealized P&L
             if block_height % int(os.environ.get('POSITIONING_UPDATE_INTERVAL', '250')) == 0:
-                logging.info('Updating positionings...')
+                logging.info(f'Marking unrealied P&L to market... (blk ht = {block_height})')
 
                 open_positions = self.crud.filter_many(Position, Position.status=='open')
-
-                # mark_price_resp = self.client.query_mark_price(None, True)
-                # mark_prices = { d['pairId']: Decimal(d['price']) for d in mark_price_resp['pairMarkPrice'] }
-
                 mark_prices = { res[0]: res[1] for res in self.crud.query_mark_prices() }
 
-                # Track unrealized P&L on positions
                 for position in open_positions:
                     is_long = position.direction=='LONG'
 
                     best_price = mark_prices[position.pair_id]
                     unrealized_pnl = position.base_quantity * (1 if is_long else -1) * (best_price - position.entry_price)
 
+                    # is_batch_update = True
                     positioning = Positioning(owner=position.owner, pair_id=position.pair_id, 
                                               entry_price=position.entry_price, mark_price=best_price,
                                               base_quantity=position.base_quantity, realized_pnl=position.realized_pnl,
@@ -828,11 +824,45 @@ class ScanBlock(ScanBlockBase):
         if locked_fees:
             self.crud.insert_many(locked_fees)
 
+    def process_cumulative_realized_pnl(self, block_height):
+        interval = 500
+        if block_height%interval==0:
+            self.crud.update_realized_pnl_logs(
+                start_block_height=block_height-interval+1,
+                end_block_height=block_height
+            )
+
+    def integrity_check(self, block_height, order_diff_threshold=10):
+        """
+        Compare top n open order counts (grouped by `owner`, `pair_id`) between database and SDK.
+        E-mail alerts will be sent for open order counts differing more than `order_diff_threshold`.
+        """
+        if block_height % 250 == 0:
+            logging.info(f'Running integrity check... (blk ht = {block_height})')
+
+        open_order_counts = self.crud.query_open_order_count_by_pairid_and_address(limit_records=10)
+        alert_list = []
+
+        for pair_id, owner, db_order_count in open_order_counts:
+            try:
+                sdk_order_count = len(self.client.query_orders(owner=owner, pair_id=pair_id, page="1", limit="10000", use_db=False))
+            except:
+                sdk_order_count = 0
+                
+            if abs(db_order_count - sdk_order_count) > order_diff_threshold:
+                alert_msg = f'{owner} has {sdk_order_count} open orders on chain, but {db_order_count} in database'
+                alert_list.append(alert_msg)
+                logging.warn(alert_msg)
+
+        if alert_list:
+            alert_text = os.linesep.join(alert_list)
+            send_mail(f'Integrity Check Alert (Blk Ht: {block_height})', alert_text)
+
     def initialize_order_book(self):
         all_entries = []
 
         if self.crud.count(Orderbook)==0:
-            client = self. GRPCClient(constants.Network.get_rpc_url())
+            client = GRPCClient(constants.Network.get_rpc_url())
 
             for pair_id in ['aapl:usdt']:
                 order_book = client.query_orderbook(pair_id)
@@ -920,6 +950,7 @@ class TradingScanBlock(ScanBlockBase):
                 position.status = PositionStatus.Close
                 position.block_height = block_height
                 position.close_height = block_height
+                position.last_order_fill_height = block_height
 
                 self.on_position_close(position, block_height)
 

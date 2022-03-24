@@ -74,6 +74,7 @@ class Position(Base):
     open_height = Column(Integer)
     close_height = Column(Integer)
     block_height = Column(Integer)
+    last_order_fill_height = Column(Integer)
 
 class Orderbook(Base):
     __tablename__ = 'orderbook'
@@ -113,15 +114,17 @@ class FundingTransfer(Base):
 
     id = Column('id', Integer, primary_key=True, autoincrement=True)
     position_id = Column(Integer)
-    pair_id = Column(String(20))
-    owner = Column(String(42))
+    pair_id = Column(String(20), index=True)
+    owner = Column(String(42), index=True)
     funding_fee = Column(Numeric)
     block_height = Column(Integer)
 
 class Block(Base):
     __tablename__ = 'block'
-    height = Column('height', Integer, primary_key=True, autoincrement=False)
+    height = Column('height', Integer, primary_key=True, index=True, autoincrement=False)
     time = Column(DateTime, index=True)
+    block_processed = Column(Boolean, default=False, index=True)
+    tx_events_processed = Column(Boolean, default=False, index=True)
 
 class Tx(Base):
     __tablename__ = 'tx'
@@ -153,6 +156,16 @@ class Positioning(Base):
     locked_fees = Column(Numeric)
     block_height = Column(Integer)
     is_batch_update = Column(Boolean, default=False)
+
+class Realized_Pnl_Log(Base):
+    __tablename__ = 'realized_pnl_log'
+
+    owner = Column(String(42), index=True, primary_key=True)
+    pair_id = Column(String(42), index=True, primary_key=True)
+    realized_pnl = Column(Numeric)
+    funding_gain = Column(Numeric)
+    liquidated_margin = Column(Numeric)
+    block_height = Column(Integer, index=True, primary_key=True)
 
 class Balance(Base):
     __tablename__ = 'balance'
@@ -186,6 +199,7 @@ class Wallet(Base):
     owner = Column(String(100))
     pair_id = Column(String(20))
     comment = Column(String(256))
+    leverage = Column(Integer)
 
 class Margin(Base):
     __tablename__ = 'margin'
@@ -245,6 +259,38 @@ class TradePair(Base):
     __tablename__ = 'trade_pair'
     pair_id = Column(String(20), primary_key=True)
 
+class HedgingOrder(Base):
+    __tablename__ = 'hedging_order'
+    id = Column('id', Integer, primary_key=True, autoincrement=True)
+    dex_order_id = Column(String(100))
+    dex_trade_id = Column(Integer)
+    order_id = Column(String(100))      # Hedging exchange order ID
+    order_type = Column(String(50))
+    status = Column(String(50), index=True)
+    price = Column(Numeric)
+    quantity = Column(Numeric)
+    direction = Column(String(10))
+    symbol = Column(String(20), index=True)
+    exchange = Column(String(20), index=True)
+    time = Column(DateTime)
+    commission = Column(Numeric, default=0)
+    gas_fee = Column(Numeric, default=0)
+
+class HedgingTrade(Base):
+    __tablename__ = 'hedging_trade'
+    id = Column('id', Integer, primary_key=True, autoincrement=True)
+    order_id = Column(String(100))      # Hedging exchange order ID
+    trade_id = Column(String(100))      # Hedging exchange trade ID (if any)
+    dex_trade_id = Column(Integer)
+    order_type = Column(String(50))
+    status = Column(String(50), index=True)
+    price = Column(Numeric)
+    quantity = Column(Numeric)
+    direction = Column(String(10))
+    symbol = Column(String(20), index=True)
+    exchange = Column(String(20), index=True)
+    time = Column(DateTime)
+
 class Sql:
     def __init__(self, database: str = "postgres", user: str = "postgres", password: str = "123456", host: str = "localhost",
                  port: str = "5432"):
@@ -252,7 +298,7 @@ class Sql:
         database = os.environ.get(constants.DB.Database, database)
         user = os.environ.get(constants.DB.User, user)
         password = os.environ.get(constants.DB.Password, password)
-        host = os.environ.get(constants.DB.Host, host)
+        host = os.environ.get(constants.DB.Host, host)  # 47.90.177.191
         port = os.environ.get(constants.DB.Port, port)
 
         self.database = database
@@ -306,13 +352,15 @@ AND pid <> pg_backend_pid();''')
         self.initialize_table('trade_pairs.csv', 'trade_pair')
 
     def initialize_error_log_height(self, starting_height=None):
-        if not starting_height:
-            starting_height = self.engine.execute('SELECT MAX(height) FROM block').first()[0] or 1
+        with self.session() as session:
+            if not starting_height:
+                starting_height = session.execute('SELECT MAX(height) FROM block').first()[0] or 1
 
-        self.engine.execute(f'''
-INSERT INTO error_log (height)
-SELECT {starting_height}
-WHERE NOT EXISTS (SELECT * FROM error_log)''')
+            session.execute(f'''
+    INSERT INTO error_log (height)
+    SELECT {starting_height}
+    WHERE NOT EXISTS (SELECT * FROM error_log)''')
+            session.commit()
 
     """
     Below is create database and table use psycopg2, require your computer install postgresql

@@ -1,3 +1,4 @@
+from collections import deque
 import datetime
 import websocket
 import json
@@ -15,6 +16,7 @@ from fx_py_sdk.grpc_client import GRPCClient
 import traceback
 import datetime as dt
 import time
+from fx_py_sdk.notify_service import send_mail
 from fx_py_sdk.scan_block import ScanBlock, ScanBlockBase
 
 reconnect_block_count = 0
@@ -69,9 +71,9 @@ class RpcScan:
                 start_block = int(os.environ.get('START_BLOCK', '1'))
 
             block_heights = [blk_ht for blk_ht, in (self.scan.crud.session.query(Block)
-                                                    .filter(Block.height >= start_block)
-                                                    .with_entities(Block.height)
-                                                    .order_by(Block.height))]
+                                                                         .filter(Block.height >= start_block)
+                                                                         .with_entities(Block.height)
+                                                                         .order_by(Block.height))]
             missing_blocks = list(sorted(
                 set(range(start_block, latest_block_height+1)).difference(set(block_heights))
             ))
@@ -124,13 +126,6 @@ class RpcScan:
                     timestamp = Timestamp()
                     timestamp.FromJsonString(block_time),
                     block_datetime = datetime.datetime.utcfromtimestamp(timestamp.ToSeconds())
-                    block = Block(height=block_height, time=block_datetime)
-                    sql_latest_block = self.scan.crud.filterone(Block, Block.height == block_height)
-                    if sql_latest_block is None:
-                        self.scan.crud.insert(block)
-                    else:
-                        self.scan.crud.update(Block, filter=(Block.height == block_height),
-                                              updic=block.to_dict())
 
                     if block_result[BlockResponse.Txs_results] is not None:
                         for tx_result in block_result[BlockResponse.Txs_results]:
@@ -140,11 +135,18 @@ class RpcScan:
                     if block_result[BlockResponse.Begin_block_events] is not None:
                         self.scan.process_begin_block(
                             block_result[BlockResponse.Begin_block_events], block_height)
+
+                    self.scan.realized_positions[block_height] = deque()
                     if block_result[BlockResponse.End_block_events] is not None:
                         self.scan.process_end_block(
                             block_result[BlockResponse.End_block_events], block_height)
 
                     self.scan.process_best_bid_ask(block_height, True)
+                    self.scan.process_cumulative_realized_pnl(block_height)
+
+                    # Update latest block on chain
+                    block = Block(height=block_height, time=block_datetime, block_processed=True)
+                    self.scan.process_block_height(block)
 
             # Read the block directly after all missing blocks previously acquired
             start_block = last_block_height + 1
@@ -154,7 +156,7 @@ class WebsocketScan:
 
     def __init__(self, scan_manager: ScanManager=None, subscribe_events: Iterable=None, scan: ScanBlockBase = None):
         self.manager = scan_manager
-        self.scan = scan or ScanBlock()
+        self.scan: ScanBlockBase = scan or ScanBlock()
 
         self.wss_url = constants.Network.get_ws_url()
 
@@ -167,9 +169,16 @@ class WebsocketScan:
     def _get_ws_endpoint_url(self):
         return f"{self.wss_url}websocket"
 
-    def on_error(self, error):
+    def _handle_exception(self, error, send_email=True):
         was_ready = self.rpc_ready
         self.rpc_ready = False
+
+        title = f'WS error in handling message: {str(error)} (Blk Ht: {self.scan.max_block_height})'
+        exception_traceback = traceback.format_exc()
+        logging.warning(title)
+        logging.warning(exception_traceback)
+        if was_ready:
+            send_mail(title, exception_traceback, recipients='matthew.ang@pundix.com')
 
         global reconnect_block_count
         print("websocket caught: ", error)
@@ -181,16 +190,27 @@ class WebsocketScan:
             logging.info("正在尝试第 %d 次重连" % reconnect_block_count)
             reconnect_block_count += 1
 
-            # if we were processing WS data before, then we need to resume RPC
-            # else, RPC is probably already running - we don't need to do anything
-            if was_ready and self.manager:
+            """
+            if we were processing WS data before, then we need to resume RPC
+            else, RPC is probably already running - we don't need to do anything extra
+            """
+            if was_ready and self.manager and isinstance(self.scan, ScanBlock):
+                # reinstate connection (in case of idle-in-transaction timeout)
+                self.manager.rpc_scan.scan.crud.init_session()
+                # delete all data from the most recent block height with incomplete data
+                self.manager.rpc_scan.scan.crud.delete_data_from_lowest_incomplete_height()
+                # process RPC data sequentially
                 self.manager.rpc_scan.process_block_threaded()
+
+            """reinstate websocket connection"""
             self.subscribe_block()
         else:
             print("error: ", error)
 
+    def on_error(self, error):
+        self._handle_exception(error)
 
-    def on_message(self, message):
+    def on_message(self, message):        
         if self.manager and not self.rpc_ready:
             return
 
@@ -226,9 +246,8 @@ class WebsocketScan:
                     self.scan.process_tx_events(tx_events, block_height)
                 elif msg[BlockResponse.RESULT][BlockResponse.QUERY] == tm_event_NewBlock:
                     self.scan.process_block(msg)
-        except:
-            logging.error(f'Error in handling message: {msg}')
-            logging.error(traceback.format_exc())
+        except Exception as ex:
+            self._handle_exception(ex)
 
     def on_open(self):
         logging.info("connection to fxdex...")

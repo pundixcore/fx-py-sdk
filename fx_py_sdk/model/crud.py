@@ -1,7 +1,8 @@
+from datetime import datetime
 from decimal import Decimal
 from typing import Dict, Iterable, List, Union
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import case, create_engine
+from sqlalchemy import case, create_engine, text
 from sqlalchemy.orm.session import Session
 from fx_py_sdk.codec.fx.dex.match_pb2 import OrderBook
 from fx_py_sdk.model.model import *
@@ -9,6 +10,9 @@ from sqlalchemy import or_, and_, func
 
 class Crud:
     def __init__(self):
+        self.init_session()
+
+    def init_session(self):
         sql = Sql("fxdex")
         self.DBSession = sessionmaker(bind=sql.engine, autocommit=False)
         self.session: Session = self.DBSession()
@@ -82,10 +86,12 @@ class Crud:
         ask_items = dict()
         bid_items = dict()
         # ob = dict(ask=[dict(price=0, quantity=0)], bid=[dict(price=0, quantity=0)])
-        order_ask = self.session.query(Order.price, Order.base_quantity).filter(Order.pair_id == pair_id,
-                                                     Order.direction == 'ASK',
-                                                     or_(Order.status == 'ORDER_PENDING',
-                                                         Order.status == 'ORDER_PARTIAL_FILLED')).order_by(Order.price)
+        order_ask = (self.session.query(Order.price, Order.base_quantity)
+                                 .filter(Order.pair_id == pair_id,
+                                         Order.direction == 'ASK',
+                                         or_(Order.status == 'ORDER_PENDING',
+                                             Order.status == 'ORDER_PARTIAL_FILLED'))
+                                 .order_by(Order.price))
 
         for order in order_ask:
             order_dict = dict(zip(order.keys(), order))
@@ -98,10 +104,12 @@ class Crud:
             item = {'price':key, 'quantity':ask_items[key]}
             asks.append(item)
 
-        order_bid = self.session.query(Order.price, Order.base_quantity).filter(Order.pair_id == pair_id,
-                                                     Order.direction == 'BID',
-                                                     or_(Order.status == 'ORDER_PENDING',
-                                                         Order.status == 'ORDER_PARTIAL_FILLED')).order_by(Order.price.desc())
+        order_bid = (self.session.query(Order.price, Order.base_quantity)
+                                 .filter(Order.pair_id == pair_id,
+                                         Order.direction == 'BID',
+                                         or_(Order.status == 'ORDER_PENDING',
+                                             Order.status == 'ORDER_PARTIAL_FILLED'))
+                                 .order_by(Order.price.desc()))
         for order in order_bid:
             order_dict = dict(zip(order.keys(), order))
             if order_dict['price'] in bid_items:
@@ -128,6 +136,15 @@ class Crud:
     def query_open_order_count(self, client_address=None, pair_id=None) -> int:
         conditions = self.__get_open_order_conditions(client_address, pair_id)
         return self.session.query(Order).filter(and_(*conditions)).count()
+
+    def query_open_order_count_by_pairid_and_address(self, client_address=None, pair_id=None, limit_records=5) -> int:
+        conditions = self.__get_open_order_conditions(client_address, pair_id)
+        return (self.session.query(Order.pair_id, Order.owner, func.count(Order.id).label('order_count'))
+                            .filter(and_(*conditions))
+                            .group_by(Order.pair_id, Order.owner)
+                            .order_by(text('order_count DESC'))
+                            .limit(limit_records)
+                            .all())
 
     def query_all_locked_fees(self) -> Iterable:
         order_conditions = self.__get_open_order_conditions()
@@ -250,3 +267,131 @@ class Crud:
     def get_dollar_exposure(self, address=None, pair_id=None, is_bot=True):
         """Returns a single exposure marked to mark price if pair_id is provided. Otherwise, returns dictionary."""
         return self.__get_exposure(address, pair_id, is_bot, as_dollar_value=True)
+
+    def get_funding_transfers(self, address: str=None, pair_id: str=None, from_datetime: datetime=None):
+        limit_records = 100
+
+        conditions = []
+        if address:
+            conditions.append(FundingTransfer.owner==address)
+        if pair_id:
+            conditions.append(FundingTransfer.pair_id==pair_id)
+        if from_datetime:
+            conditions.append(Block.time>=from_datetime)
+
+        query = (self.session.query(FundingTransfer)
+                             .join(Block, FundingTransfer.block_height==Block.height)
+                             .filter(*conditions)
+                             .order_by(Block.height.asc())
+                             .limit(limit_records))
+        return query.all()
+
+    def update_realized_pnl_logs(self, start_block_height: int, end_block_height: int):
+        update_query = """
+        INSERT INTO realized_pnl_log
+            SELECT owner, pair_id, SUM(realized_pnl) AS realized_pnl, SUM(funding_gain) AS funding_gain, SUM(liquidated_margin) AS liquidated_margin, :end_block_height AS block_height FROM (
+                SELECT
+                    COALESCE(q1.owner, q2.owner, q3.owner, q4.owner) AS owner,
+                    COALESCE(q1.pair_id, q2.pair_id, q3.pair_id, q4.pair_id) AS pair_id,
+                    COALESCE(q1.realized_pnl, 0) + COALESCE(q4.realized_pnl, 0) AS realized_pnl,
+                    COALESCE(q2.funding_fee, 0) + COALESCE(q4.funding_gain, 0) AS funding_gain,
+                    COALESCE(q3.margin, 0) + COALESCE(q4.liquidated_margin, 0) AS liquidated_margin,
+                    :end_block_height AS block_height
+                FROM
+                    (SELECT
+                        p.owner,
+                        p.pair_id,
+                        SUM(p.realized_pnl) AS realized_pnl
+                    FROM positioning p
+                    LEFT JOIN block b on p.block_height=b.height
+                    WHERE
+                        p.block_height BETWEEN :start_block_height AND :end_block_height
+                        AND COALESCE(p.is_batch_update, FALSE) = FALSE
+                    GROUP BY 1,2) q1
+                FULL OUTER JOIN
+                    (SELECT
+                        f.owner,
+                        f.pair_id,
+                        SUM(funding_fee) AS funding_fee
+                    FROM funding_transfer f
+                    WHERE
+                        f.block_height BETWEEN :start_block_height AND :end_block_height
+                    GROUP BY 1,2) q2 ON q1.owner=q2.owner AND q1.pair_id=q2.pair_id
+                FULL OUTER JOIN
+                    (SELECT
+                        p.owner,
+                        p.pair_id,
+                        SUM(margin) AS margin
+                    FROM position p
+                    WHERE
+                        p.block_height BETWEEN :start_block_height AND :end_block_height
+                        AND p.status='liquidated'
+                    GROUP BY 1,2) q3 ON q1.owner=q3.owner AND q1.pair_id=q3.pair_id
+                FULL OUTER JOIN
+                    (SELECT DISTINCT ON (owner, pair_id) owner, pair_id, realized_pnl, funding_gain, liquidated_margin, block_height
+                    FROM realized_pnl_log
+                    ORDER BY owner ASC, pair_id ASC, block_height DESC) q4 ON q1.owner=q4.owner AND q1.pair_id=q4.pair_id
+                ) q
+            GROUP BY 1,2
+        """
+
+        self.session.execute(update_query, params=
+        {
+            'start_block_height': start_block_height,
+            'end_block_height': end_block_height
+        })
+        self.session.commit()
+
+    def delete_data(self, from_block_height: int, verbose=True):
+        """Deletes all data starting from block height"""
+        if not from_block_height:
+            if verbose:
+                logging.info('No initial block height specified, delete_data() did not remove any data')
+            return
+
+        delete_query = """
+        DO $$
+        DECLARE bh integer;
+        BEGIN
+            SELECT :from_block_height INTO bh;
+
+            DELETE FROM block WHERE height>=bh;
+            DELETE FROM funding_transfer WHERE block_height>=bh;
+            DELETE FROM orderbook WHERE block_height>=bh;
+            DELETE FROM orders WHERE block_height>=bh;
+            DELETE FROM position WHERE block_height>=bh;
+            DELETE FROM trade WHERE block_height>=bh;
+            DELETE FROM orderbook_top WHERE block_height>=bh;
+            DELETE FROM positioning WHERE block_height>=bh;
+            DELETE FROM error WHERE block_height>=bh;
+            DELETE FROM transfer WHERE block_height>=bh;
+            DELETE FROM margin WHERE block_height>=bh;
+            DELETE FROM oracle_price WHERE block_height>=bh;
+            DELETE FROM realized_pnl_log wHERE block_height>=bh;
+
+            UPDATE error_log SET height=el.height
+            FROM (SELECT CASE WHEN bh<height THEN bh-1 ELSE height END as height FROM error_log) el;
+        END $$;"""
+
+        self.session.execute(delete_query, params={'from_block_height': from_block_height})
+        self.session.commit()
+        if verbose:
+            logging.info(f'All data from {from_block_height} onward (inclusive) removed from database')
+
+    def query_latest_block_height(self):
+        """Query latest valid block height from database (where both `block_processed` and `tx_events_processed` are true)"""
+        return (self.session.query(func.max(Block.height))
+                    .filter(and_(Block.tx_events_processed==True, Block.block_processed==True))
+                    .scalar())
+
+    def query_lowest_incomplete_height(self):
+        """Query lowest block height where either `block_processed` or `tx_events_processed` is false (i.e. block processing is incomplete)"""
+        return (self.session.query(func.min(Block.height))
+                            .filter(or_(Block.block_processed==False, Block.tx_events_processed==False))
+                            .scalar())
+
+    def delete_data_from_lowest_incomplete_height(self):
+        """Deletes data from max block height (i.e. removes topmost block data)"""
+        block_height = self.query_lowest_incomplete_height()
+        self.delete_data(block_height)
+            

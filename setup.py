@@ -18,7 +18,7 @@ setup(
     url='https://github.com/falcons-x/fx-py-sdk',
     keywords=["FX", "DEX", "BLOCKCHAIN"],
     install_requires=["bech32", "hdwallets",
-                      "ecdsa", "mnemonic", "grpcio", "protobuf"],
+                      "ecdsa", "mnemonic", "grpcio", "protobuf", "psycopg2-binary"],
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
