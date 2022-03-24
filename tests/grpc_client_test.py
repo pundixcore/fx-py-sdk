@@ -11,7 +11,7 @@ from google.protobuf.json_format import MessageToJson
 import json
 from google.protobuf.timestamp_pb2 import Timestamp
 
-client = GRPCClient('44.196.199.119:9090')
+client = GRPCClient('44.196.199.119:9190')
 # client = GRPCClient('127.0.0.1:9090')
 
 
@@ -98,9 +98,9 @@ class MyTestCase(unittest.TestCase):
               'sequence:', account.sequence)
 
         tx_builder = TxBuilder(priv_key, chain_id, account.account_number, Coin(
-            amount='60000000', denom='FX'))
+            amount='3000', denom='USDT'))
 
-        tx_response = client.create_order(tx_builder, 'tsla:usdt', "BUY", decimal.Decimal(
+        tx_response = client.create_order(tx_builder, 'BTC:USDT', "BUY", decimal.Decimal(
             910.1), decimal.Decimal(1.2), 10, account.sequence, mode=BROADCAST_MODE_BLOCK)
         print(MessageToJson(tx_response))
 

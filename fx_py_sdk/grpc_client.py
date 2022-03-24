@@ -45,7 +45,7 @@ from fx_py_sdk.model.model import HedgingOrder, HedgingTrade, Order as CrudOrder
 
 DEFAULT_DEX_GAS = 5000000
 DEFAULT_GRPC_NONE = "Not found"
-DEFAULT_DEC = 1000000000000000000
+DEFAULT_DEC = 1000000
 
 
 class GRPCClient:
