@@ -14,13 +14,10 @@ from fx_py_sdk.codec.cosmos.base.tendermint.v1beta1.query_pb2_grpc import Servic
 from fx_py_sdk.codec.cosmos.base.abci.v1beta1.abci_pb2 import GasInfo
 from fx_py_sdk.codec.cosmos.base.abci.v1beta1.abci_pb2 import TxResponse
 from fx_py_sdk.codec.cosmos.tx.v1beta1.service_pb2_grpc import ServiceStub as TxClient
-from fx_py_sdk.codec.cosmos.tx.v1beta1.service_pb2 import SimulateRequest
-from fx_py_sdk.codec.cosmos.tx.v1beta1.service_pb2 import BroadcastTxRequest
-from fx_py_sdk.codec.cosmos.tx.v1beta1.service_pb2 import BroadcastMode
-from fx_py_sdk.codec.cosmos.tx.v1beta1.service_pb2 import BROADCAST_MODE_BLOCK, BROADCAST_MODE_SYNC
-from fx_py_sdk.codec.cosmos.tx.v1beta1.tx_pb2 import Tx
-from fx_py_sdk.codec.cosmos.tx.v1beta1.tx_pb2 import TxRaw
-from fx_py_sdk.codec.cosmos.tx.v1beta1.tx_pb2 import Fee
+from fx_py_sdk.codec.cosmos.tx.v1beta1.service_pb2 import (
+    SimulateRequest, BroadcastTxRequest, GetTxRequest, BroadcastMode, BROADCAST_MODE_BLOCK, BROADCAST_MODE_SYNC
+)
+from fx_py_sdk.codec.cosmos.tx.v1beta1.tx_pb2 import Tx, TxRaw, Fee
 from fx_py_sdk.codec.cosmos.base.v1beta1.coin_pb2 import Coin
 from fx_py_sdk.codec.fx.other.query_pb2 import GasPriceRequest
 from fx_py_sdk.codec.fx.other.query_pb2_grpc import QueryStub as OtherQuery
@@ -389,6 +386,10 @@ class GRPCClient:
             )
 
         return new_order
+
+    def query_tx(self, tx_hash: str):
+        """Queries Tx from chain"""
+        return TxClient(self.channel).GetTx(GetTxRequest(hash=tx_hash))
 
     def query_trades(self, order_id):
         """Queries trades from database given an order ID, sorted by time."""
