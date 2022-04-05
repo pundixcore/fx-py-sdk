@@ -17,7 +17,7 @@ setup(
     packages=find_packages(),
     url='https://github.com/falcons-x/fx-py-sdk',
     keywords=["FX", "DEX", "BLOCKCHAIN"],
-    install_requires=["bech32", "hdwallets",
+    install_requires=["bech32", "hdwallets", "sqlalchemy",
                       "ecdsa", "mnemonic", "grpcio", "protobuf", "psycopg2-binary"],
     classifiers=[
         "Development Status :: 3 - Alpha",

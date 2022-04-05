@@ -5,7 +5,7 @@
 ```shell
 git clone git@github.com:falcons-x/fx-py-sdk.git
 
-cd fx-pay-sdk
+cd fx-py-sdk
 ```
 
 ### 2. 构建当前项目的Python虚拟环境
@@ -34,6 +34,7 @@ pip install -r requirements.txt
 pip install -r requirements.txt -i https://mirrors.cloud.tencent.com/pypi/simple
 ```
 
+<s>
 ### 4. 编译Proto文件为python文件
 
 > 如果gen-proto.sh没有执行权限,使用 `chmo +x gen-proto.sh`
@@ -53,6 +54,7 @@ cd fx_py_sdk
 cd fx_py_sdk
 ./scripts/imports.sh
 ```
+</s>
 
 ### 5. 安装sdk
 
@@ -62,6 +64,7 @@ cd fx_py_sdk
  python setup.py install
 ```
 
+<s>
 ### 6.使用sdk
 
 > 在开发仓库执行easy_install, 加载到venv环境
@@ -72,6 +75,7 @@ easy_install  --find-links="$Install_PATH/site-packages" fx_py_sdk
 from fx_py_sdk.grpc_client import GRPCClient
 
 ```
+</s>
 
 ### 7.使用GRPC
 
@@ -100,7 +104,7 @@ block_res = rpc_client.get_block_results(100)
 print(block_res)
 ```
 
-### 8.使用Websocket
+### 9.使用Websocket
 
 ```python
 import asyncio
@@ -124,7 +128,7 @@ if __name__ == "__main__":
     loop.run_until_complete(main())
 ```
 
-### 9.扫描fxdex区块数据，并记录到postgresql
+### 10.扫描fxdex区块数据，并记录到postgresql
 
 **postgres docker运行**
 
