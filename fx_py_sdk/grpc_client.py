@@ -49,7 +49,7 @@ class GRPCClient:
     def __init__(self, url: str = 'localhost:9090'):
         if urlparse(url).scheme == "https":
             self.channel = grpc.secure_channel(
-                url, grpc.ssl_channel_credentials())
+                urlparse(url).netloc, grpc.ssl_channel_credentials())
         else:
             self.channel = grpc.insecure_channel(url)
 
