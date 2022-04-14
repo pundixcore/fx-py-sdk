@@ -14,6 +14,8 @@ enum Direction {
   BOTH  = 0 [(gogoproto.enumvalue_customname) = "BOTH"];
   BUY = 1 [(gogoproto.enumvalue_customname) = "BUY"];
   SELL  = 2 [(gogoproto.enumvalue_customname) = "SELL"];
+  MarketBuy  = 3 [(gogoproto.enumvalue_customname) = "MarketBuy"];
+  MarketSell  = 4 [(gogoproto.enumvalue_customname) = "MarketSell"];
 }
 
 enum OrderStatus {

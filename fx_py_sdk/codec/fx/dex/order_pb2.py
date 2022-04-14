@@ -22,7 +22,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=b'Z1git.wokoworks.com/blockchain/fx-chain/x/dex/types',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x12\x66x/dex/order.proto\x12\x06\x66x.dex\x1a\x14gogoproto/gogo.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x17\n\x08OrderIDs\x12\x0b\n\x03ids\x18\x01 \x03(\t\"\x98\x06\n\x05Order\x12\n\n\x02id\x18\x01 \x01(\t\x12@\n\x05owner\x18\x02 \x01(\x0c\x42\x31\xfa\xde\x1f-github.com/cosmos/cosmos-sdk/types.AccAddress\x12\x0f\n\x07pair_id\x18\x03 \x01(\t\x12$\n\tdirection\x18\x04 \x01(\x0e\x32\x11.fx.dex.Direction\x12=\n\x05price\x18\x05 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x45\n\rbase_quantity\x18\x06 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x46\n\x0equote_quantity\x18\x07 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12G\n\x0f\x66illed_quantity\x18\x08 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12H\n\x10\x66illed_avg_price\x18\t \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x45\n\rremain_locked\x18\n \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x10\n\x08leverage\x18\x0b \x01(\x03\x12#\n\x06status\x18\x0c \x01(\x0e\x32\x13.fx.dex.OrderStatus\x12%\n\norder_type\x18\r \x01(\x0e\x32\x11.fx.dex.OrderType\x12@\n\x08\x63ost_fee\x18\x0e \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x42\n\nlocked_fee\x18\x0f \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"-\n\x06Orders\x12#\n\x06orders\x18\x01 \x03(\x0b\x32\r.fx.dex.OrderB\x04\xc8\xde\x1f\x00*O\n\tDirection\x12\x12\n\x04\x42OTH\x10\x00\x1a\x08\x8a\x9d \x04\x42OTH\x12\x10\n\x03\x42UY\x10\x01\x1a\x07\x8a\x9d \x03\x42UY\x12\x12\n\x04SELL\x10\x02\x1a\x08\x8a\x9d \x04SELL\x1a\x08\xa8\xa4\x1e\x01\x88\xa3\x1e\x00*\xf1\x02\n\x0bOrderStatus\x12$\n\rORDER_PENDING\x10\x00\x1a\x11\x8a\x9d \rORDER_PENDING\x12\"\n\x0cORDER_FILLED\x10\x01\x1a\x10\x8a\x9d \x0cORDER_FILLED\x12\x32\n\x14ORDER_PARTIAL_FILLED\x10\x02\x1a\x18\x8a\x9d \x14ORDER_PARTIAL_FILLED\x12(\n\x0fORDER_CANCELLED\x10\x03\x1a\x13\x8a\x9d \x0fORDER_CANCELLED\x12\x46\n\x1eORDER_PARTIAL_FILLED_CANCELLED\x10\x04\x1a\"\x8a\x9d \x1eORDER_PARTIAL_FILLED_CANCELLED\x12\x42\n\x1cORDER_PARTIAL_FILLED_EXPIRED\x10\x05\x1a \x8a\x9d \x1cORDER_PARTIAL_FILLED_EXPIRED\x12$\n\rORDER_EXPIRED\x10\x06\x1a\x11\x8a\x9d \rORDER_EXPIRED\x1a\x08\xa8\xa4\x1e\x01\x88\xa3\x1e\x00*\xf7\x01\n\tOrderType\x12:\n\x18ORDER_TYPE_OPEN_POSITION\x10\x00\x1a\x1c\x8a\x9d \x18ORDER_TYPE_OPEN_POSITION\x12\x34\n\x15ORDER_TYPE_CLOSE_LONG\x10\x01\x1a\x19\x8a\x9d \x15ORDER_TYPE_CLOSE_LONG\x12\x36\n\x16ORDER_TYPE_CLOSE_SHORT\x10\x02\x1a\x1a\x8a\x9d \x16ORDER_TYPE_CLOSE_SHORT\x12\x36\n\x16ORDER_TYPE_LIQUIDATION\x10\x03\x1a\x1a\x8a\x9d \x16ORDER_TYPE_LIQUIDATION\x1a\x08\xa8\xa4\x1e\x01\x88\xa3\x1e\x00\x42\x33Z1git.wokoworks.com/blockchain/fx-chain/x/dex/typesb\x06proto3'
+  serialized_pb=b'\n\x12\x66x/dex/order.proto\x12\x06\x66x.dex\x1a\x14gogoproto/gogo.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x17\n\x08OrderIDs\x12\x0b\n\x03ids\x18\x01 \x03(\t\"\x98\x06\n\x05Order\x12\n\n\x02id\x18\x01 \x01(\t\x12@\n\x05owner\x18\x02 \x01(\x0c\x42\x31\xfa\xde\x1f-github.com/cosmos/cosmos-sdk/types.AccAddress\x12\x0f\n\x07pair_id\x18\x03 \x01(\t\x12$\n\tdirection\x18\x04 \x01(\x0e\x32\x11.fx.dex.Direction\x12=\n\x05price\x18\x05 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x45\n\rbase_quantity\x18\x06 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x46\n\x0equote_quantity\x18\x07 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12G\n\x0f\x66illed_quantity\x18\x08 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12H\n\x10\x66illed_avg_price\x18\t \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x45\n\rremain_locked\x18\n \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x10\n\x08leverage\x18\x0b \x01(\x03\x12#\n\x06status\x18\x0c \x01(\x0e\x32\x13.fx.dex.OrderStatus\x12%\n\norder_type\x18\r \x01(\x0e\x32\x11.fx.dex.OrderType\x12@\n\x08\x63ost_fee\x18\x0e \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x42\n\nlocked_fee\x18\x0f \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"-\n\x06Orders\x12#\n\x06orders\x18\x01 \x03(\x0b\x32\r.fx.dex.OrderB\x04\xc8\xde\x1f\x00*\x8d\x01\n\tDirection\x12\x12\n\x04\x42OTH\x10\x00\x1a\x08\x8a\x9d \x04\x42OTH\x12\x10\n\x03\x42UY\x10\x01\x1a\x07\x8a\x9d \x03\x42UY\x12\x12\n\x04SELL\x10\x02\x1a\x08\x8a\x9d \x04SELL\x12\x1c\n\tMarketBuy\x10\x03\x1a\r\x8a\x9d \tMarketBuy\x12\x1e\n\nMarketSell\x10\x04\x1a\x0e\x8a\x9d \nMarketSell\x1a\x08\xa8\xa4\x1e\x01\x88\xa3\x1e\x00*\xf1\x02\n\x0bOrderStatus\x12$\n\rORDER_PENDING\x10\x00\x1a\x11\x8a\x9d \rORDER_PENDING\x12\"\n\x0cORDER_FILLED\x10\x01\x1a\x10\x8a\x9d \x0cORDER_FILLED\x12\x32\n\x14ORDER_PARTIAL_FILLED\x10\x02\x1a\x18\x8a\x9d \x14ORDER_PARTIAL_FILLED\x12(\n\x0fORDER_CANCELLED\x10\x03\x1a\x13\x8a\x9d \x0fORDER_CANCELLED\x12\x46\n\x1eORDER_PARTIAL_FILLED_CANCELLED\x10\x04\x1a\"\x8a\x9d \x1eORDER_PARTIAL_FILLED_CANCELLED\x12\x42\n\x1cORDER_PARTIAL_FILLED_EXPIRED\x10\x05\x1a \x8a\x9d \x1cORDER_PARTIAL_FILLED_EXPIRED\x12$\n\rORDER_EXPIRED\x10\x06\x1a\x11\x8a\x9d \rORDER_EXPIRED\x1a\x08\xa8\xa4\x1e\x01\x88\xa3\x1e\x00*\xf7\x01\n\tOrderType\x12:\n\x18ORDER_TYPE_OPEN_POSITION\x10\x00\x1a\x1c\x8a\x9d \x18ORDER_TYPE_OPEN_POSITION\x12\x34\n\x15ORDER_TYPE_CLOSE_LONG\x10\x01\x1a\x19\x8a\x9d \x15ORDER_TYPE_CLOSE_LONG\x12\x36\n\x16ORDER_TYPE_CLOSE_SHORT\x10\x02\x1a\x1a\x8a\x9d \x16ORDER_TYPE_CLOSE_SHORT\x12\x36\n\x16ORDER_TYPE_LIQUIDATION\x10\x03\x1a\x1a\x8a\x9d \x16ORDER_TYPE_LIQUIDATION\x1a\x08\xa8\xa4\x1e\x01\x88\xa3\x1e\x00\x42\x33Z1git.wokoworks.com/blockchain/fx-chain/x/dex/typesb\x06proto3'
   ,
   dependencies=[gogoproto_dot_gogo__pb2.DESCRIPTOR,google_dot_protobuf_dot_timestamp__pb2.DESCRIPTOR,])
 
@@ -48,11 +48,21 @@ _DIRECTION = _descriptor.EnumDescriptor(
       serialized_options=b'\212\235 \004SELL',
       type=None,
       create_key=_descriptor._internal_create_key),
+    _descriptor.EnumValueDescriptor(
+      name='MarketBuy', index=3, number=3,
+      serialized_options=b'\212\235 \tMarketBuy',
+      type=None,
+      create_key=_descriptor._internal_create_key),
+    _descriptor.EnumValueDescriptor(
+      name='MarketSell', index=4, number=4,
+      serialized_options=b'\212\235 \nMarketSell',
+      type=None,
+      create_key=_descriptor._internal_create_key),
   ],
   containing_type=None,
   serialized_options=b'\250\244\036\001\210\243\036\000',
-  serialized_start=952,
-  serialized_end=1031,
+  serialized_start=953,
+  serialized_end=1094,
 )
 _sym_db.RegisterEnumDescriptor(_DIRECTION)
 
@@ -102,8 +112,8 @@ _ORDERSTATUS = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=b'\250\244\036\001\210\243\036\000',
-  serialized_start=1034,
-  serialized_end=1403,
+  serialized_start=1097,
+  serialized_end=1466,
 )
 _sym_db.RegisterEnumDescriptor(_ORDERSTATUS)
 
@@ -138,8 +148,8 @@ _ORDERTYPE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=b'\250\244\036\001\210\243\036\000',
-  serialized_start=1406,
-  serialized_end=1653,
+  serialized_start=1469,
+  serialized_end=1716,
 )
 _sym_db.RegisterEnumDescriptor(_ORDERTYPE)
 
@@ -147,6 +157,8 @@ OrderType = enum_type_wrapper.EnumTypeWrapper(_ORDERTYPE)
 BOTH = 0
 BUY = 1
 SELL = 2
+MarketBuy = 3
+MarketSell = 4
 ORDER_PENDING = 0
 ORDER_FILLED = 1
 ORDER_PARTIAL_FILLED = 2
@@ -393,6 +405,8 @@ _DIRECTION._options = None
 _DIRECTION.values_by_name["BOTH"]._options = None
 _DIRECTION.values_by_name["BUY"]._options = None
 _DIRECTION.values_by_name["SELL"]._options = None
+_DIRECTION.values_by_name["MarketBuy"]._options = None
+_DIRECTION.values_by_name["MarketSell"]._options = None
 _ORDERSTATUS._options = None
 _ORDERSTATUS.values_by_name["ORDER_PENDING"]._options = None
 _ORDERSTATUS.values_by_name["ORDER_FILLED"]._options = None
