@@ -1,9 +1,10 @@
 import os
-from gmail import GMail, Message
 import logging
 
 def send_mail(subject, text, recipients=None, attachments=[]):
     try:
+        from gmail import GMail, Message
+
         sender = os.environ['GMAIL_APP_EMAIL']
         password = os.environ['GMAIL_APP_PASSWORD']
 

@@ -25,7 +25,8 @@ class ScanBlockBase:
     max_block_height: int = None
 
     def __init__(self):
-        pass
+        # maps block height to deque
+        self.realized_positions: Dict[int, deque] = dict()
 
     """
      ************************ process Block ************************
@@ -319,11 +320,9 @@ class ScanBlock(ScanBlockBase):
     """process block event, then update to sql"""
 
     def __init__(self):
+        super().__init__()
         self.client = GRPCClient(constants.Network.get_grpc_url())
         self.crud = self.client.crud
-
-        # maps block height to deque
-        self.realized_positions: Dict[int, deque] = dict()
 
     def process_block_height(self, block: Block):
         sql_block = self.crud.filterone(
