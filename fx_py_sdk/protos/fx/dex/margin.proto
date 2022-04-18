@@ -5,14 +5,6 @@ import "gogoproto/gogo.proto";
 
 option go_package = "git.wokoworks.com/blockchain/fx-chain/x/dex/types";
 
-message MovingAverage {
-  repeated string average_price = 1 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
-    (gogoproto.nullable) = false
-  ];
-}
-
-
 //cumulative funding rates
 //keys: pairID + leverage --> NominalPosition + MantMarginRate
 message MarginRate {

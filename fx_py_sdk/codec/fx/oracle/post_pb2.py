@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=b'Z4git.wokoworks.com/blockchain/fx-chain/x/oracle/types',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x14\x66x/oracle/post.proto\x12\tfx.oracle\x1a\x14gogoproto/gogo.proto\"\xba\x01\n\x0bOraclePrice\x12\n\n\x02id\x18\x01 \x01(\t\x12?\n\x04\x66rom\x18\x02 \x01(\x0c\x42\x31\xfa\xde\x1f-github.com/cosmos/cosmos-sdk/types.AccAddress\x12\x0f\n\x07pair_id\x18\x03 \x01(\t\x12=\n\x05price\x18\x04 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x0e\n\x06\x65xpiry\x18\x05 \x01(\x03\"^\n\x0c\x43urrentPrice\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12=\n\x05price\x18\x02 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"E\n\rCurrentPrices\x12\x34\n\rcurrentPrices\x18\x01 \x03(\x0b\x32\x17.fx.oracle.CurrentPriceB\x04\xc8\xde\x1f\x00\"\x83\x01\n\x06Market\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12\x12\n\nbase_asset\x18\x02 \x01(\t\x12\x13\n\x0bquote_asset\x18\x03 \x01(\t\x12\x0e\n\x06\x61\x63tive\x18\x05 \x01(\x08\x12\x15\n\rprice_decimal\x18\x06 \x01(\x03\x12\x18\n\x10position_decimal\x18\x07 \x01(\x03\"]\n\x0bPostedPrice\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12=\n\x05price\x18\x03 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"B\n\x0cPostedPrices\x12\x32\n\x0cpostedPrices\x18\x01 \x03(\x0b\x32\x16.fx.oracle.PostedPriceB\x04\xc8\xde\x1f\x00\x42\x36Z4git.wokoworks.com/blockchain/fx-chain/x/oracle/typesb\x06proto3'
+  serialized_pb=b'\n\x14\x66x/oracle/post.proto\x12\tfx.oracle\x1a\x14gogoproto/gogo.proto\"\xba\x01\n\x0bOraclePrice\x12\n\n\x02id\x18\x01 \x01(\t\x12?\n\x04\x66rom\x18\x02 \x01(\x0c\x42\x31\xfa\xde\x1f-github.com/cosmos/cosmos-sdk/types.AccAddress\x12\x0f\n\x07pair_id\x18\x03 \x01(\t\x12=\n\x05price\x18\x04 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x0e\n\x06\x65xpiry\x18\x05 \x01(\x03\"^\n\x0c\x43urrentPrice\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12=\n\x05price\x18\x02 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"E\n\rCurrentPrices\x12\x34\n\rcurrentPrices\x18\x01 \x03(\x0b\x32\x17.fx.oracle.CurrentPriceB\x04\xc8\xde\x1f\x00\"\x97\x01\n\x06Market\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12\x12\n\nbase_asset\x18\x02 \x01(\t\x12\x13\n\x0bquote_asset\x18\x03 \x01(\t\x12\x0e\n\x06\x61\x63tive\x18\x05 \x01(\x08\x12\x15\n\rprice_decimal\x18\x06 \x01(\x03\x12\x18\n\x10position_decimal\x18\x07 \x01(\x03\x12\x12\n\x04type\x18\x08 \x01(\tB\x04\xc8\xde\x1f\x01\"]\n\x0bPostedPrice\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12=\n\x05price\x18\x03 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"B\n\x0cPostedPrices\x12\x32\n\x0cpostedPrices\x18\x01 \x03(\x0b\x32\x16.fx.oracle.PostedPriceB\x04\xc8\xde\x1f\x00\x42\x36Z4git.wokoworks.com/blockchain/fx-chain/x/oracle/typesb\x06proto3'
   ,
   dependencies=[gogoproto_dot_gogo__pb2.DESCRIPTOR,])
 
@@ -208,6 +208,13 @@ _MARKET = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='type', full_name='fx.oracle.Market.type', index=6,
+      number=8, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=b'\310\336\037\001', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -221,7 +228,7 @@ _MARKET = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=414,
-  serialized_end=545,
+  serialized_end=565,
 )
 
 
@@ -259,8 +266,8 @@ _POSTEDPRICE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=547,
-  serialized_end=640,
+  serialized_start=567,
+  serialized_end=660,
 )
 
 
@@ -291,8 +298,8 @@ _POSTEDPRICES = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=642,
-  serialized_end=708,
+  serialized_start=662,
+  serialized_end=728,
 )
 
 _CURRENTPRICES.fields_by_name['currentPrices'].message_type = _CURRENTPRICE
@@ -353,6 +360,7 @@ _ORACLEPRICE.fields_by_name['from']._options = None
 _ORACLEPRICE.fields_by_name['price']._options = None
 _CURRENTPRICE.fields_by_name['price']._options = None
 _CURRENTPRICES.fields_by_name['currentPrices']._options = None
+_MARKET.fields_by_name['type']._options = None
 _POSTEDPRICE.fields_by_name['price']._options = None
 _POSTEDPRICES.fields_by_name['postedPrices']._options = None
 # @@protoc_insertion_point(module_scope)

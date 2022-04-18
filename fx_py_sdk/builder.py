@@ -10,7 +10,7 @@ from fx_py_sdk.codec.cosmos.tx.signing.v1beta1.signing_pb2 import SIGN_MODE_DIRE
 from google.protobuf.any_pb2 import Any
 from fx_py_sdk.wallet import PrivateKey, Address
 
-DEFAULT_DENOM = "FX"
+DEFAULT_DENOM = "USDT"
 
 
 class TxBuilder:

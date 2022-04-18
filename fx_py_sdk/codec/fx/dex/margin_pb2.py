@@ -20,43 +20,11 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=b'Z1git.wokoworks.com/blockchain/fx-chain/x/dex/types',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x13\x66x/dex/margin.proto\x12\x06\x66x.dex\x1a\x14gogoproto/gogo.proto\"V\n\rMovingAverage\x12\x45\n\raverage_price\x18\x01 \x03(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"\x8a\x02\n\nMarginRate\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12\x10\n\x08leverage\x18\x02 \x01(\x04\x12H\n\x10nominal_position\x18\x03 \x03(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12I\n\x11maint_margin_rate\x18\x04 \x03(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x44\n\x0cmaint_amount\x18\x05 \x03(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"\xd1\x01\n\x0eInitMarginRate\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12\x14\n\x0cmax_leverage\x18\x02 \x01(\x04\x12H\n\x10nominal_position\x18\x03 \x03(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x10\n\x08Leverage\x18\x04 \x03(\r\x12<\n\x04Rate\x18\x05 \x03(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x42\x33Z1git.wokoworks.com/blockchain/fx-chain/x/dex/typesb\x06proto3'
+  serialized_pb=b'\n\x13\x66x/dex/margin.proto\x12\x06\x66x.dex\x1a\x14gogoproto/gogo.proto\"\x8a\x02\n\nMarginRate\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12\x10\n\x08leverage\x18\x02 \x01(\x04\x12H\n\x10nominal_position\x18\x03 \x03(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12I\n\x11maint_margin_rate\x18\x04 \x03(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x44\n\x0cmaint_amount\x18\x05 \x03(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"\xd1\x01\n\x0eInitMarginRate\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12\x14\n\x0cmax_leverage\x18\x02 \x01(\x04\x12H\n\x10nominal_position\x18\x03 \x03(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x10\n\x08Leverage\x18\x04 \x03(\r\x12<\n\x04Rate\x18\x05 \x03(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x42\x33Z1git.wokoworks.com/blockchain/fx-chain/x/dex/typesb\x06proto3'
   ,
   dependencies=[gogoproto_dot_gogo__pb2.DESCRIPTOR,])
 
 
-
-
-_MOVINGAVERAGE = _descriptor.Descriptor(
-  name='MovingAverage',
-  full_name='fx.dex.MovingAverage',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='average_price', full_name='fx.dex.MovingAverage.average_price', index=0,
-      number=1, type=9, cpp_type=9, label=3,
-      has_default_value=False, default_value=[],
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=b'\332\336\037&github.com/cosmos/cosmos-sdk/types.Dec\310\336\037\000', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=53,
-  serialized_end=139,
-)
 
 
 _MARGINRATE = _descriptor.Descriptor(
@@ -114,8 +82,8 @@ _MARGINRATE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=142,
-  serialized_end=408,
+  serialized_start=54,
+  serialized_end=320,
 )
 
 
@@ -174,21 +142,13 @@ _INITMARGINRATE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=411,
-  serialized_end=620,
+  serialized_start=323,
+  serialized_end=532,
 )
 
-DESCRIPTOR.message_types_by_name['MovingAverage'] = _MOVINGAVERAGE
 DESCRIPTOR.message_types_by_name['MarginRate'] = _MARGINRATE
 DESCRIPTOR.message_types_by_name['InitMarginRate'] = _INITMARGINRATE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
-
-MovingAverage = _reflection.GeneratedProtocolMessageType('MovingAverage', (_message.Message,), {
-  'DESCRIPTOR' : _MOVINGAVERAGE,
-  '__module__' : 'fx.dex.margin_pb2'
-  # @@protoc_insertion_point(class_scope:fx.dex.MovingAverage)
-  })
-_sym_db.RegisterMessage(MovingAverage)
 
 MarginRate = _reflection.GeneratedProtocolMessageType('MarginRate', (_message.Message,), {
   'DESCRIPTOR' : _MARGINRATE,
@@ -206,7 +166,6 @@ _sym_db.RegisterMessage(InitMarginRate)
 
 
 DESCRIPTOR._options = None
-_MOVINGAVERAGE.fields_by_name['average_price']._options = None
 _MARGINRATE.fields_by_name['nominal_position']._options = None
 _MARGINRATE.fields_by_name['maint_margin_rate']._options = None
 _MARGINRATE.fields_by_name['maint_amount']._options = None

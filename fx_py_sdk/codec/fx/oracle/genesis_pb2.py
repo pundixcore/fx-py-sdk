@@ -21,7 +21,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=b'Z4git.wokoworks.com/blockchain/fx-chain/x/oracle/types',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x17\x66x/oracle/genesis.proto\x12\tfx.oracle\x1a\x14\x66x/oracle/post.proto\x1a\x14gogoproto/gogo.proto\"\xcd\x01\n\x0cGenesisState\x12\'\n\x06params\x18\x01 \x01(\x0b\x32\x11.fx.oracle.ParamsB\x04\xc8\xde\x1f\x00\x12\x33\n\x0cpostedPrices\x18\x02 \x01(\x0b\x32\x17.fx.oracle.PostedPricesB\x04\xc8\xde\x1f\x00\x12/\n\nbandOracle\x18\x03 \x01(\x0b\x32\x15.fx.oracle.BandOracleB\x04\xc8\xde\x1f\x00\x12.\n\taggrators\x18\x04 \x03(\x0b\x32\x15.fx.oracle.AggregatorB\x04\xc8\xde\x1f\x00\"2\n\x06Params\x12(\n\x07markets\x18\x01 \x03(\x0b\x32\x11.fx.oracle.MarketB\x04\xc8\xde\x1f\x00\"\xa9\x01\n\nBandOracle\x12\x13\n\x0brequest_key\x18\x01 \x01(\t\x12\x18\n\x10oracle_script_id\x18\x02 \x01(\x03\x12\x12\n\nmultiplier\x18\x03 \x01(\x04\x12\x13\n\x0bibc_version\x18\x04 \x01(\t\x12\x0f\n\x07\x63hannel\x18\x05 \x01(\t\x12\x0c\n\x04port\x18\x06 \x01(\t\x12\x11\n\task_count\x18\x07 \x01(\x04\x12\x11\n\tmin_count\x18\x08 \x01(\x04\"X\n\x06\x41nswer\x12\x0e\n\x06oracle\x18\x01 \x01(\t\x12>\n\x06\x61nswer\x18\x02 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"\x93\x01\n\nAggregator\x12\x0e\n\x06symbol\x18\x01 \x01(\t\x12-\n\x06\x63onfig\x18\x02 \x01(\x0b\x32\x17.fx.oracle.OracleConfigB\x04\xc8\xde\x1f\x00\x12\x18\n\x10round_start_time\x18\x03 \x01(\x03\x12,\n\x0bsubmissions\x18\x04 \x03(\x0b\x32\x11.fx.oracle.AnswerB\x04\xc8\xde\x1f\x00\"Z\n\x0cOracleConfig\x12\x0f\n\x07oracles\x18\x01 \x03(\t\x12\x1c\n\x14min_answer_threshold\x18\x02 \x01(\r\x12\x1b\n\x13staleness_threshold\x18\x03 \x01(\x03\x42\x36Z4git.wokoworks.com/blockchain/fx-chain/x/oracle/typesb\x06proto3'
+  serialized_pb=b'\n\x17\x66x/oracle/genesis.proto\x12\tfx.oracle\x1a\x14\x66x/oracle/post.proto\x1a\x14gogoproto/gogo.proto\"\x97\x02\n\x0cGenesisState\x12(\n\x07markets\x18\x01 \x03(\x0b\x32\x11.fx.oracle.MarketB\x04\xc8\xde\x1f\x00\x12\x33\n\x0cpostedPrices\x18\x02 \x01(\x0b\x32\x17.fx.oracle.PostedPricesB\x04\xc8\xde\x1f\x00\x12/\n\nbandOracle\x18\x03 \x01(\x0b\x32\x15.fx.oracle.BandOracleB\x04\xc8\xde\x1f\x00\x12.\n\taggrators\x18\x04 \x03(\x0b\x32\x15.fx.oracle.AggregatorB\x04\xc8\xde\x1f\x00\x12.\n\x06prices\x18\x05 \x01(\x0b\x32\x18.fx.oracle.CurrentPricesB\x04\xc8\xde\x1f\x00\x12\x17\n\x0foracleRequestId\x18\x06 \x01(\x04\"\x08\n\x06Params\"\xa9\x01\n\nBandOracle\x12\x13\n\x0brequest_key\x18\x01 \x01(\t\x12\x18\n\x10oracle_script_id\x18\x02 \x01(\x03\x12\x12\n\nmultiplier\x18\x03 \x01(\x04\x12\x13\n\x0bibc_version\x18\x04 \x01(\t\x12\x0f\n\x07\x63hannel\x18\x05 \x01(\t\x12\x0c\n\x04port\x18\x06 \x01(\t\x12\x11\n\task_count\x18\x07 \x01(\x04\x12\x11\n\tmin_count\x18\x08 \x01(\x04\"X\n\x06\x41nswer\x12\x0e\n\x06oracle\x18\x01 \x01(\t\x12>\n\x06\x61nswer\x18\x02 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"\xa7\x01\n\nAggregator\x12\x0e\n\x06symbol\x18\x01 \x01(\t\x12-\n\x06\x63onfig\x18\x02 \x01(\x0b\x32\x17.fx.oracle.OracleConfigB\x04\xc8\xde\x1f\x00\x12\x18\n\x10round_start_time\x18\x03 \x01(\x03\x12,\n\x0bsubmissions\x18\x04 \x03(\x0b\x32\x11.fx.oracle.AnswerB\x04\xc8\xde\x1f\x00\x12\x12\n\x04type\x18\x05 \x01(\tB\x04\xc8\xde\x1f\x01\"Z\n\x0cOracleConfig\x12\x0f\n\x07oracles\x18\x01 \x03(\t\x12\x1c\n\x14min_answer_threshold\x18\x02 \x01(\r\x12\x1b\n\x13staleness_threshold\x18\x03 \x01(\x03\x42\x36Z4git.wokoworks.com/blockchain/fx-chain/x/oracle/typesb\x06proto3'
   ,
   dependencies=[fx_dot_oracle_dot_post__pb2.DESCRIPTOR,gogoproto_dot_gogo__pb2.DESCRIPTOR,])
 
@@ -37,9 +37,9 @@ _GENESISSTATE = _descriptor.Descriptor(
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='params', full_name='fx.oracle.GenesisState.params', index=0,
-      number=1, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
+      name='markets', full_name='fx.oracle.GenesisState.markets', index=0,
+      number=1, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=b'\310\336\037\000', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
@@ -64,6 +64,20 @@ _GENESISSTATE = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=b'\310\336\037\000', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='prices', full_name='fx.oracle.GenesisState.prices', index=4,
+      number=5, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=b'\310\336\037\000', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='oracleRequestId', full_name='fx.oracle.GenesisState.oracleRequestId', index=5,
+      number=6, type=4, cpp_type=4, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -77,7 +91,7 @@ _GENESISSTATE = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=83,
-  serialized_end=288,
+  serialized_end=362,
 )
 
 
@@ -89,13 +103,6 @@ _PARAMS = _descriptor.Descriptor(
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
-    _descriptor.FieldDescriptor(
-      name='markets', full_name='fx.oracle.Params.markets', index=0,
-      number=1, type=11, cpp_type=10, label=3,
-      has_default_value=False, default_value=[],
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=b'\310\336\037\000', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -108,8 +115,8 @@ _PARAMS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=290,
-  serialized_end=340,
+  serialized_start=364,
+  serialized_end=372,
 )
 
 
@@ -189,8 +196,8 @@ _BANDORACLE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=343,
-  serialized_end=512,
+  serialized_start=375,
+  serialized_end=544,
 )
 
 
@@ -228,8 +235,8 @@ _ANSWER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=514,
-  serialized_end=602,
+  serialized_start=546,
+  serialized_end=634,
 )
 
 
@@ -269,6 +276,13 @@ _AGGREGATOR = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=b'\310\336\037\000', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='type', full_name='fx.oracle.Aggregator.type', index=4,
+      number=5, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=b'\310\336\037\001', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -281,8 +295,8 @@ _AGGREGATOR = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=605,
-  serialized_end=752,
+  serialized_start=637,
+  serialized_end=804,
 )
 
 
@@ -327,15 +341,15 @@ _ORACLECONFIG = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=754,
-  serialized_end=844,
+  serialized_start=806,
+  serialized_end=896,
 )
 
-_GENESISSTATE.fields_by_name['params'].message_type = _PARAMS
+_GENESISSTATE.fields_by_name['markets'].message_type = fx_dot_oracle_dot_post__pb2._MARKET
 _GENESISSTATE.fields_by_name['postedPrices'].message_type = fx_dot_oracle_dot_post__pb2._POSTEDPRICES
 _GENESISSTATE.fields_by_name['bandOracle'].message_type = _BANDORACLE
 _GENESISSTATE.fields_by_name['aggrators'].message_type = _AGGREGATOR
-_PARAMS.fields_by_name['markets'].message_type = fx_dot_oracle_dot_post__pb2._MARKET
+_GENESISSTATE.fields_by_name['prices'].message_type = fx_dot_oracle_dot_post__pb2._CURRENTPRICES
 _AGGREGATOR.fields_by_name['config'].message_type = _ORACLECONFIG
 _AGGREGATOR.fields_by_name['submissions'].message_type = _ANSWER
 DESCRIPTOR.message_types_by_name['GenesisState'] = _GENESISSTATE
@@ -390,12 +404,13 @@ _sym_db.RegisterMessage(OracleConfig)
 
 
 DESCRIPTOR._options = None
-_GENESISSTATE.fields_by_name['params']._options = None
+_GENESISSTATE.fields_by_name['markets']._options = None
 _GENESISSTATE.fields_by_name['postedPrices']._options = None
 _GENESISSTATE.fields_by_name['bandOracle']._options = None
 _GENESISSTATE.fields_by_name['aggrators']._options = None
-_PARAMS.fields_by_name['markets']._options = None
+_GENESISSTATE.fields_by_name['prices']._options = None
 _ANSWER.fields_by_name['answer']._options = None
 _AGGREGATOR.fields_by_name['config']._options = None
 _AGGREGATOR.fields_by_name['submissions']._options = None
+_AGGREGATOR.fields_by_name['type']._options = None
 # @@protoc_insertion_point(module_scope)

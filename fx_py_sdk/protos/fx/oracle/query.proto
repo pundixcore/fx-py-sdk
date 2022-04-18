@@ -30,8 +30,8 @@ service Query {
   }
   rpc GetLatestOracleRequest(QueryLatestOracleRequest) returns (BandOracleRequest){}
 
-  rpc GetAggrators(QueryAggregatorsRequest) returns (QueryAggregatorsResponse) {
-    option (google.api.http).get = "/oracle/aggragors";
+  rpc GetAggregators(QueryAggregatorsRequest) returns (QueryAggregatorsResponse) {
+    option (google.api.http).get = "/oracle/aggregators";
   }
 }
 

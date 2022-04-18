@@ -83,7 +83,6 @@ class DB:
 
 
 class Order(NamedTuple):
-    TxHash: str
     Id: str
     Owner: str
     PairId: str

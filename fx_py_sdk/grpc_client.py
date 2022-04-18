@@ -42,7 +42,7 @@ from fx_py_sdk.model.model import HedgingOrder, HedgingTrade, Order as CrudOrder
 
 DEFAULT_DEX_GAS = 5000000
 DEFAULT_GRPC_NONE = "Not found"
-DEFAULT_DEC = 1000000000000000000
+DEFAULT_DEC = 1000000
 
 
 class GRPCClient:
@@ -155,7 +155,6 @@ class GRPCClient:
                 locked_fee = decimal.Decimal(order['lockedFee'])
 
                 new_order = Order(
-                    order['txHash'],
                     order['orderId'],
                     order['ownerAddress'],
                     order['pair'],
@@ -170,8 +169,7 @@ class GRPCClient:
                     order['statusName'],
                     order['orderTypeName'],
                     cost_fee,
-                    locked_fee,
-                    order['blockTime'],)
+                    locked_fee,)
 
                 orders.append(new_order)
 
@@ -305,7 +303,7 @@ class GRPCClient:
                 locked_fee	string｜ 锁定费用
 
                 example:
-                    Order(TxHash='F6EA065DD58257AE1AB2F22AE45040A1F8E747E5668F3E8DF857CA222B38B85A', Id='ID-706-1', Owner='dex1ggz598a4506llaglzsmhp3r23hfke6nw29wans', PairId='tsla:usdc', Direction=0, Price=1000.4, BaseQuantity=0.5, QuoteQuantity=50.02, FilledQuantity=0.0, FilledAvgPrice=0.0, RemainLocked=500.2, Leverage=10, Status=0, OrderType=0, CostFee=0.0, LockedFee=0.20008)
+                    Order(Id='ID-706-1', Owner='dex1ggz598a4506llaglzsmhp3r23hfke6nw29wans', PairId='tsla:usdc', Direction=0, Price=1000.4, BaseQuantity=0.5, QuoteQuantity=50.02, FilledQuantity=0.0, FilledAvgPrice=0.0, RemainLocked=500.2, Leverage=10, Status=0, OrderType=0, CostFee=0.0, LockedFee=0.20008)
         """
         if not use_db:
             response = DexQuery(self.channel).QueryOrder(
@@ -417,8 +415,8 @@ class GRPCClient:
             Returns:
                 orders	Orders	订单列表
                 example:
-            [Order(TxHash='236A2424826BE4C3F75F33B2835E47063F1F7077D8AFC63CFAE73C31A9810BF9', Id='ID-5-1', Owner='dex1ggz598a4506llaglzsmhp3r23hfke6nw29wans', PairId='tsla:usdc', Direction=0, Price=1000.4, BaseQuantity=0.5, QuoteQuantity=50.02, FilledQuantity=0.0, FilledAvgPrice=0.0, RemainLocked=500.2, Leverage=10, Status=0, OrderType=0, CostFee=0.0, LockedFee=0.20008),
-            Order(TxHash='3F9656C61695AFCE827ADC19D5B2E51CA9B5682E1EC4020DD091E4C9DD1F83FF', Id='ID-7-1', Owner='dex1ggz598a4506llaglzsmhp3r23hfke6nw29wans', PairId='tsla:usdc', Direction=0, Price=1000.4, BaseQuantity=0.5, QuoteQuantity=50.02, FilledQuantity=0.0, FilledAvgPrice=0.0, RemainLocked=500.2, Leverage=10, Status=0, OrderType=0, CostFee=0.0, LockedFee=0.20008)]
+            [Order(Id='ID-5-1', Owner='dex1ggz598a4506llaglzsmhp3r23hfke6nw29wans', PairId='tsla:usdc', Direction=0, Price=1000.4, BaseQuantity=0.5, QuoteQuantity=50.02, FilledQuantity=0.0, FilledAvgPrice=0.0, RemainLocked=500.2, Leverage=10, Status=0, OrderType=0, CostFee=0.0, LockedFee=0.20008),
+            Order(Id='ID-7-1', Owner='dex1ggz598a4506llaglzsmhp3r23hfke6nw29wans', PairId='tsla:usdc', Direction=0, Price=1000.4, BaseQuantity=0.5, QuoteQuantity=50.02, FilledQuantity=0.0, FilledAvgPrice=0.0, RemainLocked=500.2, Leverage=10, Status=0, OrderType=0, CostFee=0.0, LockedFee=0.20008)]
         """
 
         orders = []
@@ -589,7 +587,7 @@ class GRPCClient:
         """
         try:
             response = DexQuery(self.channel).QueryPairFundingRates(QueryPairFundingRatesReq(
-                pair_id=pair_id, funding_times=funding_times, query_all=query_all))
+                last_or_realtime=True))
             res_str = MessageToJson(response)
             res = json.loads(res_str)
             for rate in res['pairFundingRates']:
@@ -622,30 +620,30 @@ class GRPCClient:
             print("query error: ", e)
             return e
 
-    def query_funding_rate_log(self, pair_id):
-        """查询变动资金费率.
-            Args:
-                pair_id: 交易对
-            Returns:
-                Asks：卖单
-                    price：价格
-                    quantity：数量
-                Bids：买单
-                {'pairFundingRates': {'pairId': 'tsla:usdt', 'fundingRate': '0.133420164103952947', 'fundingTime': '1639474025'}}
-        """
-        try:
-            response = DexQuery(self.channel).QueryFundingRate(
-                QueryOrderbookReq(pair_id=pair_id))
-            res_str = MessageToJson(response)
-            res = json.loads(res_str)
-            funding_rate = decimal.Decimal(
-                res['pairFundingRates']['fundingRate'])
-            funding_rate = funding_rate / decimal.Decimal(DEFAULT_DEC)
-            res['pairFundingRates']['fundingRate'] = str(funding_rate)
-            return res
-        except Exception as e:
-            print("query error: ", e)
-            return e
+    # def query_funding_rate_log(self, pair_id):
+    #     """查询变动资金费率.
+    #         Args:
+    #             pair_id: 交易对
+    #         Returns:
+    #             Asks：卖单
+    #                 price：价格
+    #                 quantity：数量
+    #             Bids：买单
+    #             {'pairFundingRates': {'pairId': 'tsla:usdt', 'fundingRate': '0.133420164103952947', 'fundingTime': '1639474025'}}
+    #     """
+    #     try:
+    #         response = DexQuery(self.channel).QueryFundingRate(
+    #             QueryOrderbookReq(pair_id=pair_id))
+    #         res_str = MessageToJson(response)
+    #         res = json.loads(res_str)
+    #         funding_rate = decimal.Decimal(
+    #             res['pairFundingRates']['fundingRate'])
+    #         funding_rate = funding_rate / decimal.Decimal(DEFAULT_DEC)
+    #         res['pairFundingRates']['fundingRate'] = str(funding_rate)
+    #         return res
+    #     except Exception as e:
+    #         print("query error: ", e)
+    #         return e
 
     def query_funding_payments(self, address: str=None, pair_id: str=None, from_datetime: datetime=None):
         return self.crud.get_funding_transfers(

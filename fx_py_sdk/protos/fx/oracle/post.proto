@@ -36,6 +36,7 @@ message Market {
   bool	active = 5;
   int64 price_decimal = 6;
   int64 position_decimal = 7;
+  string type = 8 [(gogoproto.nullable) = true];
 }
 
 message PostedPrice {

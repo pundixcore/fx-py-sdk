@@ -17,6 +17,7 @@ message MsgOracleRequest {
   uint64 prepare_gas = 2;
   uint64 execute_gas = 3;
   cosmos.base.v1beta1.Coin fee_limit = 4 [(gogoproto.nullable) = false];
+  string market_type = 5 [(gogoproto.nullable) = true];
 }
 
 message MsgOracleResponse {

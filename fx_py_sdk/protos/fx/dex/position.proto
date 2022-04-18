@@ -23,18 +23,16 @@ message PositionIDs {
   repeated PositionID position_ids = 1 [(gogoproto.nullable) = false];
 }
 
-//BOTH字段仅供查询使用，开仓只能选择BID或ASK
 enum PosDirection {
   option (gogoproto.goproto_enum_stringer) = true;
   option (gogoproto.goproto_enum_prefix)   = false;
 
-  LONG = 0 [(gogoproto.enumvalue_customname) = "LONG"];
-  SHORT  = 1 [(gogoproto.enumvalue_customname) = "SHORT"];
-  ALL  = 2 [(gogoproto.enumvalue_customname) = "ALL"];
+  POSITIONBOTH = 0[(gogoproto.enumvalue_customname) = "POSITIONBOTH"];
+  LONG = 1 [(gogoproto.enumvalue_customname) = "LONG"];
+  SHORT  = 2 [(gogoproto.enumvalue_customname) = "SHORT"];
 }
 
-//持仓凭证信息
-// fundingfee (正+: trader paid, 负-: trader received)
+// fundingfee (+: trader paid, -: trader received)
 // lastUpdateCumuFundingRate： calculating funding payment, record when trader open/reduce/close position
 message Position {
   string id = 1 [

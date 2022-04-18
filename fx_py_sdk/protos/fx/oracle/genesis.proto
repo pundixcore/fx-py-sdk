@@ -7,14 +7,15 @@ option go_package = "git.wokoworks.com/blockchain/fx-chain/x/oracle/types";
 import "gogoproto/gogo.proto";
 // GenesisState defines the oracle module's genesis state.
 message GenesisState {
-    Params params = 1 [(gogoproto.nullable) = false];
+    repeated Market markets = 1 [(gogoproto.nullable) = false];
     PostedPrices postedPrices = 2 [(gogoproto.nullable) = false];
     BandOracle bandOracle = 3 [(gogoproto.nullable) = false];
     repeated Aggregator aggrators = 4 [(gogoproto.nullable) = false];
+    CurrentPrices prices = 5 [(gogoproto.nullable) = false];
+    uint64 oracleRequestId = 6;
 }
 
 message Params {
-    repeated Market markets = 1 [(gogoproto.nullable) = false];
 }
 
 message BandOracle {
@@ -45,6 +46,7 @@ message Aggregator {
     repeated Answer submissions = 4 [
         (gogoproto.nullable) = false
     ];
+    string type = 5 [(gogoproto.nullable) = true];
 }
 
 message OracleConfig {
