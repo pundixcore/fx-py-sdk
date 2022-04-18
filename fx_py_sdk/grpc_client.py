@@ -746,7 +746,7 @@ class GRPCClient:
             account = self.query_account_info(tx_builder.address())
             tx_builder.account_number = account.account_number
 
-        gas_price_amount = int(tx_builder.gas_price.amount)
+        gas_price_amount = int(tx_builder.gas_price.amount) / DEFAULT_DEC
         fee_denom = tx_builder.gas_price.denom
         if gas_price_amount <= 0:
             # 如果未设置gas price 查询链上gas price
@@ -757,7 +757,7 @@ class GRPCClient:
         if gas_limit <= 0:
             # 计算默认的gas amount
             fee_amount = Coin(amount=str(
-                gas_limit * gas_price_amount), denom=fee_denom)
+                round(gas_limit * gas_price_amount)), denom=fee_denom)
             fee = Fee(amount=[fee_amount], gas_limit=gas_limit)
             tx = tx_builder.sign(acc_seq, msg, fee)
             # 估算gas limit
@@ -765,7 +765,7 @@ class GRPCClient:
             gas_limit = int(float(gas_info.gas_used) * 1.5)
 
         fee_amount = Coin(amount=str(
-            gas_limit * gas_price_amount), denom=fee_denom)
+            round(gas_limit * gas_price_amount)), denom=fee_denom)
         fee = Fee(amount=[fee_amount], gas_limit=gas_limit)
         return tx_builder.sign(acc_seq, msg, fee)
 

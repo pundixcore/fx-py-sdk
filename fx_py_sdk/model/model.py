@@ -26,6 +26,7 @@ class Order(Base):
     id = Column('id', Integer, primary_key=True, autoincrement=True)
     block_height = Column(Integer, index=True)
     order_id = Column(String(100), nullable=False, unique=True)
+    tx_hash = Column(String(64))
     owner = Column(String(42))
     liquidation_owner = Column(String(42))
     pair_id = Column(String(20), index=True)
