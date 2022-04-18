@@ -25,7 +25,8 @@ class ScanBlockBase:
     max_block_height: int = None
 
     def __init__(self):
-        pass
+        # maps block height to deque
+        self.realized_positions: Dict[int, deque] = dict()
 
     """
      ************************ process Block ************************
@@ -138,7 +139,6 @@ class ScanBlockBase:
 
     def get_order(self, attributes: []) -> Order:
         """decode order data"""
-
         order = Order()
         for attribute in attributes:
             key = base64.b64decode(attribute[BlockResponse.Key]).decode('utf8')
@@ -323,9 +323,6 @@ class ScanBlock(ScanBlockBase):
     def __init__(self):
         self.client = GRPCClient(constants.Network.get_grpc_url())
         self.crud = self.client.crud
-
-        # maps block height to deque
-        self.realized_positions: Dict[int, deque] = dict()
 
     def process_block_height(self, block: Block):
         sql_block = self.crud.filterone(
@@ -666,6 +663,9 @@ class ScanBlock(ScanBlockBase):
 
     def process_tx_events(self, tx_events, block_height):
         """process fxdex chain Transaction events"""
+        if tx_events is None:
+            return
+
         for event in tx_events:
             if event[BlockResponse.TYPE] == EventTypes.Order or event[
                     BlockResponse.TYPE] == EventTypes.Close_position_order:
