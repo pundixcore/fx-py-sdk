@@ -92,7 +92,7 @@ message MsgClosePosition {
         (gogoproto.nullable) = false
     ];
     bool full_close = 6;
-    bool market_close = 7;
+//    bool market_close = 7;
 }
 
 message MsgClosePositionResp {
