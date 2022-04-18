@@ -333,7 +333,7 @@ class GRPCClient:
             locked_fee = decimal.Decimal(order.locked_fee)
             locked_fee = locked_fee / decimal.Decimal(DEFAULT_DEC)
             new_order = Order(
-                order.tx_hash,
+                # order.tx_hash,
                 order.id,
                 Address(order.owner).to_string(),
                 order.pair_id,
@@ -349,7 +349,7 @@ class GRPCClient:
                 order.order_type,
                 cost_fee,
                 locked_fee,
-                order.created_at.ToSeconds()
+                # order.created_at.ToSeconds()
             )
 
         else:
@@ -361,7 +361,7 @@ class GRPCClient:
 
             order = response.Order
             new_order = Order(
-                order.tx_hash,
+                # order.tx_hash,
                 order.order_id,
                 Address(order.owner).to_string(),
                 order.pair_id,
@@ -377,7 +377,7 @@ class GRPCClient:
                 order.order_type,
                 order.cost_fee,
                 order.locked_fee,
-                order.created_at,
+                # order.created_at,
                 order.last_filled_quantity,
                 response.time,
                 trades
@@ -453,7 +453,7 @@ class GRPCClient:
                 locked_fee = locked_fee / decimal.Decimal(DEFAULT_DEC)
 
                 new_order = Order(
-                    order.tx_hash,
+                    # order.tx_hash,
                     order.id,
                     Address(order.owner).to_string(),
                     order.pair_id,
@@ -469,7 +469,8 @@ class GRPCClient:
                     order.order_type,
                     cost_fee,
                     locked_fee,
-                    MessageToJson(order.created_at),)
+                    # MessageToJson(order.created_at),
+                )
 
                 orders.append(new_order)
 
@@ -503,7 +504,7 @@ class GRPCClient:
             for response in sql_orders:
                 order: CrudOrder = response.Order
                 new_order = Order(
-                    order.tx_hash,
+                    # order.tx_hash,
                     order.order_id,
                     Address(order.owner).to_string(),
                     order.pair_id,
@@ -519,7 +520,7 @@ class GRPCClient:
                     order.order_type,
                     order.cost_fee,
                     order.locked_fee,
-                    order.created_at,
+                    # order.created_at,
                     order.last_filled_quantity,
                     response.time,
                     order_trades[order.order_id] if include_trades else None

@@ -17,7 +17,7 @@ class TxBuilder:
     def __init__(self, private_key: PrivateKey,
                  chain_id: str = '',
                  account_number: int = -1,
-                 gas_price: Coin = Coin(amount='0', denom=DEFAULT_DENOM)):
+                 gas_price: Coin = Coin(amount='3000', denom=DEFAULT_DENOM)):
         self.chain_id = chain_id
         self.account_number = account_number
         if gas_price.denom == '':
