@@ -13,6 +13,7 @@ _sym_db = _symbol_database.Default()
 
 from fx_py_sdk.codec.gogoproto import gogo_pb2 as gogoproto_dot_gogo__pb2
 from fx_py_sdk.codec.fx.dex import order_pb2 as fx_dot_dex_dot_order__pb2
+from fx_py_sdk.codec.cosmos.base.v1beta1 import coin_pb2 as cosmos_dot_base_dot_v1beta1_dot_coin__pb2
 
 
 DESCRIPTOR = _descriptor.FileDescriptor(
@@ -21,9 +22,9 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=b'Z1git.wokoworks.com/blockchain/fx-chain/x/dex/types',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x0f\x66x/dex/tx.proto\x12\x06\x66x.dex\x1a\x14gogoproto/gogo.proto\x1a\x12\x66x/dex/order.proto\"\xa1\x02\n\x0eMsgCreateOrder\x12@\n\x05owner\x18\x01 \x01(\x0c\x42\x31\xfa\xde\x1f-github.com/cosmos/cosmos-sdk/types.AccAddress\x12\x0f\n\x07pair_id\x18\x02 \x01(\t\x12$\n\tdirection\x18\x03 \x01(\x0e\x32\x11.fx.dex.Direction\x12=\n\x05price\x18\x04 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x45\n\rbase_quantity\x18\x05 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x10\n\x08leverage\x18\x06 \x01(\x03\"*\n\x16MsgCreateOrderResponse\x12\x10\n\x08order_id\x18\x01 \x01(\t\"d\n\x0eMsgCancelOrder\x12@\n\x05owner\x18\x01 \x01(\x0c\x42\x31\xfa\xde\x1f-github.com/cosmos/cosmos-sdk/types.AccAddress\x12\x10\n\x08order_id\x18\x02 \x01(\t\"\x18\n\x16MsgCancelOrderResponse\"\xe7\x01\n\x0cMsgAddMargin\x12@\n\x05owner\x18\x01 \x01(\x0c\x42\x31\xfa\xde\x1f-github.com/cosmos/cosmos-sdk/types.AccAddress\x12\x0f\n\x07pair_id\x18\x02 \x01(\t\x12\x44\n\x0bposition_id\x18\x03 \x01(\tB/\xda\xde\x1f\'github.com/cosmos/cosmos-sdk/types.Uint\xc8\xde\x1f\x00\x12>\n\x06margin\x18\x04 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"\x12\n\x10MsgAddMarginResp\"\xea\x01\n\x0fMsgReduceMargin\x12@\n\x05owner\x18\x01 \x01(\x0c\x42\x31\xfa\xde\x1f-github.com/cosmos/cosmos-sdk/types.AccAddress\x12\x0f\n\x07pair_id\x18\x02 \x01(\t\x12\x44\n\x0bposition_id\x18\x03 \x01(\tB/\xda\xde\x1f\'github.com/cosmos/cosmos-sdk/types.Uint\xc8\xde\x1f\x00\x12>\n\x06margin\x18\x04 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"\x12\n\x10ReduceMarginResp\"\xc5\x02\n\x10MsgClosePosition\x12@\n\x05owner\x18\x01 \x01(\x0c\x42\x31\xfa\xde\x1f-github.com/cosmos/cosmos-sdk/types.AccAddress\x12\x0f\n\x07pair_id\x18\x02 \x01(\t\x12\x44\n\x0bposition_id\x18\x03 \x01(\tB/\xda\xde\x1f\'github.com/cosmos/cosmos-sdk/types.Uint\xc8\xde\x1f\x00\x12=\n\x05price\x18\x04 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x45\n\rbase_quantity\x18\x05 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x12\n\nfull_close\x18\x06 \x01(\x08\"\x16\n\x14MsgClosePositionResp\"\xa5\x01\n\x16MsgLiquidationPosition\x12\x45\n\nliquidator\x18\x01 \x01(\x0c\x42\x31\xfa\xde\x1f-github.com/cosmos/cosmos-sdk/types.AccAddress\x12\x44\n\x0bposition_id\x18\x02 \x01(\tB/\xda\xde\x1f\'github.com/cosmos/cosmos-sdk/types.Uint\xc8\xde\x1f\x00\"\x1c\n\x1aMsgLiquidationPositionResp\"\x96\x01\n\x14MsgCreatePairRequest\x12\x12\n\nbase_asset\x18\x01 \x01(\t\x12\x13\n\x0bquote_asset\x18\x02 \x01(\t\x12\x11\n\tvalidator\x18\x03 \x01(\t\x12\x42\n\ninit_price\x18\x04 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"\x17\n\x15MsgCreatePairResponse2\x82\x04\n\x03Msg\x12\x45\n\x0b\x43reateOrder\x12\x16.fx.dex.MsgCreateOrder\x1a\x1e.fx.dex.MsgCreateOrderResponse\x12\x45\n\x0b\x43\x61ncelOrder\x12\x16.fx.dex.MsgCancelOrder\x1a\x1e.fx.dex.MsgCancelOrderResponse\x12;\n\tAddMargin\x12\x14.fx.dex.MsgAddMargin\x1a\x18.fx.dex.MsgAddMarginResp\x12\x41\n\x0cReduceMargin\x12\x17.fx.dex.MsgReduceMargin\x1a\x18.fx.dex.ReduceMarginResp\x12G\n\rClosePosition\x12\x18.fx.dex.MsgClosePosition\x1a\x1c.fx.dex.MsgClosePositionResp\x12Y\n\x13LiquidationPosition\x12\x1e.fx.dex.MsgLiquidationPosition\x1a\".fx.dex.MsgLiquidationPositionResp\x12I\n\nCreatePair\x12\x1c.fx.dex.MsgCreatePairRequest\x1a\x1d.fx.dex.MsgCreatePairResponseB3Z1git.wokoworks.com/blockchain/fx-chain/x/dex/typesb\x06proto3'
+  serialized_pb=b'\n\x0f\x66x/dex/tx.proto\x12\x06\x66x.dex\x1a\x14gogoproto/gogo.proto\x1a\x12\x66x/dex/order.proto\x1a\x1e\x63osmos/base/v1beta1/coin.proto\"\xa1\x02\n\x0eMsgCreateOrder\x12@\n\x05owner\x18\x01 \x01(\x0c\x42\x31\xfa\xde\x1f-github.com/cosmos/cosmos-sdk/types.AccAddress\x12\x0f\n\x07pair_id\x18\x02 \x01(\t\x12$\n\tdirection\x18\x03 \x01(\x0e\x32\x11.fx.dex.Direction\x12=\n\x05price\x18\x04 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x45\n\rbase_quantity\x18\x05 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x10\n\x08leverage\x18\x06 \x01(\x03\"\x18\n\x16MsgCreateOrderResponse\"d\n\x0eMsgCancelOrder\x12@\n\x05owner\x18\x01 \x01(\x0c\x42\x31\xfa\xde\x1f-github.com/cosmos/cosmos-sdk/types.AccAddress\x12\x10\n\x08order_id\x18\x02 \x01(\t\"\x18\n\x16MsgCancelOrderResponse\"\xe7\x01\n\x0cMsgAddMargin\x12@\n\x05owner\x18\x01 \x01(\x0c\x42\x31\xfa\xde\x1f-github.com/cosmos/cosmos-sdk/types.AccAddress\x12\x0f\n\x07pair_id\x18\x02 \x01(\t\x12\x44\n\x0bposition_id\x18\x03 \x01(\tB/\xda\xde\x1f\'github.com/cosmos/cosmos-sdk/types.Uint\xc8\xde\x1f\x00\x12>\n\x06margin\x18\x04 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"\x12\n\x10MsgAddMarginResp\"\xea\x01\n\x0fMsgReduceMargin\x12@\n\x05owner\x18\x01 \x01(\x0c\x42\x31\xfa\xde\x1f-github.com/cosmos/cosmos-sdk/types.AccAddress\x12\x0f\n\x07pair_id\x18\x02 \x01(\t\x12\x44\n\x0bposition_id\x18\x03 \x01(\tB/\xda\xde\x1f\'github.com/cosmos/cosmos-sdk/types.Uint\xc8\xde\x1f\x00\x12>\n\x06margin\x18\x04 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"\x12\n\x10ReduceMarginResp\"\xc5\x02\n\x10MsgClosePosition\x12@\n\x05owner\x18\x01 \x01(\x0c\x42\x31\xfa\xde\x1f-github.com/cosmos/cosmos-sdk/types.AccAddress\x12\x0f\n\x07pair_id\x18\x02 \x01(\t\x12\x44\n\x0bposition_id\x18\x03 \x01(\tB/\xda\xde\x1f\'github.com/cosmos/cosmos-sdk/types.Uint\xc8\xde\x1f\x00\x12=\n\x05price\x18\x04 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x45\n\rbase_quantity\x18\x05 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x12\n\nfull_close\x18\x06 \x01(\x08\"\x16\n\x14MsgClosePositionResp\"\xa5\x01\n\x16MsgLiquidationPosition\x12\x45\n\nliquidator\x18\x01 \x01(\x0c\x42\x31\xfa\xde\x1f-github.com/cosmos/cosmos-sdk/types.AccAddress\x12\x44\n\x0bposition_id\x18\x02 \x01(\tB/\xda\xde\x1f\'github.com/cosmos/cosmos-sdk/types.Uint\xc8\xde\x1f\x00\"\x1c\n\x1aMsgLiquidationPositionResp\"\xb3\x01\n\x0eMsgFundDexPool\x12[\n\x06\x61mount\x18\x01 \x03(\x0b\x32\x19.cosmos.base.v1beta1.CoinB0\xc8\xde\x1f\x00\xaa\xdf\x1f(github.com/cosmos/cosmos-sdk/types.Coins\x12\x44\n\tdepositor\x18\x02 \x01(\x0c\x42\x31\xfa\xde\x1f-github.com/cosmos/cosmos-sdk/types.AccAddress\"\x14\n\x12MsgFundDexPoolResp2\xfa\x03\n\x03Msg\x12\x45\n\x0b\x43reateOrder\x12\x16.fx.dex.MsgCreateOrder\x1a\x1e.fx.dex.MsgCreateOrderResponse\x12\x45\n\x0b\x43\x61ncelOrder\x12\x16.fx.dex.MsgCancelOrder\x1a\x1e.fx.dex.MsgCancelOrderResponse\x12;\n\tAddMargin\x12\x14.fx.dex.MsgAddMargin\x1a\x18.fx.dex.MsgAddMarginResp\x12\x41\n\x0cReduceMargin\x12\x17.fx.dex.MsgReduceMargin\x1a\x18.fx.dex.ReduceMarginResp\x12G\n\rClosePosition\x12\x18.fx.dex.MsgClosePosition\x1a\x1c.fx.dex.MsgClosePositionResp\x12Y\n\x13LiquidationPosition\x12\x1e.fx.dex.MsgLiquidationPosition\x1a\".fx.dex.MsgLiquidationPositionResp\x12\x41\n\x0b\x46undDexPool\x12\x16.fx.dex.MsgFundDexPool\x1a\x1a.fx.dex.MsgFundDexPoolRespB3Z1git.wokoworks.com/blockchain/fx-chain/x/dex/typesb\x06proto3'
   ,
-  dependencies=[gogoproto_dot_gogo__pb2.DESCRIPTOR,fx_dot_dex_dot_order__pb2.DESCRIPTOR,])
+  dependencies=[gogoproto_dot_gogo__pb2.DESCRIPTOR,fx_dot_dex_dot_order__pb2.DESCRIPTOR,cosmos_dot_base_dot_v1beta1_dot_coin__pb2.DESCRIPTOR,])
 
 
 
@@ -90,8 +91,8 @@ _MSGCREATEORDER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=70,
-  serialized_end=359,
+  serialized_start=102,
+  serialized_end=391,
 )
 
 
@@ -103,13 +104,6 @@ _MSGCREATEORDERRESPONSE = _descriptor.Descriptor(
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
-    _descriptor.FieldDescriptor(
-      name='order_id', full_name='fx.dex.MsgCreateOrderResponse.order_id', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -122,8 +116,8 @@ _MSGCREATEORDERRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=361,
-  serialized_end=403,
+  serialized_start=393,
+  serialized_end=417,
 )
 
 
@@ -161,8 +155,8 @@ _MSGCANCELORDER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=405,
-  serialized_end=505,
+  serialized_start=419,
+  serialized_end=519,
 )
 
 
@@ -186,8 +180,8 @@ _MSGCANCELORDERRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=507,
-  serialized_end=531,
+  serialized_start=521,
+  serialized_end=545,
 )
 
 
@@ -239,8 +233,8 @@ _MSGADDMARGIN = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=534,
-  serialized_end=765,
+  serialized_start=548,
+  serialized_end=779,
 )
 
 
@@ -264,8 +258,8 @@ _MSGADDMARGINRESP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=767,
-  serialized_end=785,
+  serialized_start=781,
+  serialized_end=799,
 )
 
 
@@ -317,8 +311,8 @@ _MSGREDUCEMARGIN = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=788,
-  serialized_end=1022,
+  serialized_start=802,
+  serialized_end=1036,
 )
 
 
@@ -342,8 +336,8 @@ _REDUCEMARGINRESP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1024,
-  serialized_end=1042,
+  serialized_start=1038,
+  serialized_end=1056,
 )
 
 
@@ -409,8 +403,8 @@ _MSGCLOSEPOSITION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1045,
-  serialized_end=1370,
+  serialized_start=1059,
+  serialized_end=1384,
 )
 
 
@@ -434,8 +428,8 @@ _MSGCLOSEPOSITIONRESP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1372,
-  serialized_end=1394,
+  serialized_start=1386,
+  serialized_end=1408,
 )
 
 
@@ -473,8 +467,8 @@ _MSGLIQUIDATIONPOSITION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1397,
-  serialized_end=1562,
+  serialized_start=1411,
+  serialized_end=1576,
 )
 
 
@@ -498,47 +492,33 @@ _MSGLIQUIDATIONPOSITIONRESP = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1564,
-  serialized_end=1592,
+  serialized_start=1578,
+  serialized_end=1606,
 )
 
 
-_MSGCREATEPAIRREQUEST = _descriptor.Descriptor(
-  name='MsgCreatePairRequest',
-  full_name='fx.dex.MsgCreatePairRequest',
+_MSGFUNDDEXPOOL = _descriptor.Descriptor(
+  name='MsgFundDexPool',
+  full_name='fx.dex.MsgFundDexPool',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='base_asset', full_name='fx.dex.MsgCreatePairRequest.base_asset', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
+      name='amount', full_name='fx.dex.MsgFundDexPool.amount', index=0,
+      number=1, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+      serialized_options=b'\310\336\037\000\252\337\037(github.com/cosmos/cosmos-sdk/types.Coins', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='quote_asset', full_name='fx.dex.MsgCreatePairRequest.quote_asset', index=1,
-      number=2, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
+      name='depositor', full_name='fx.dex.MsgFundDexPool.depositor', index=1,
+      number=2, type=12, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"",
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='validator', full_name='fx.dex.MsgCreatePairRequest.validator', index=2,
-      number=3, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='init_price', full_name='fx.dex.MsgCreatePairRequest.init_price', index=3,
-      number=4, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=b'\332\336\037&github.com/cosmos/cosmos-sdk/types.Dec\310\336\037\000', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+      serialized_options=b'\372\336\037-github.com/cosmos/cosmos-sdk/types.AccAddress', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -551,14 +531,14 @@ _MSGCREATEPAIRREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1595,
-  serialized_end=1745,
+  serialized_start=1609,
+  serialized_end=1788,
 )
 
 
-_MSGCREATEPAIRRESPONSE = _descriptor.Descriptor(
-  name='MsgCreatePairResponse',
-  full_name='fx.dex.MsgCreatePairResponse',
+_MSGFUNDDEXPOOLRESP = _descriptor.Descriptor(
+  name='MsgFundDexPoolResp',
+  full_name='fx.dex.MsgFundDexPoolResp',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
@@ -576,11 +556,12 @@ _MSGCREATEPAIRRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1747,
-  serialized_end=1770,
+  serialized_start=1790,
+  serialized_end=1810,
 )
 
 _MSGCREATEORDER.fields_by_name['direction'].enum_type = fx_dot_dex_dot_order__pb2._DIRECTION
+_MSGFUNDDEXPOOL.fields_by_name['amount'].message_type = cosmos_dot_base_dot_v1beta1_dot_coin__pb2._COIN
 DESCRIPTOR.message_types_by_name['MsgCreateOrder'] = _MSGCREATEORDER
 DESCRIPTOR.message_types_by_name['MsgCreateOrderResponse'] = _MSGCREATEORDERRESPONSE
 DESCRIPTOR.message_types_by_name['MsgCancelOrder'] = _MSGCANCELORDER
@@ -593,8 +574,8 @@ DESCRIPTOR.message_types_by_name['MsgClosePosition'] = _MSGCLOSEPOSITION
 DESCRIPTOR.message_types_by_name['MsgClosePositionResp'] = _MSGCLOSEPOSITIONRESP
 DESCRIPTOR.message_types_by_name['MsgLiquidationPosition'] = _MSGLIQUIDATIONPOSITION
 DESCRIPTOR.message_types_by_name['MsgLiquidationPositionResp'] = _MSGLIQUIDATIONPOSITIONRESP
-DESCRIPTOR.message_types_by_name['MsgCreatePairRequest'] = _MSGCREATEPAIRREQUEST
-DESCRIPTOR.message_types_by_name['MsgCreatePairResponse'] = _MSGCREATEPAIRRESPONSE
+DESCRIPTOR.message_types_by_name['MsgFundDexPool'] = _MSGFUNDDEXPOOL
+DESCRIPTOR.message_types_by_name['MsgFundDexPoolResp'] = _MSGFUNDDEXPOOLRESP
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 MsgCreateOrder = _reflection.GeneratedProtocolMessageType('MsgCreateOrder', (_message.Message,), {
@@ -681,19 +662,19 @@ MsgLiquidationPositionResp = _reflection.GeneratedProtocolMessageType('MsgLiquid
   })
 _sym_db.RegisterMessage(MsgLiquidationPositionResp)
 
-MsgCreatePairRequest = _reflection.GeneratedProtocolMessageType('MsgCreatePairRequest', (_message.Message,), {
-  'DESCRIPTOR' : _MSGCREATEPAIRREQUEST,
+MsgFundDexPool = _reflection.GeneratedProtocolMessageType('MsgFundDexPool', (_message.Message,), {
+  'DESCRIPTOR' : _MSGFUNDDEXPOOL,
   '__module__' : 'fx.dex.tx_pb2'
-  # @@protoc_insertion_point(class_scope:fx.dex.MsgCreatePairRequest)
+  # @@protoc_insertion_point(class_scope:fx.dex.MsgFundDexPool)
   })
-_sym_db.RegisterMessage(MsgCreatePairRequest)
+_sym_db.RegisterMessage(MsgFundDexPool)
 
-MsgCreatePairResponse = _reflection.GeneratedProtocolMessageType('MsgCreatePairResponse', (_message.Message,), {
-  'DESCRIPTOR' : _MSGCREATEPAIRRESPONSE,
+MsgFundDexPoolResp = _reflection.GeneratedProtocolMessageType('MsgFundDexPoolResp', (_message.Message,), {
+  'DESCRIPTOR' : _MSGFUNDDEXPOOLRESP,
   '__module__' : 'fx.dex.tx_pb2'
-  # @@protoc_insertion_point(class_scope:fx.dex.MsgCreatePairResponse)
+  # @@protoc_insertion_point(class_scope:fx.dex.MsgFundDexPoolResp)
   })
-_sym_db.RegisterMessage(MsgCreatePairResponse)
+_sym_db.RegisterMessage(MsgFundDexPoolResp)
 
 
 DESCRIPTOR._options = None
@@ -713,7 +694,8 @@ _MSGCLOSEPOSITION.fields_by_name['price']._options = None
 _MSGCLOSEPOSITION.fields_by_name['base_quantity']._options = None
 _MSGLIQUIDATIONPOSITION.fields_by_name['liquidator']._options = None
 _MSGLIQUIDATIONPOSITION.fields_by_name['position_id']._options = None
-_MSGCREATEPAIRREQUEST.fields_by_name['init_price']._options = None
+_MSGFUNDDEXPOOL.fields_by_name['amount']._options = None
+_MSGFUNDDEXPOOL.fields_by_name['depositor']._options = None
 
 _MSG = _descriptor.ServiceDescriptor(
   name='Msg',
@@ -722,8 +704,8 @@ _MSG = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=1773,
-  serialized_end=2287,
+  serialized_start=1813,
+  serialized_end=2319,
   methods=[
   _descriptor.MethodDescriptor(
     name='CreateOrder',
@@ -786,12 +768,12 @@ _MSG = _descriptor.ServiceDescriptor(
     create_key=_descriptor._internal_create_key,
   ),
   _descriptor.MethodDescriptor(
-    name='CreatePair',
-    full_name='fx.dex.Msg.CreatePair',
+    name='FundDexPool',
+    full_name='fx.dex.Msg.FundDexPool',
     index=6,
     containing_service=None,
-    input_type=_MSGCREATEPAIRREQUEST,
-    output_type=_MSGCREATEPAIRRESPONSE,
+    input_type=_MSGFUNDDEXPOOL,
+    output_type=_MSGFUNDDEXPOOLRESP,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
   ),

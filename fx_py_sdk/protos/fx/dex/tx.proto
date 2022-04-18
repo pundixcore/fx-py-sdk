@@ -3,6 +3,7 @@ package fx.dex;
 
 import "gogoproto/gogo.proto";
 import "fx/dex/order.proto";
+import "cosmos/base/v1beta1/coin.proto";
 
 option go_package = "git.wokoworks.com/blockchain/fx-chain/x/dex/types";
 
@@ -14,8 +15,7 @@ service Msg {
     rpc ReduceMargin(MsgReduceMargin) returns (ReduceMarginResp);
     rpc ClosePosition(MsgClosePosition) returns (MsgClosePositionResp);
     rpc LiquidationPosition(MsgLiquidationPosition) returns (MsgLiquidationPositionResp);
-
-    rpc CreatePair(MsgCreatePairRequest) returns (MsgCreatePairResponse);
+    rpc FundDexPool(MsgFundDexPool) returns (MsgFundDexPoolResp);
 }
 
 message MsgCreateOrder {
@@ -34,7 +34,6 @@ message MsgCreateOrder {
 }
 
 message MsgCreateOrderResponse {
-    string order_id = 1;
 }
 
 message MsgCancelOrder {
@@ -92,7 +91,8 @@ message MsgClosePosition {
         (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
         (gogoproto.nullable) = false
     ];
-    bool full_close = 6 ;
+    bool full_close = 6;
+//    bool market_close = 7;
 }
 
 message MsgClosePositionResp {
@@ -109,19 +109,12 @@ message MsgLiquidationPosition {
 message MsgLiquidationPositionResp {
 }
 
-
-message MsgCreatePairRequest {
-    string base_asset = 1;
-    string quote_asset = 2;
-    string validator = 3;
-    string init_price = 4 [
-        (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
-        (gogoproto.nullable) = false
-    ];
+message MsgFundDexPool{
+  repeated cosmos.base.v1beta1.Coin amount = 1 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  bytes depositor = 2 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
 }
 
-message MsgCreatePairResponse {
-
-}
-
-
+message MsgFundDexPoolResp {}

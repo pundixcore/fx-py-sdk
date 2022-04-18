@@ -144,9 +144,7 @@ class ScanBlockBase:
             key = base64.b64decode(attribute[BlockResponse.Key]).decode('utf8')
             value = base64.b64decode(
                 attribute[BlockResponse.VALUE]).decode('utf8')
-            if key == EventKeys.tx_hash:
-                order.tx_hash = value
-            elif key == EventKeys.order_id:
+            if key == EventKeys.order_id:
                 order.order_id = value
             elif key == EventKeys.owner:
                 order.owner = value
@@ -321,6 +319,7 @@ class ScanBlock(ScanBlockBase):
     """process block event, then update to sql"""
 
     def __init__(self):
+        super().__init__()
         self.client = GRPCClient(constants.Network.get_grpc_url())
         self.crud = self.client.crud
 
@@ -621,17 +620,17 @@ class ScanBlock(ScanBlockBase):
                     self.crud.insert(funding_transfer)
                     """if exist, do not need to update"""
             
-            elif event[BlockResponse.TYPE] == EventTypes.Log_funding_rate:
-                funding_rate = self.get_funding_rate(event[BlockResponse.Attributes])
-                funding_rate.block_height = block_height
-
-                """in case of duplicate"""
-                sql_funding_rate = self.crud.filterone(FundingRate, and_(
-                    FundingRate.pair_id==funding_rate.pair_id, FundingRate.block_height==block_height
-                ))
-
-                if not sql_funding_rate:
-                    self.crud.insert(funding_rate)
+            # elif event[BlockResponse.TYPE] == EventTypes.Log_funding_rate:
+            #     funding_rate = self.get_funding_rate(event[BlockResponse.Attributes])
+            #     funding_rate.block_height = block_height
+            #
+            #     """in case of duplicate"""
+            #     sql_funding_rate = self.crud.filterone(FundingRate, and_(
+            #         FundingRate.pair_id==funding_rate.pair_id, FundingRate.block_height==block_height
+            #     ))
+            #
+            #     if not sql_funding_rate:
+            #         self.crud.insert(funding_rate)
 
             elif event[BlockResponse.TYPE] == EventTypes.Transfer:
                 transfer = self.get_transfer(event[BlockResponse.Attributes])

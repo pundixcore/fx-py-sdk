@@ -44,10 +44,10 @@ class MsgStub(object):
                 request_serializer=fx_dot_dex_dot_tx__pb2.MsgLiquidationPosition.SerializeToString,
                 response_deserializer=fx_dot_dex_dot_tx__pb2.MsgLiquidationPositionResp.FromString,
                 )
-        self.CreatePair = channel.unary_unary(
-                '/fx.dex.Msg/CreatePair',
-                request_serializer=fx_dot_dex_dot_tx__pb2.MsgCreatePairRequest.SerializeToString,
-                response_deserializer=fx_dot_dex_dot_tx__pb2.MsgCreatePairResponse.FromString,
+        self.FundDexPool = channel.unary_unary(
+                '/fx.dex.Msg/FundDexPool',
+                request_serializer=fx_dot_dex_dot_tx__pb2.MsgFundDexPool.SerializeToString,
+                response_deserializer=fx_dot_dex_dot_tx__pb2.MsgFundDexPoolResp.FromString,
                 )
 
 
@@ -90,7 +90,7 @@ class MsgServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def CreatePair(self, request, context):
+    def FundDexPool(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -129,10 +129,10 @@ def add_MsgServicer_to_server(servicer, server):
                     request_deserializer=fx_dot_dex_dot_tx__pb2.MsgLiquidationPosition.FromString,
                     response_serializer=fx_dot_dex_dot_tx__pb2.MsgLiquidationPositionResp.SerializeToString,
             ),
-            'CreatePair': grpc.unary_unary_rpc_method_handler(
-                    servicer.CreatePair,
-                    request_deserializer=fx_dot_dex_dot_tx__pb2.MsgCreatePairRequest.FromString,
-                    response_serializer=fx_dot_dex_dot_tx__pb2.MsgCreatePairResponse.SerializeToString,
+            'FundDexPool': grpc.unary_unary_rpc_method_handler(
+                    servicer.FundDexPool,
+                    request_deserializer=fx_dot_dex_dot_tx__pb2.MsgFundDexPool.FromString,
+                    response_serializer=fx_dot_dex_dot_tx__pb2.MsgFundDexPoolResp.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -247,7 +247,7 @@ class Msg(object):
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def CreatePair(request,
+    def FundDexPool(request,
             target,
             options=(),
             channel_credentials=None,
@@ -257,8 +257,8 @@ class Msg(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/fx.dex.Msg/CreatePair',
-            fx_dot_dex_dot_tx__pb2.MsgCreatePairRequest.SerializeToString,
-            fx_dot_dex_dot_tx__pb2.MsgCreatePairResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/fx.dex.Msg/FundDexPool',
+            fx_dot_dex_dot_tx__pb2.MsgFundDexPool.SerializeToString,
+            fx_dot_dex_dot_tx__pb2.MsgFundDexPoolResp.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

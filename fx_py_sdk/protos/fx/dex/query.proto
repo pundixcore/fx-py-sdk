@@ -22,6 +22,10 @@ service Query {
         option (google.api.http).get = "/dex/orders";
     }
 
+  rpc QueryPendingOrders(QueryOrdersRequest) returns (QueryPendingOrdersResponse) {
+    option (google.api.http).get = "/dex/pending_orders";
+  }
+
     rpc QueryOrder(QueryOrderRequest) returns (QueryOrderResponse) {
         option (google.api.http).get = "/dex/order";
     }
@@ -52,14 +56,9 @@ service Query {
         option (google.api.http).get = "/dex/funding_time";
     }
 
-    // match query
+    // query latest deal price no matter what block
     rpc QueryDealPrice(QueryDealPriceReq) returns (QueryDealPriceResp) {
         option (google.api.http).get = "/dex/deal_price";
-    }
-
-    // query latest deal price no matter what block
-    rpc QueryPairPrice(QueryPairPriceReq) returns (QueryPairPriceResp) {
-        option (google.api.http).get = "/dex/pair_price";
     }
 
     rpc QueryMatchResult(QueryMatchResultReq) returns (QueryMatchResultResp) {
@@ -71,7 +70,7 @@ service Query {
     }
 
     rpc QueryMarkAndOraclePrice(QueryMarkAndOraclePriceReq) returns (QueryMarkAndOraclePriceResp) {
-        option (google.api.http).get = "/dex/mark_oracle_price";
+      option (google.api.http).get = "/dex/mark_oracle_price";
     }
 
     rpc QueryLiquidationPrice(QueryLiquidationPriceReq) returns (QueryLiquidationPriceResp) {
@@ -90,17 +89,9 @@ service Query {
         option (google.api.http).get = "/dex/is_funding";
     }
 
-  rpc QueryFundingRate(QueryFundingRateReq) returns (QueryFundingRateResp) {
-    option (google.api.http).get = "/dex/funding_rate";
-  }
-}
-
-message QueryFundingRateReq {
-  string pair_id = 1 ;
-}
-
-message QueryFundingRateResp {
-  PairFundingRates pair_funding_rates = 1 [(gogoproto.nullable) = false];
+    rpc QueryPremiumIndexConf(QueryPremiumIndexConfReq) returns (QueryPremiumIndexConfResp) {
+      option (google.api.http).get = "/dex/premium_index_conf";
+    }
 }
 
 message QueryIsFundingReq {}
@@ -141,6 +132,15 @@ message QueryMAResp {
     ];
 }
 
+message QueryMarkAndOraclePriceReq {
+  string pair_id = 1;
+  bool query_all = 2;
+}
+
+message QueryMarkAndOraclePriceResp {
+  repeated MarkAndOraclePrice prices = 1 [(gogoproto.nullable) = false];
+}
+
 message QueryParamsReq {
 
 }
@@ -167,6 +167,11 @@ message QueryOrdersRequest {
 
 message QueryOrdersResponse {
   repeated Order orders = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryPendingOrdersResponse {
+  int64 bid_len = 1;
+  int64 ask_len = 2;
 }
 
 message QueryOrderRequest {
@@ -228,14 +233,15 @@ message QueryFundingResp {
     Funding funding = 1 [(gogoproto.nullable) = false];
 }
 
+// latest_or_realtime:
+// true/1: last settled funding rate
+// false/0: realtime funding rate
 message QueryPairFundingRatesReq {
-    string pair_id = 1;
-    int64 funding_times = 2;
-    bool query_all = 3;
+  bool last_or_realtime = 1;
 }
 
 message QueryPairFundingRatesResp {
-    repeated PairFundingRates pair_funding_rates = 1 [(gogoproto.nullable) = false];
+  repeated PairFundingRate pair_funding_rates = 1 [(gogoproto.nullable) = false];
 }
 
 message QueryFundingTimeReq {
@@ -243,7 +249,7 @@ message QueryFundingTimeReq {
 }
 
 message QueryFundingTimeResp {
-  FundingTime funding_time = 1 [(gogoproto.nullable) = false];;
+  FundingTime funding_time = 1 [(gogoproto.nullable) = false];
 }
 
 ///////////////////// match query ///////////////////////////
@@ -257,19 +263,10 @@ message PairPrice {
 
 message QueryDealPriceReq {
     string pair_id = 1;
-    int64 block_number = 2;
-}
-
-message QueryDealPriceResp {
-    DealPrice deal_price = 1 [(gogoproto.nullable) = false];
-}
-
-message QueryPairPriceReq {
-    string pair_id = 1;
     bool query_all = 2;
 }
 
-message QueryPairPriceResp {
+message QueryDealPriceResp {
     repeated PairPrice pair_price = 1 [(gogoproto.nullable) = false];
 }
 
@@ -303,15 +300,6 @@ message MarkAndOraclePrice {
     ];
 }
 
-message QueryMarkAndOraclePriceReq {
-    string pair_id = 1;
-    bool query_all = 2;
-}
-
-message QueryMarkAndOraclePriceResp {
-    repeated MarkAndOraclePrice prices = 1 [(gogoproto.nullable) = false];
-}
-
 ///////////////////// liquidation calculator ///////////////////////////
 message QueryLiquidationPriceReq {
   string pair_id = 1;
@@ -336,4 +324,12 @@ message QueryLiquidationPriceResp {
       (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
       (gogoproto.nullable) = false
   ];
+}
+
+message QueryPremiumIndexConfReq {
+
+}
+
+message QueryPremiumIndexConfResp {
+    PremiumIndexConf premium_index_conf = 1 [(gogoproto.nullable) = false];
 }

@@ -83,7 +83,6 @@ class DB:
 
 
 class Order(NamedTuple):
-    TxHash: str
     Id: str
     Owner: str
     PairId: str
@@ -99,7 +98,6 @@ class Order(NamedTuple):
     OrderType: str
     CostFee: Decimal
     LockedFee: Decimal
-    Created_at: str
     LastFilledQuantity: Decimal = None
     LastUpdated: datetime = None
     Trades: Iterable = None

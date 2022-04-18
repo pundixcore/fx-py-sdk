@@ -21,7 +21,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=b'Z4git.wokoworks.com/blockchain/fx-chain/x/oracle/types',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x12\x66x/oracle/tx.proto\x12\tfx.oracle\x1a\x14gogoproto/gogo.proto\x1a\x1e\x63osmos/base/v1beta1/coin.proto\"\x83\x01\n\x10MsgOracleRequest\x12\x11\n\tvalidator\x18\x01 \x01(\t\x12\x13\n\x0bprepare_gas\x18\x02 \x01(\x04\x12\x13\n\x0b\x65xecute_gas\x18\x03 \x01(\x04\x12\x32\n\tfee_limit\x18\x04 \x01(\x0b\x32\x19.cosmos.base.v1beta1.CoinB\x04\xc8\xde\x1f\x00\"\x13\n\x11MsgOracleResponse\"q\n\x0fMsgSubmitAnswer\x12\x0e\n\x06symbol\x18\x01 \x01(\t\x12\x0e\n\x06oracle\x18\x02 \x01(\t\x12>\n\x06\x61nswer\x18\x03 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"\x13\n\x11MsgSubmitResponse2\x9b\x01\n\x03Msg\x12J\n\rOracleRequest\x12\x1b.fx.oracle.MsgOracleRequest\x1a\x1c.fx.oracle.MsgOracleResponse\x12H\n\x0cSubmitAnswer\x12\x1a.fx.oracle.MsgSubmitAnswer\x1a\x1c.fx.oracle.MsgSubmitResponseB6Z4git.wokoworks.com/blockchain/fx-chain/x/oracle/typesb\x06proto3'
+  serialized_pb=b'\n\x12\x66x/oracle/tx.proto\x12\tfx.oracle\x1a\x14gogoproto/gogo.proto\x1a\x1e\x63osmos/base/v1beta1/coin.proto\"\x9e\x01\n\x10MsgOracleRequest\x12\x11\n\tvalidator\x18\x01 \x01(\t\x12\x13\n\x0bprepare_gas\x18\x02 \x01(\x04\x12\x13\n\x0b\x65xecute_gas\x18\x03 \x01(\x04\x12\x32\n\tfee_limit\x18\x04 \x01(\x0b\x32\x19.cosmos.base.v1beta1.CoinB\x04\xc8\xde\x1f\x00\x12\x19\n\x0bmarket_type\x18\x05 \x01(\tB\x04\xc8\xde\x1f\x01\"\x13\n\x11MsgOracleResponse\"q\n\x0fMsgSubmitAnswer\x12\x0e\n\x06symbol\x18\x01 \x01(\t\x12\x0e\n\x06oracle\x18\x02 \x01(\t\x12>\n\x06\x61nswer\x18\x03 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"\x13\n\x11MsgSubmitResponse2\x9b\x01\n\x03Msg\x12J\n\rOracleRequest\x12\x1b.fx.oracle.MsgOracleRequest\x1a\x1c.fx.oracle.MsgOracleResponse\x12H\n\x0cSubmitAnswer\x12\x1a.fx.oracle.MsgSubmitAnswer\x1a\x1c.fx.oracle.MsgSubmitResponseB6Z4git.wokoworks.com/blockchain/fx-chain/x/oracle/typesb\x06proto3'
   ,
   dependencies=[gogoproto_dot_gogo__pb2.DESCRIPTOR,cosmos_dot_base_dot_v1beta1_dot_coin__pb2.DESCRIPTOR,])
 
@@ -64,6 +64,13 @@ _MSGORACLEREQUEST = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=b'\310\336\037\000', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='market_type', full_name='fx.oracle.MsgOracleRequest.market_type', index=4,
+      number=5, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=b'\310\336\037\001', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -77,7 +84,7 @@ _MSGORACLEREQUEST = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=88,
-  serialized_end=219,
+  serialized_end=246,
 )
 
 
@@ -101,8 +108,8 @@ _MSGORACLERESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=221,
-  serialized_end=240,
+  serialized_start=248,
+  serialized_end=267,
 )
 
 
@@ -147,8 +154,8 @@ _MSGSUBMITANSWER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=242,
-  serialized_end=355,
+  serialized_start=269,
+  serialized_end=382,
 )
 
 
@@ -172,8 +179,8 @@ _MSGSUBMITRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=357,
-  serialized_end=376,
+  serialized_start=384,
+  serialized_end=403,
 )
 
 _MSGORACLEREQUEST.fields_by_name['fee_limit'].message_type = cosmos_dot_base_dot_v1beta1_dot_coin__pb2._COIN
@@ -214,6 +221,7 @@ _sym_db.RegisterMessage(MsgSubmitResponse)
 
 DESCRIPTOR._options = None
 _MSGORACLEREQUEST.fields_by_name['fee_limit']._options = None
+_MSGORACLEREQUEST.fields_by_name['market_type']._options = None
 _MSGSUBMITANSWER.fields_by_name['answer']._options = None
 
 _MSG = _descriptor.ServiceDescriptor(
@@ -223,8 +231,8 @@ _MSG = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=379,
-  serialized_end=534,
+  serialized_start=406,
+  serialized_end=561,
   methods=[
   _descriptor.MethodDescriptor(
     name='OracleRequest',

@@ -25,6 +25,11 @@ class QueryStub(object):
                 request_serializer=fx_dot_dex_dot_query__pb2.QueryOrdersRequest.SerializeToString,
                 response_deserializer=fx_dot_dex_dot_query__pb2.QueryOrdersResponse.FromString,
                 )
+        self.QueryPendingOrders = channel.unary_unary(
+                '/fx.dex.Query/QueryPendingOrders',
+                request_serializer=fx_dot_dex_dot_query__pb2.QueryOrdersRequest.SerializeToString,
+                response_deserializer=fx_dot_dex_dot_query__pb2.QueryPendingOrdersResponse.FromString,
+                )
         self.QueryOrder = channel.unary_unary(
                 '/fx.dex.Query/QueryOrder',
                 request_serializer=fx_dot_dex_dot_query__pb2.QueryOrderRequest.SerializeToString,
@@ -65,11 +70,6 @@ class QueryStub(object):
                 request_serializer=fx_dot_dex_dot_query__pb2.QueryDealPriceReq.SerializeToString,
                 response_deserializer=fx_dot_dex_dot_query__pb2.QueryDealPriceResp.FromString,
                 )
-        self.QueryPairPrice = channel.unary_unary(
-                '/fx.dex.Query/QueryPairPrice',
-                request_serializer=fx_dot_dex_dot_query__pb2.QueryPairPriceReq.SerializeToString,
-                response_deserializer=fx_dot_dex_dot_query__pb2.QueryPairPriceResp.FromString,
-                )
         self.QueryMatchResult = channel.unary_unary(
                 '/fx.dex.Query/QueryMatchResult',
                 request_serializer=fx_dot_dex_dot_query__pb2.QueryMatchResultReq.SerializeToString,
@@ -105,10 +105,10 @@ class QueryStub(object):
                 request_serializer=fx_dot_dex_dot_query__pb2.QueryIsFundingReq.SerializeToString,
                 response_deserializer=fx_dot_dex_dot_query__pb2.QueryIsFundingResp.FromString,
                 )
-        self.QueryFundingRate = channel.unary_unary(
-                '/fx.dex.Query/QueryFundingRate',
-                request_serializer=fx_dot_dex_dot_query__pb2.QueryFundingRateReq.SerializeToString,
-                response_deserializer=fx_dot_dex_dot_query__pb2.QueryFundingRateResp.FromString,
+        self.QueryPremiumIndexConf = channel.unary_unary(
+                '/fx.dex.Query/QueryPremiumIndexConf',
+                request_serializer=fx_dot_dex_dot_query__pb2.QueryPremiumIndexConfReq.SerializeToString,
+                response_deserializer=fx_dot_dex_dot_query__pb2.QueryPremiumIndexConfResp.FromString,
                 )
 
 
@@ -125,6 +125,12 @@ class QueryServicer(object):
     def QueryOrders(self, request, context):
         """orders query
         """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def QueryPendingOrders(self, request, context):
+        """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
@@ -174,13 +180,6 @@ class QueryServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def QueryDealPrice(self, request, context):
-        """match query
-        """
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
-    def QueryPairPrice(self, request, context):
         """query latest deal price no matter what block
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -229,7 +228,7 @@ class QueryServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def QueryFundingRate(self, request, context):
+    def QueryPremiumIndexConf(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -247,6 +246,11 @@ def add_QueryServicer_to_server(servicer, server):
                     servicer.QueryOrders,
                     request_deserializer=fx_dot_dex_dot_query__pb2.QueryOrdersRequest.FromString,
                     response_serializer=fx_dot_dex_dot_query__pb2.QueryOrdersResponse.SerializeToString,
+            ),
+            'QueryPendingOrders': grpc.unary_unary_rpc_method_handler(
+                    servicer.QueryPendingOrders,
+                    request_deserializer=fx_dot_dex_dot_query__pb2.QueryOrdersRequest.FromString,
+                    response_serializer=fx_dot_dex_dot_query__pb2.QueryPendingOrdersResponse.SerializeToString,
             ),
             'QueryOrder': grpc.unary_unary_rpc_method_handler(
                     servicer.QueryOrder,
@@ -288,11 +292,6 @@ def add_QueryServicer_to_server(servicer, server):
                     request_deserializer=fx_dot_dex_dot_query__pb2.QueryDealPriceReq.FromString,
                     response_serializer=fx_dot_dex_dot_query__pb2.QueryDealPriceResp.SerializeToString,
             ),
-            'QueryPairPrice': grpc.unary_unary_rpc_method_handler(
-                    servicer.QueryPairPrice,
-                    request_deserializer=fx_dot_dex_dot_query__pb2.QueryPairPriceReq.FromString,
-                    response_serializer=fx_dot_dex_dot_query__pb2.QueryPairPriceResp.SerializeToString,
-            ),
             'QueryMatchResult': grpc.unary_unary_rpc_method_handler(
                     servicer.QueryMatchResult,
                     request_deserializer=fx_dot_dex_dot_query__pb2.QueryMatchResultReq.FromString,
@@ -328,10 +327,10 @@ def add_QueryServicer_to_server(servicer, server):
                     request_deserializer=fx_dot_dex_dot_query__pb2.QueryIsFundingReq.FromString,
                     response_serializer=fx_dot_dex_dot_query__pb2.QueryIsFundingResp.SerializeToString,
             ),
-            'QueryFundingRate': grpc.unary_unary_rpc_method_handler(
-                    servicer.QueryFundingRate,
-                    request_deserializer=fx_dot_dex_dot_query__pb2.QueryFundingRateReq.FromString,
-                    response_serializer=fx_dot_dex_dot_query__pb2.QueryFundingRateResp.SerializeToString,
+            'QueryPremiumIndexConf': grpc.unary_unary_rpc_method_handler(
+                    servicer.QueryPremiumIndexConf,
+                    request_deserializer=fx_dot_dex_dot_query__pb2.QueryPremiumIndexConfReq.FromString,
+                    response_serializer=fx_dot_dex_dot_query__pb2.QueryPremiumIndexConfResp.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -375,6 +374,23 @@ class Query(object):
         return grpc.experimental.unary_unary(request, target, '/fx.dex.Query/QueryOrders',
             fx_dot_dex_dot_query__pb2.QueryOrdersRequest.SerializeToString,
             fx_dot_dex_dot_query__pb2.QueryOrdersResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def QueryPendingOrders(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/fx.dex.Query/QueryPendingOrders',
+            fx_dot_dex_dot_query__pb2.QueryOrdersRequest.SerializeToString,
+            fx_dot_dex_dot_query__pb2.QueryPendingOrdersResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -515,23 +531,6 @@ class Query(object):
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def QueryPairPrice(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/fx.dex.Query/QueryPairPrice',
-            fx_dot_dex_dot_query__pb2.QueryPairPriceReq.SerializeToString,
-            fx_dot_dex_dot_query__pb2.QueryPairPriceResp.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
-
-    @staticmethod
     def QueryMatchResult(request,
             target,
             options=(),
@@ -651,7 +650,7 @@ class Query(object):
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def QueryFundingRate(request,
+    def QueryPremiumIndexConf(request,
             target,
             options=(),
             channel_credentials=None,
@@ -661,8 +660,8 @@ class Query(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/fx.dex.Query/QueryFundingRate',
-            fx_dot_dex_dot_query__pb2.QueryFundingRateReq.SerializeToString,
-            fx_dot_dex_dot_query__pb2.QueryFundingRateResp.FromString,
+        return grpc.experimental.unary_unary(request, target, '/fx.dex.Query/QueryPremiumIndexConf',
+            fx_dot_dex_dot_query__pb2.QueryPremiumIndexConfReq.SerializeToString,
+            fx_dot_dex_dot_query__pb2.QueryPremiumIndexConfResp.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
