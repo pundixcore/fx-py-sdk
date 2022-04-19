@@ -22,6 +22,7 @@ async def main():
 if __name__ == "__main__":
     """init database"""
     sql = Sql(database="fxdex")
+    sql.drop_table()
     sql.create_table()  # creates tables if not exist
 
     """give some time for db to fully init"""

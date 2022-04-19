@@ -1,14 +1,8 @@
 import base64
 from collections import deque
-import datetime
+import datetime as dt
 from sqlite3 import IntegrityError
-from numpy import block
-
-import logging
-import os
-from fx_py_sdk import constants
 from fx_py_sdk.model.block import *
-from fx_py_sdk.model.model import *
 from fx_py_sdk.model.crud import *
 from fx_py_sdk.fx_rpc.rpc import *
 from decimal import Decimal
@@ -37,6 +31,7 @@ class ScanBlockBase:
             if BlockResponse.DATA not in message[BlockResponse.RESULT]:
                 logging.info(f"data not in message: {message}")
                 return
+            print(message[BlockResponse.RESULT])
             block_height = message[BlockResponse.RESULT][BlockResponse.DATA][BlockResponse.VALUE][
                 BlockResponse.BLOCK][BlockResponse.HEADER][BlockResponse.HEIGHT]
             block_height = int(block_height)
@@ -45,7 +40,7 @@ class ScanBlockBase:
 
             timestamp = Timestamp()
             timestamp.FromJsonString(block_time),
-            block_datetime = datetime.datetime.utcfromtimestamp(
+            block_datetime = dt.datetime.utcfromtimestamp(
                 timestamp.ToSeconds())
 
             begin_block_events = message[BlockResponse.RESULT][BlockResponse.DATA][BlockResponse.VALUE][
@@ -73,7 +68,7 @@ class ScanBlockBase:
     def process_block_height(self, block: Block):
         pass
     
-    def process_tx_events(self, tx_events, block_height):
+    def process_tx_events(self, tx_events, block_height, tx_hash):
         pass
 
     def process_begin_block(self, begin_block_events, block_height):
@@ -168,7 +163,7 @@ class ScanBlockBase:
                 if value.__contains__('T') and value.__contains__('Z'):
                     timestamp = Timestamp()
                     timestamp.FromJsonString(value),
-                    block_datetime = datetime.datetime.utcfromtimestamp(
+                    block_datetime = dt.datetime.utcfromtimestamp(
                         timestamp.ToSeconds())
                     order.created_at = block_datetime
                 else:
@@ -176,7 +171,7 @@ class ScanBlockBase:
                     # microseconds truncated to 6 decimals
                     date_value = re.sub(
                         '(\d{7,9})', lambda x: x.group()[:6], value)
-                    block_datetime = datetime.datetime.strptime(
+                    block_datetime = dt.datetime.strptime(
                         date_value, UTC_FORMAT)
                     order.created_at = block_datetime
             elif key == EventKeys.leverage:
@@ -192,7 +187,7 @@ class ScanBlockBase:
             elif key == EventKeys.cancel_time:  # only cancel order or expire order have cancel_time
                 timestamp = Timestamp()
                 timestamp.FromJsonString(value),
-                block_datetime = datetime.datetime.utcfromtimestamp(
+                block_datetime = dt.datetime.utcfromtimestamp(
                     timestamp.ToSeconds())
                 order.cancel_time = block_datetime
 
@@ -660,7 +655,7 @@ class ScanBlock(ScanBlockBase):
             
             self.crud.insert(error)
 
-    def process_tx_events(self, tx_events, block_height):
+    def process_tx_events(self, tx_events, block_height, tx_hash):
         """process fxdex chain Transaction events"""
         if tx_events is None:
             return
@@ -670,6 +665,7 @@ class ScanBlock(ScanBlockBase):
                     BlockResponse.TYPE] == EventTypes.Close_position_order:
                 """only insert order, if sql order is none, then do not update"""
                 order = self.get_order(event[BlockResponse.Attributes])
+                order.tx_hash = tx_hash
                 order.open_block_height = block_height
                 order.block_height = block_height
                 order.initial_base_quantity = order.base_quantity
@@ -899,12 +895,13 @@ class TradingScanBlock(ScanBlockBase):
     def on_oracle_price_change(self, oracle_price: OraclePrice, block_height: int):
         pass
 
-    def process_tx_events(self, tx_events, block_height):
+    def process_tx_events(self, tx_events, block_height, tx_hash):
         for event in tx_events:
             if event[BlockResponse.TYPE] == EventTypes.Order or event[
                     BlockResponse.TYPE] == EventTypes.Close_position_order:
                 """new order on chain (both open & closing position"""
                 order = self.get_order(event[BlockResponse.Attributes])
+                order.tx_hash = tx_hash
                 order.open_block_height = block_height
                 order.block_height = block_height
                 order.initial_base_quantity = order.base_quantity

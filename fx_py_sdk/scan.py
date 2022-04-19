@@ -1,3 +1,5 @@
+import base64
+import hashlib
 from collections import deque
 import datetime
 import websocket
@@ -69,6 +71,7 @@ class RpcScan:
             if not start_block:
                 start_block = int(os.environ.get('START_BLOCK', '1'))
 
+            print("start_block", start_block)
             block_heights = [blk_ht for blk_ht, in (self.scan.crud.session.query(Block)
                                                                          .filter(Block.height >= start_block)
                                                                          .with_entities(Block.height)
@@ -76,7 +79,7 @@ class RpcScan:
             missing_blocks = list(sorted(
                 set(range(start_block, latest_block_height+1)).difference(set(block_heights))
             ))
-
+            print("missing_blocks", missing_blocks)
             if not missing_blocks:  # use WebSockets if fully synced
                 logging.info(
                     'Synced with latest block. Switching to WebSockets...')
@@ -121,16 +124,18 @@ class RpcScan:
                 for block_result, block_rpc in sorted(results, key=lambda x: x[0]['height']):
                     block_height = int(block_result['height'])
                     block_time = block_rpc[BlockResponse.BLOCK][BlockResponse.HEADER][BlockResponse.Time]
-
                     timestamp = Timestamp()
                     timestamp.FromJsonString(block_time),
                     block_datetime = datetime.datetime.utcfromtimestamp(timestamp.ToSeconds())
 
                     # If txs_results is not None, process each tx_event
                     if block_result[BlockResponse.Txs_results] is not None:
-                        for tx_result in block_result[BlockResponse.Txs_results]:
+                        for index, tx_result in enumerate(block_result[BlockResponse.Txs_results]):
+                            txMsg = block_rpc[BlockResponse.BLOCK][BlockResponse.DATA][BlockResponse.Txs][index]
+                            txHashByte = base64.b64decode(txMsg)
+                            tx_hash = hashlib.sha256(txHashByte).hexdigest().upper()
                             tx_events = tx_result[BlockResponse.EVENTS]
-                            self.scan.process_tx_events(tx_events, block_height)
+                            self.scan.process_tx_events(tx_events, block_height, tx_hash)
                     # Else update block height in any case
                     else:
                         block = Block(height=block_height, time=block_datetime, tx_events_processed=True)
@@ -250,7 +255,8 @@ class WebsocketScan:
                         tx_events = tx_result[BlockResponse.RESULT][BlockResponse.EVENTS]
                     else:
                         tx_events = []
-                    self.scan.process_tx_events(tx_events, block_height)
+                    tx_hash = msg["result"]["events"]["tx.hash"][0]
+                    self.scan.process_tx_events(tx_events, block_height, tx_hash)
                 elif msg[BlockResponse.RESULT][BlockResponse.QUERY] == tm_event_NewBlock:
                     self.scan.process_block(msg)
         except Exception as ex:
@@ -301,7 +307,7 @@ class AccountScan:
         logging.info('Updating account balances...')
         now = datetime.datetime.utcnow()
 
-        if not self.owners or (now - self.last_updated) > datetime.timedelta(seconds=self.update_interval*9.5):            
+        if not self.owners or (now - self.last_updated) > datetime.timedelta(seconds=self.update_interval*9.5):
             query_result = self.manager.scan.crud.session.execute('SELECT DISTINCT owner FROM trade;').fetchall()
             self.owners = [res[0] for res in query_result]
             self.last_updated = now

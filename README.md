@@ -52,7 +52,7 @@ cd fx_py_sdk
 >
 ```shell
 cd fx_py_sdk
-./scripts/imports.sh
+./scripts/fix-imports.sh
 ```
 </s>
 
