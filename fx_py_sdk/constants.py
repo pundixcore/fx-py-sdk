@@ -2,7 +2,7 @@ from typing import Iterable, NamedTuple
 from decimal import Decimal
 import os
 import logging
-from datetime import datetime
+import datetime
 
 class EnvVar:
     NETWORK = "NETWORK"
@@ -98,9 +98,8 @@ class Order(NamedTuple):
     OrderType: str
     CostFee: Decimal
     LockedFee: Decimal
-    Created_at: str
     LastFilledQuantity: Decimal = None
-    LastUpdated: datetime = None
+    LastUpdated: datetime.datetime = None
     Trades: Iterable = None
 
 class Position(NamedTuple):
@@ -122,7 +121,7 @@ class Position(NamedTuple):
 class Trade(NamedTuple):
     DealPrice: Decimal
     MatchedQuantity: Decimal
-    FilledTime: datetime
+    FilledTime: datetime.datetime
 
 class BackEndApi:
     query_order_page = "http://44.195.213.51:30225/api/address/queryOrderPage"

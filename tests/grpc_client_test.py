@@ -1,3 +1,5 @@
+import base64
+import hashlib
 import unittest
 from fx_py_sdk import wallet
 from fx_py_sdk.wallet import Address
@@ -11,8 +13,8 @@ from google.protobuf.json_format import MessageToJson
 import json
 from google.protobuf.timestamp_pb2 import Timestamp
 
-client = GRPCClient('44.196.199.119:9190')
-# client = GRPCClient('127.0.0.1:9090')
+# client = GRPCClient('44.196.199.119:9190')
+client = GRPCClient('127.0.0.1:9090')
 
 
 class MyTestCase(unittest.TestCase):
@@ -98,9 +100,9 @@ class MyTestCase(unittest.TestCase):
               'sequence:', account.sequence)
 
         tx_builder = TxBuilder(priv_key, chain_id, account.account_number, Coin(
-            amount='3000', denom='USDT'))
+            amount='600', denom='USDT'))
 
-        tx_response = client.create_order(tx_builder, 'BTC:USDT', "BUY", decimal.Decimal(
+        tx_response = client.create_order(tx_builder, 'TSLA:USDT', "SELL", decimal.Decimal(
             910.1), decimal.Decimal(1.2), 10, account.sequence, mode=BROADCAST_MODE_BLOCK)
         print(MessageToJson(tx_response))
 
@@ -192,6 +194,12 @@ class MyTestCase(unittest.TestCase):
         time3 = Timestamp().FromJsonString(time1)  # return None
         print(time3)
 
+    def test_txHash(self):
+        txHash = "ClUKUwoWL2Z4LmRleC5Nc2dDcmVhdGVPcmRlchI5ChQSAialXAf769jHo6c6hUOLeOAJpxIJVFNMQTpVU0RUGAIiCTkxMDEwMDAwMCoHMTE5OTk5OTAKEmcKUApGCh8vY29zbW9zLmNyeXB0by5zZWNwMjU2azEuUHViS2V5EiMKIQPTv2q291gispQoYVcXwNSBVwZ34vDbQDHZ6EfR+VZQLBIECgIIARgDEhMKDAoEVVNEVBIEMzAwMBDAlrECGkDIFwI42lN772BkjtwjLK7G5omFXerBs0u1TU7UTxlUyjnaj5AUVGUC71WqNWGhWEETkGWpW/Tfpb0a0i5tJgBt"
+        txHashByte = base64.b64decode(txHash)
+        print(txHashByte)
+        data_sha = hashlib.sha256(txHashByte).hexdigest().upper()
+        print(data_sha)
 
 if __name__ == '__main__':
     unittest.main()

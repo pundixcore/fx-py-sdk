@@ -36,8 +36,10 @@ class FxWebsocket:
             print("websocket disconnected", error)
 
     def on_message(self, message):
+        print(message)
         msg = json.loads(message)
-        print(msg)
+        tx_hash = msg["result"]["events"]["tx.hash"][0]
+        print(tx_hash)
 
     def on_open(self):
         logging.info("connection to fxdex...")

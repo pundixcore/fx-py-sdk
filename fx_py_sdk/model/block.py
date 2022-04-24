@@ -16,6 +16,7 @@ class BlockResponse:
     Attributes = "attributes"
     Key = "key"
     Time = "time"
+    Txs = "txs"
 
     Response = "response"
     Txs_results = "txs_results"

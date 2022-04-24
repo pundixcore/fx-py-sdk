@@ -1,3 +1,5 @@
+import base64
+import hashlib
 from collections import deque
 import datetime
 import websocket
@@ -14,7 +16,6 @@ from google.protobuf.timestamp_pb2 import Timestamp
 from sqlalchemy import and_
 from fx_py_sdk.grpc_client import GRPCClient
 import traceback
-import datetime as dt
 import time
 from fx_py_sdk.notify_service import send_mail
 from fx_py_sdk.scan_block import ScanBlock, ScanBlockBase
@@ -70,6 +71,7 @@ class RpcScan:
             if not start_block:
                 start_block = int(os.environ.get('START_BLOCK', '1'))
 
+            print("start_block", start_block)
             block_heights = [blk_ht for blk_ht, in (self.scan.crud.session.query(Block)
                                                                          .filter(Block.height >= start_block)
                                                                          .with_entities(Block.height)
@@ -77,7 +79,7 @@ class RpcScan:
             missing_blocks = list(sorted(
                 set(range(start_block, latest_block_height+1)).difference(set(block_heights))
             ))
-
+            print("missing_blocks", missing_blocks)
             if not missing_blocks:  # use WebSockets if fully synced
                 logging.info(
                     'Synced with latest block. Switching to WebSockets...')
@@ -122,15 +124,22 @@ class RpcScan:
                 for block_result, block_rpc in sorted(results, key=lambda x: x[0]['height']):
                     block_height = int(block_result['height'])
                     block_time = block_rpc[BlockResponse.BLOCK][BlockResponse.HEADER][BlockResponse.Time]
-
                     timestamp = Timestamp()
                     timestamp.FromJsonString(block_time),
                     block_datetime = datetime.datetime.utcfromtimestamp(timestamp.ToSeconds())
 
+                    # If txs_results is not None, process each tx_event
                     if block_result[BlockResponse.Txs_results] is not None:
-                        for tx_result in block_result[BlockResponse.Txs_results]:
+                        for index, tx_result in enumerate(block_result[BlockResponse.Txs_results]):
+                            txMsg = block_rpc[BlockResponse.BLOCK][BlockResponse.DATA][BlockResponse.Txs][index]
+                            txHashByte = base64.b64decode(txMsg)
+                            tx_hash = hashlib.sha256(txHashByte).hexdigest().upper()
                             tx_events = tx_result[BlockResponse.EVENTS]
-                            self.scan.process_tx_events(tx_events, block_height)
+                            self.scan.process_tx_events(tx_events, block_height, tx_hash)
+                    # Else update block height in any case
+                    else:
+                        block = Block(height=block_height, time=block_datetime, tx_events_processed=True)
+                        self.scan.process_block_height(block)
 
                     if block_result[BlockResponse.Begin_block_events] is not None:
                         self.scan.process_begin_block(
@@ -241,9 +250,13 @@ class WebsocketScan:
                         logging.debug(f"events not in tx_result yet {msg}")
                         return
 
-                    tx_events = tx_result[BlockResponse.RESULT][BlockResponse.EVENTS]
                     block_height = int(tx_result[BlockResponse.HEIGHT])
-                    self.scan.process_tx_events(tx_events, block_height)
+                    if tx_result is not None and BlockResponse.EVENTS in tx_result[BlockResponse.RESULT]:
+                        tx_events = tx_result[BlockResponse.RESULT][BlockResponse.EVENTS]
+                    else:
+                        tx_events = []
+                    tx_hash = msg["result"]["events"]["tx.hash"][0]
+                    self.scan.process_tx_events(tx_events, block_height, tx_hash)
                 elif msg[BlockResponse.RESULT][BlockResponse.QUERY] == tm_event_NewBlock:
                     self.scan.process_block(msg)
         except Exception as ex:
@@ -292,9 +305,9 @@ class AccountScan:
 
     def update_account_balances(self):
         logging.info('Updating account balances...')
-        now = dt.datetime.utcnow()
+        now = datetime.datetime.utcnow()
 
-        if not self.owners or (now - self.last_updated) > dt.timedelta(seconds=self.update_interval*9.5):            
+        if not self.owners or (now - self.last_updated) > datetime.timedelta(seconds=self.update_interval*9.5):
             query_result = self.manager.scan.crud.session.execute('SELECT DISTINCT owner FROM trade;').fetchall()
             self.owners = [res[0] for res in query_result]
             self.last_updated = now
@@ -304,9 +317,9 @@ class AccountScan:
 
         all_balances = []
 
-        batch_time = dt.datetime.utcnow()
+        batch_time = datetime.datetime.utcnow()
         for owner in self.owners:
-            time_updated = dt.datetime.utcnow()
+            time_updated = datetime.datetime.utcnow()
             balances = self.client.query_all_balances(owner)
             
             for symbol, balance_amount in balances.items():

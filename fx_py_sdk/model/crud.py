@@ -1,4 +1,4 @@
-from datetime import datetime
+import datetime
 from decimal import Decimal
 from typing import Dict, Iterable, List, Union
 from sqlalchemy.orm import sessionmaker
@@ -268,7 +268,7 @@ class Crud:
         """Returns a single exposure marked to mark price if pair_id is provided. Otherwise, returns dictionary."""
         return self.__get_exposure(address, pair_id, is_bot, as_dollar_value=True)
 
-    def get_funding_transfers(self, address: str=None, pair_id: str=None, from_datetime: datetime=None):
+    def get_funding_transfers(self, address: str=None, pair_id: str=None, from_datetime: datetime.datetime=None):
         limit_records = 100
 
         conditions = []
@@ -279,7 +279,7 @@ class Crud:
         if from_datetime:
             conditions.append(Block.time>=from_datetime)
 
-        query = (self.session.query(FundingTransfer)
+        query = (self.session.query(FundingTransfer, Block.time)
                              .join(Block, FundingTransfer.block_height==Block.height)
                              .filter(*conditions)
                              .order_by(Block.height.asc())

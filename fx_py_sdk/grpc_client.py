@@ -1,5 +1,5 @@
 import decimal
-from datetime import datetime
+import datetime
 from urllib.parse import urlparse
 
 import grpc
@@ -14,13 +14,10 @@ from fx_py_sdk.codec.cosmos.base.tendermint.v1beta1.query_pb2_grpc import Servic
 from fx_py_sdk.codec.cosmos.base.abci.v1beta1.abci_pb2 import GasInfo
 from fx_py_sdk.codec.cosmos.base.abci.v1beta1.abci_pb2 import TxResponse
 from fx_py_sdk.codec.cosmos.tx.v1beta1.service_pb2_grpc import ServiceStub as TxClient
-from fx_py_sdk.codec.cosmos.tx.v1beta1.service_pb2 import SimulateRequest
-from fx_py_sdk.codec.cosmos.tx.v1beta1.service_pb2 import BroadcastTxRequest
-from fx_py_sdk.codec.cosmos.tx.v1beta1.service_pb2 import BroadcastMode
-from fx_py_sdk.codec.cosmos.tx.v1beta1.service_pb2 import BROADCAST_MODE_BLOCK, BROADCAST_MODE_SYNC
-from fx_py_sdk.codec.cosmos.tx.v1beta1.tx_pb2 import Tx
-from fx_py_sdk.codec.cosmos.tx.v1beta1.tx_pb2 import TxRaw
-from fx_py_sdk.codec.cosmos.tx.v1beta1.tx_pb2 import Fee
+from fx_py_sdk.codec.cosmos.tx.v1beta1.service_pb2 import (
+    SimulateRequest, BroadcastTxRequest, GetTxRequest, BroadcastMode, BROADCAST_MODE_BLOCK, BROADCAST_MODE_SYNC
+)
+from fx_py_sdk.codec.cosmos.tx.v1beta1.tx_pb2 import Tx, TxRaw, Fee
 from fx_py_sdk.codec.cosmos.base.v1beta1.coin_pb2 import Coin
 from fx_py_sdk.codec.fx.other.query_pb2 import GasPriceRequest
 from fx_py_sdk.codec.fx.other.query_pb2_grpc import QueryStub as OtherQuery
@@ -52,7 +49,7 @@ class GRPCClient:
     def __init__(self, url: str = 'localhost:9090'):
         if urlparse(url).scheme == "https":
             self.channel = grpc.secure_channel(
-                url, grpc.ssl_channel_credentials())
+                urlparse(url).netloc, grpc.ssl_channel_credentials())
         else:
             self.channel = grpc.insecure_channel(url)
 
@@ -336,7 +333,7 @@ class GRPCClient:
             locked_fee = decimal.Decimal(order.locked_fee)
             locked_fee = locked_fee / decimal.Decimal(DEFAULT_DEC)
             new_order = Order(
-                order.tx_hash,
+                # order.tx_hash,
                 order.id,
                 Address(order.owner).to_string(),
                 order.pair_id,
@@ -352,7 +349,7 @@ class GRPCClient:
                 order.order_type,
                 cost_fee,
                 locked_fee,
-                order.created_at.ToSeconds()
+                # order.created_at.ToSeconds()
             )
 
         else:
@@ -364,7 +361,7 @@ class GRPCClient:
 
             order = response.Order
             new_order = Order(
-                order.tx_hash,
+                # order.tx_hash,
                 order.order_id,
                 Address(order.owner).to_string(),
                 order.pair_id,
@@ -380,13 +377,17 @@ class GRPCClient:
                 order.order_type,
                 order.cost_fee,
                 order.locked_fee,
-                order.created_at,
+                # order.created_at,
                 order.last_filled_quantity,
                 response.time,
                 trades
             )
 
         return new_order
+
+    def query_tx(self, tx_hash: str):
+        """Queries Tx from chain"""
+        return TxClient(self.channel).GetTx(GetTxRequest(hash=tx_hash))
 
     def query_trades(self, order_id):
         """Queries trades from database given an order ID, sorted by time."""
@@ -452,7 +453,7 @@ class GRPCClient:
                 locked_fee = locked_fee / decimal.Decimal(DEFAULT_DEC)
 
                 new_order = Order(
-                    order.tx_hash,
+                    # order.tx_hash,
                     order.id,
                     Address(order.owner).to_string(),
                     order.pair_id,
@@ -468,7 +469,8 @@ class GRPCClient:
                     order.order_type,
                     cost_fee,
                     locked_fee,
-                    MessageToJson(order.created_at),)
+                    # MessageToJson(order.created_at),
+                )
 
                 orders.append(new_order)
 
@@ -502,7 +504,7 @@ class GRPCClient:
             for response in sql_orders:
                 order: CrudOrder = response.Order
                 new_order = Order(
-                    order.tx_hash,
+                    # order.tx_hash,
                     order.order_id,
                     Address(order.owner).to_string(),
                     order.pair_id,
@@ -518,7 +520,7 @@ class GRPCClient:
                     order.order_type,
                     order.cost_fee,
                     order.locked_fee,
-                    order.created_at,
+                    # order.created_at,
                     order.last_filled_quantity,
                     response.time,
                     order_trades[order.order_id] if include_trades else None
@@ -744,7 +746,7 @@ class GRPCClient:
             account = self.query_account_info(tx_builder.address())
             tx_builder.account_number = account.account_number
 
-        gas_price_amount = int(tx_builder.gas_price.amount)
+        gas_price_amount = int(tx_builder.gas_price.amount) / DEFAULT_DEC
         fee_denom = tx_builder.gas_price.denom
         if gas_price_amount <= 0:
             # 如果未设置gas price 查询链上gas price
@@ -755,7 +757,7 @@ class GRPCClient:
         if gas_limit <= 0:
             # 计算默认的gas amount
             fee_amount = Coin(amount=str(
-                gas_limit * gas_price_amount), denom=fee_denom)
+                round(gas_limit * gas_price_amount)), denom=fee_denom)
             fee = Fee(amount=[fee_amount], gas_limit=gas_limit)
             tx = tx_builder.sign(acc_seq, msg, fee)
             # 估算gas limit
@@ -763,7 +765,7 @@ class GRPCClient:
             gas_limit = int(float(gas_info.gas_used) * 1.5)
 
         fee_amount = Coin(amount=str(
-            gas_limit * gas_price_amount), denom=fee_denom)
+            round(gas_limit * gas_price_amount)), denom=fee_denom)
         fee = Fee(amount=[fee_amount], gas_limit=gas_limit)
         return tx_builder.sign(acc_seq, msg, fee)
 
