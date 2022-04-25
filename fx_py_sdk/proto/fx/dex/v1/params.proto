@@ -1,0 +1,33 @@
+syntax = "proto3";
+package fx.dex.v1;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/functionx/fx-dex/x/dex/types";
+
+message Params {
+  string fee_rate = 1 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+  int64 force_liquidation_margin_rate_threshold = 2;
+  int64 order_expire_blocks = 3;
+  int64 max_deals_per_block = 4;
+  int64 max_orders_per_account = 5;
+  int64 permitted_max_leverage = 6;
+}
+
+message Reserve {
+  string accumulative_fee = 1 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+  string risk_reserve = 2 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+  string locked_funds = 3 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+}

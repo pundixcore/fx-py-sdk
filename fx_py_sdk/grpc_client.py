@@ -24,13 +24,13 @@ from fx_py_sdk.codec.fx.other.query_pb2_grpc import QueryStub as OtherQuery
 from google.protobuf.any_pb2 import Any
 from fx_py_sdk.builder import TxBuilder
 
-from fx_py_sdk.codec.fx.dex.query_pb2_grpc import QueryStub as DexQuery
-from fx_py_sdk.codec.fx.dex.query_pb2 import *
-from fx_py_sdk.codec.fx.dex.tx_pb2 import *
-from fx_py_sdk.codec.fx.dex.order_pb2 import Direction
+from fx_py_sdk.codec.fx.dex.v1.query_pb2_grpc import QueryStub as DexQuery
+from fx_py_sdk.codec.fx.dex.v1.query_pb2 import *
+from fx_py_sdk.codec.fx.dex.v1.tx_pb2 import *
+from fx_py_sdk.codec.fx.dex.v1.order_pb2 import Direction
 
-from fx_py_sdk.codec.fx.oracle.query_pb2_grpc import QueryStub as OracleQuery
-from fx_py_sdk.codec.fx.oracle.query_pb2 import QueryPriceRequest
+from fx_py_sdk.codec.fx.oracle.v1.query_pb2_grpc import QueryStub as OracleQuery
+from fx_py_sdk.codec.fx.oracle.v1.query_pb2 import QueryPriceRequest
 
 from fx_py_sdk.wallet import Address
 from fx_py_sdk.constants import *
@@ -224,7 +224,7 @@ class GRPCClient:
         positions = []
         try:
             response = DexQuery(self.channel).QueryPosition(
-                QueryPositionReq(owner=Address(owner).to_bytes(), pair_id=pair_id))
+                QueryPositionReq(owner=owner, pair_id=pair_id))
             for pos in response.positions:
                 entry_price = decimal.Decimal(pos.entry_price)
                 entry_price = entry_price / decimal.Decimal(DEFAULT_DEC)

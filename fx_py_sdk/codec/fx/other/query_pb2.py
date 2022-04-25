@@ -20,9 +20,9 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='fx/other/query.proto',
   package='fx.other',
   syntax='proto3',
-  serialized_options=b'Z3git.wokoworks.com/blockchain/fx-chain/x/other/types',
+  serialized_options=b'Z)github.com/functionx/fx-dex/x/other/types',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x14\x66x/other/query.proto\x12\x08\x66x.other\x1a\x14gogoproto/gogo.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1e\x63osmos/base/v1beta1/coin.proto\"\x11\n\x0fGasPriceRequest\"\x88\x01\n\x10GasPriceResponse\x12t\n\ngas_prices\x18\x01 \x03(\x0b\x32\x19.cosmos.base.v1beta1.CoinBE\xc8\xde\x1f\x00\xaa\xdf\x1f(github.com/cosmos/cosmos-sdk/types.Coins\xf2\xde\x1f\x11yaml:\"gas_prices\"2g\n\x05Query\x12^\n\x08GasPrice\x12\x19.fx.other.GasPriceRequest\x1a\x1a.fx.other.GasPriceResponse\"\x1b\x82\xd3\xe4\x93\x02\x15\x12\x13/other/v1/gas_priceB5Z3git.wokoworks.com/blockchain/fx-chain/x/other/typesb\x06proto3'
+  serialized_pb=b'\n\x14\x66x/other/query.proto\x12\x08\x66x.other\x1a\x14gogoproto/gogo.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1e\x63osmos/base/v1beta1/coin.proto\"\x11\n\x0fGasPriceRequest\"\x88\x01\n\x10GasPriceResponse\x12t\n\ngas_prices\x18\x01 \x03(\x0b\x32\x19.cosmos.base.v1beta1.CoinBE\xc8\xde\x1f\x00\xaa\xdf\x1f(github.com/cosmos/cosmos-sdk/types.Coins\xf2\xde\x1f\x11yaml:\"gas_prices\"2g\n\x05Query\x12^\n\x08GasPrice\x12\x19.fx.other.GasPriceRequest\x1a\x1a.fx.other.GasPriceResponse\"\x1b\x82\xd3\xe4\x93\x02\x15\x12\x13/other/v1/gas_priceB+Z)github.com/functionx/fx-dex/x/other/typesb\x06proto3'
   ,
   dependencies=[gogoproto_dot_gogo__pb2.DESCRIPTOR,google_dot_api_dot_annotations__pb2.DESCRIPTOR,cosmos_dot_base_dot_v1beta1_dot_coin__pb2.DESCRIPTOR,])
 

@@ -6,34 +6,34 @@ from fx_py_sdk.wallet import Address
 from fx_py_sdk.grpc_client import GRPCClient, DEFAULT_GRPC_NONE, DEFAULT_DEC
 from fx_py_sdk.builder import TxBuilder
 from fx_py_sdk.codec.cosmos.base.v1beta1.coin_pb2 import Coin
-from fx_py_sdk.codec.fx.dex.order_pb2 import *
+from fx_py_sdk.codec.fx.dex.v1.order_pb2 import *
 import decimal
 from fx_py_sdk.codec.cosmos.tx.v1beta1.service_pb2 import BROADCAST_MODE_BLOCK, BROADCAST_MODE_SYNC
 from google.protobuf.json_format import MessageToJson
 import json
 from google.protobuf.timestamp_pb2 import Timestamp
 
-# client = GRPCClient('44.196.199.119:9190')
-client = GRPCClient('127.0.0.1:9090')
+client = GRPCClient('44.196.199.119:9190')
+# client = GRPCClient('127.0.0.1:9090')
 
 
 class MyTestCase(unittest.TestCase):
     def test_query_balances(self):
         balances = client.query_all_balances(
-            address="dex1zgpzdf2uqla7hkx85wnn4p2r3duwqzd8cfus97")
+            address="0x8464Cf197E0e577df711edF707763Be7DAE235A6")
         print(balances)
 
         balances = client.query_all_balances(
-            address="dex1v0zwwfe3gw2fqdhdnx0hcurh2gzz98z8dagewy")
+            address="0x61bd2030908d658dd5a2139D2C13Af55b9138efb")
         print(balances)
 
     def test_query_balance(self):
         balance = client.query_balance(
-            address="dex1waw8g8v3xw6549mvd476dvq6hwlvdry9a353ug", denom="FX")
+            address="0x8464Cf197E0e577df711edF707763Be7DAE235A6", denom="FX")
         print(balance)
 
         balances = client.query_balance(
-            address="dex1v0zwwfe3gw2fqdhdnx0hcurh2gzz98z8dagewy", denom="FX")
+            address="0x61bd2030908d658dd5a2139D2C13Af55b9138efb", denom="FX")
         print(balances)
 
     def test_query_gas_price(self):
@@ -42,16 +42,16 @@ class MyTestCase(unittest.TestCase):
 
     def test_query_account(self):
         account = client.query_account_info(
-            address="dex1v0zwwfe3gw2fqdhdnx0hcurh2gzz98z8dagewy")
+            address="0x61bd2030908d658dd5a2139D2C13Af55b9138efb")
         print(account)
 
     def test_query_oracle_price(self):
-        oracle_price = client.query_oracle_price(pair_id="tsla:usdt")
+        oracle_price = client.query_oracle_price(pair_id="BTC:USDT")
         print(oracle_price)
 
     def test_query_positions(self):
         positions = client.query_positions(
-            owner='dex179q82e7fcck4ftfvf4vfpwkg86jmxf7upext3v', pair_id="tsla:usdt")
+            owner='0xC7c0cBA77058c4711378108c1eA2e4647fCD3865', pair_id="BTC:USDT")
         print("positions: ", positions)
         # owner = Address(resp.positions[0].owner)
         # print(owner.to_string())

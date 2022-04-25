@@ -4,7 +4,7 @@ from typing import Dict, Iterable, List, Union
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import case, create_engine, text
 from sqlalchemy.orm.session import Session
-from fx_py_sdk.codec.fx.dex.match_pb2 import OrderBook
+from fx_py_sdk.codec.fx.dex.v1.match_pb2 import OrderBook
 from fx_py_sdk.model.model import *
 from sqlalchemy import or_, and_, func
 
