@@ -4,7 +4,6 @@ import unittest
 
 from eth_account import Account
 
-
 from fx_py_sdk.grpc_client import GRPCClient, DEFAULT_GRPC_NONE, DEFAULT_DEC
 from fx_py_sdk.builder import TxBuilder
 from fx_py_sdk.codec.cosmos.base.v1beta1.coin_pb2 import Coin
@@ -17,9 +16,10 @@ from google.protobuf.timestamp_pb2 import Timestamp
 
 client = GRPCClient('44.196.199.119:9190')
 # client = GRPCClient('127.0.0.1:9090')
-
+pair_id = "BTC:USDT"
 
 class MyTestCase(unittest.TestCase):
+
     def test_query_balances(self):
         balances = client.query_all_balances(
             address="0x8464Cf197E0e577df711edF707763Be7DAE235A6")
@@ -53,17 +53,17 @@ class MyTestCase(unittest.TestCase):
 
     def test_query_positions(self):
         positions = client.query_positions(
-            owner='0xC7c0cBA77058c4711378108c1eA2e4647fCD3865', pair_id="BTC:USDT")
+            owner='0x61bd2030908d658dd5a2139D2C13Af55b9138efb', pair_id=pair_id)
         print("positions: ", positions)
         # owner = Address(resp.positions[0].owner)
         # print(owner.to_string())
 
     def test_query_order(self):
-        resp = client.query_order(order_id='ID-429928-2')
+        resp = client.query_order(order_id='ID-5878-1')
         print(resp)
 
     def test_query_orders(self):
-        resp = client.query_orders(owner="dex1ggz598a4506llaglzsmhp3r23hfke6nw29wans", pair_id="tsla:usdc",
+        resp = client.query_orders(owner="0x61bd2030908d658dd5a2139D2C13Af55b9138efb", pair_id=pair_id,
                                    page=b"1".decode('utf-8'), limit=b"20".decode('utf-8'))
         print(resp)
 
@@ -72,25 +72,22 @@ class MyTestCase(unittest.TestCase):
         print(resp)
 
     def test_query_funding_rates(self):
-        resp = client.query_funding_rate("tsla:usdt", 4, query_all=True)
+        resp = client.query_funding_rate(pair_id, 4, query_all=True)
         print(resp)
 
     def test_mark_price(self):
-        resp = client.query_mark_price(pair_id="tsla:usdt", query_all=True)
+        resp = client.query_mark_price(pair_id=pair_id, query_all=True)
         print(resp)
 
     def test_query_orderbook(self):
-        resp = client.query_orderbook(pair_id="tsla:usdt")
-        print(resp)
-
-    def test_query_funding_rate_log(self):
-        resp = client.query_funding_rate_log(pair_id="tsla:usdt")
+        resp = client.query_orderbook(pair_id=pair_id)
         print(resp)
 
     def test_create_order(self):
         Account.enable_unaudited_hdwallet_features()
         account = Account.from_mnemonic(
         "dune antenna hood magic kit blouse film video another pioneer dilemma hobby message rug sail gas culture upgrade twin flag joke people general aunt")
+        print(account.address)
 
         chain_id = client.query_chain_id()
         print('chain_id:', chain_id)
@@ -102,8 +99,8 @@ class MyTestCase(unittest.TestCase):
         tx_builder = TxBuilder(account, chain_id, account_info.account_number, Coin(
             amount='600', denom='USDT'))
 
-        tx_response = client.create_order(tx_builder, 'TSLA:USDT', "SELL", decimal.Decimal(
-            910.1), decimal.Decimal(1.2), 10, account_info.sequence, mode=BROADCAST_MODE_BLOCK)
+        tx_response = client.create_order(tx_builder, 'BTC:USDT', "SELL", decimal.Decimal(
+            40000.1), decimal.Decimal(1.2), 5, account_info.sequence, mode=BROADCAST_MODE_BLOCK)
         print(MessageToJson(tx_response))
 
     def test_cancel_order(self):
@@ -119,10 +116,10 @@ class MyTestCase(unittest.TestCase):
               'sequence:', account_info.sequence)
 
         tx_builder = TxBuilder(account, chain_id, account_info.account_number, Coin(
-            amount='60000000', denom='FX'))
+            amount='600', denom='USDT'))
 
-        create_tx_response = client.create_order(tx_builder, 'tsla:dai', BUY, decimal.Decimal(
-            1.1), decimal.Decimal(1.2), 10, account_info.sequence, mode=BROADCAST_MODE_BLOCK)
+        create_tx_response = client.create_order(tx_builder, 'BTC:USDT', BUY, decimal.Decimal(
+            1.1), decimal.Decimal(1.2), 5, account_info.sequence, mode=BROADCAST_MODE_BLOCK)
         res_str = MessageToJson(create_tx_response)
         res = json.loads(res_str)
         order_id = ''
@@ -136,11 +133,11 @@ class MyTestCase(unittest.TestCase):
         print("create order id = ", order_id)
 
         tx_response = client.cancel_order(
-            tx_builder, order_id, account.sequence + 1, mode=BROADCAST_MODE_BLOCK)
+            tx_builder, order_id, account_info.sequence + 1, mode=BROADCAST_MODE_BLOCK)
         print(tx_response)
 
     def test_close_position(self):
-        pair_id = "tsla:usdt"
+        pair_id = "BTC:USDT"
         Account.enable_unaudited_hdwallet_features()
         account = Account.from_mnemonic(
             "dune antenna hood magic kit blouse film video another pioneer dilemma hobby message rug sail gas culture upgrade twin flag joke people general aunt")
@@ -151,21 +148,23 @@ class MyTestCase(unittest.TestCase):
         account_info = client.query_account_info(account.address)
         print('account number:', account_info.account_number,
               'sequence:', account_info.sequence)
-
-        positions = client.query_positions(
-            owner='dex1zgpzdf2uqla7hkx85wnn4p2r3duwqzd8cfus97', pair_id=pair_id)
+        print(account.address)
+        positions = client.query_positions(owner=account.address, pair_id=pair_id)
         print("positions: ", positions)
+        if len(positions) == 0:
+            print("please build position first")
         self.assertNotEqual(len(positions), 0)
 
         tx_builder = TxBuilder(account, chain_id, account_info.account_number, Coin(
-            amount='60000000', denom='FX'))
+            amount='600', denom='USDT'))
+
         tx_response = client.close_position(tx_builder, pair_id, positions[0].Id, positions[0].MarkPrice, decimal.Decimal(
             0.1), True, account_info.sequence, mode=BROADCAST_MODE_BLOCK)
         print(tx_response)
 
     def test_query_orders_by_account(self):
         orders = client.query_orders_by_account(
-            'dex1n58mly6f7er0zs6swtetqgfqs36jaarqlhs528', 1, 20)
+            '0x61bd2030908d658dd5a2139D2C13Af55b9138efb', 1, 20)
         print(orders)
 
     def test_decimal(self):

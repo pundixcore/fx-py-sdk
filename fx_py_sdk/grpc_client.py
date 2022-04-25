@@ -2,6 +2,7 @@ import decimal
 import datetime
 from urllib.parse import urlparse
 
+import eth_utils
 import grpc
 from fx_py_sdk.codec.cosmos.auth.v1beta1.auth_pb2 import BaseAccount
 from fx_py_sdk.codec.cosmos.auth.v1beta1.query_pb2 import QueryAccountRequest
@@ -42,7 +43,7 @@ from fx_py_sdk.model.model import HedgingOrder, HedgingTrade, Order as CrudOrder
 DEFAULT_DEX_GAS = 5000000
 DEFAULT_GRPC_NONE = "Not found"
 DEFAULT_DEC = 1000000
-
+Address_Prefix = "0x"
 
 class GRPCClient:
     def __init__(self, url: str = 'localhost:9090'):
@@ -255,9 +256,10 @@ class GRPCClient:
                 pending_order_quantity = pending_order_quantity / \
                     decimal.Decimal(DEFAULT_DEC)
 
+                checksumAddr = eth_utils.to_checksum_address(Address_Prefix + pos.owner.hex())
                 position = Position(
                     pos.id,
-                    pos.owner,
+                    checksumAddr,
                     pos.pair_id,
                     pos.direction,
                     entry_price,
@@ -331,10 +333,12 @@ class GRPCClient:
 
             locked_fee = decimal.Decimal(order.locked_fee)
             locked_fee = locked_fee / decimal.Decimal(DEFAULT_DEC)
+            checksumAddr = eth_utils.to_checksum_address(Address_Prefix + order.owner.hex())
+
             new_order = Order(
                 # order.tx_hash,
                 order.id,
-                order.owner,
+                checksumAddr,
                 order.pair_id,
                 order.direction,
                 price,
@@ -450,11 +454,12 @@ class GRPCClient:
 
                 locked_fee = decimal.Decimal(order.locked_fee)
                 locked_fee = locked_fee / decimal.Decimal(DEFAULT_DEC)
+                checksumAddr = eth_utils.to_checksum_address(Address_Prefix + order.owner.hex())
 
                 new_order = Order(
                     # order.tx_hash,
                     order.id,
-                    order.owner,
+                    checksumAddr,
                     order.pair_id,
                     order.direction,
                     price,
@@ -694,11 +699,11 @@ class GRPCClient:
         base_quantity = str(base_quantity)
         base_quantity_split = base_quantity.split('.', 1)
 
-        msg = MsgCreateOrder(owner=tx_builder.acc_address(), pair_id=pair_id, direction=direction, price=price_split[0],
+        msg = MsgCreateOrder(owner=tx_builder.account.address, pair_id=pair_id, direction=direction, price=price_split[0],
                              base_quantity=base_quantity_split[0],
                              leverage=leverage)
 
-        msg_any = Any(type_url='/fx.dex.MsgCreateOrder',
+        msg_any = Any(type_url='/fx.dex.v1.MsgCreateOrder',
                       value=msg.SerializeToString())
         # DEX 交易设置固定gas
         tx = self.build_tx(tx_builder, acc_seq, [msg_any], DEFAULT_DEX_GAS)
@@ -708,8 +713,8 @@ class GRPCClient:
     def cancel_order(self, tx_builder: TxBuilder, order_id: str,
                      acc_seq: int, mode: BroadcastMode = BROADCAST_MODE_BLOCK):
         """取消订单"""
-        msg = MsgCancelOrder(owner=tx_builder.acc_address(), order_id=order_id)
-        msg_any = Any(type_url='/fx.dex.MsgCancelOrder',
+        msg = MsgCancelOrder(owner=tx_builder.account.address, order_id=order_id)
+        msg_any = Any(type_url='/fx.dex.v1.MsgCancelOrder',
                       value=msg.SerializeToString())
         # DEX 交易设置固定gas
         tx = self.build_tx(tx_builder, acc_seq, [msg_any], DEFAULT_DEX_GAS)
@@ -725,10 +730,10 @@ class GRPCClient:
         base_quantity = str(base_quantity)
         base_quantity_split = base_quantity.split('.', 1)
 
-        msg = MsgClosePosition(owner=tx_builder.acc_address(), pair_id=pair_id, position_id=position_id, price=price_split[0],
+        msg = MsgClosePosition(owner=tx_builder.account.address, pair_id=pair_id, position_id=position_id, price=price_split[0],
                                base_quantity=base_quantity_split[0], full_close=full_close)
 
-        msg_any = Any(type_url='/fx.dex.MsgClosePosition',
+        msg_any = Any(type_url='/fx.dex.v1.MsgClosePosition',
                       value=msg.SerializeToString())
         # DEX 交易设置固定gas
         tx = self.build_tx(tx_builder, acc_seq, [msg_any], DEFAULT_DEX_GAS)

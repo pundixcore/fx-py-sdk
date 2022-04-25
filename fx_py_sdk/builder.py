@@ -44,7 +44,7 @@ class TxBuilder:
         single = ModeInfo.Single(mode=SIGN_MODE_DIRECT)
         mode_info = ModeInfo(single=single)
         privkey = PrivateKey(self.account.privateKey)
-        pubkey = PubKey(key=privkey.public_key.to_bytes()).SerializeToString()
+        pubkey = PubKey(key=privkey.backend.compress_public_key_bytes(privkey.public_key)).SerializeToString()
         pub_key_any = Any(type_url='/ethermint.crypto.v1.ethsecp256k1.PubKey', value=pubkey)
 
         signer_info = SignerInfo(
