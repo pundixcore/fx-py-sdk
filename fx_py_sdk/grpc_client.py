@@ -32,7 +32,6 @@ from fx_py_sdk.codec.fx.dex.v1.order_pb2 import Direction
 from fx_py_sdk.codec.fx.oracle.v1.query_pb2_grpc import QueryStub as OracleQuery
 from fx_py_sdk.codec.fx.oracle.v1.query_pb2 import QueryPriceRequest
 
-from fx_py_sdk.wallet import Address
 from fx_py_sdk.constants import *
 from google.protobuf.json_format import MessageToJson
 import json
@@ -258,7 +257,7 @@ class GRPCClient:
 
                 position = Position(
                     pos.id,
-                    Address(pos.owner).to_string(),
+                    pos.owner,
                     pos.pair_id,
                     pos.direction,
                     entry_price,
@@ -335,7 +334,7 @@ class GRPCClient:
             new_order = Order(
                 # order.tx_hash,
                 order.id,
-                Address(order.owner).to_string(),
+                order.owner,
                 order.pair_id,
                 order.direction,
                 price,
@@ -363,7 +362,7 @@ class GRPCClient:
             new_order = Order(
                 # order.tx_hash,
                 order.order_id,
-                Address(order.owner).to_string(),
+                order.owner,
                 order.pair_id,
                 order.direction,
                 order.price,
@@ -423,7 +422,7 @@ class GRPCClient:
 
         if not use_db:
             response = DexQuery(self.channel).QueryOrders(QueryOrdersRequest(
-                owner=Address(owner).to_bytes(), pair_id=pair_id, page=page, limit=limit))
+                owner=owner, pair_id=pair_id, page=page, limit=limit))
 
             for order in response.orders:
                 price = decimal.Decimal(order.price)
@@ -455,7 +454,7 @@ class GRPCClient:
                 new_order = Order(
                     # order.tx_hash,
                     order.id,
-                    Address(order.owner).to_string(),
+                    order.owner,
                     order.pair_id,
                     order.direction,
                     price,
@@ -506,7 +505,7 @@ class GRPCClient:
                 new_order = Order(
                     # order.tx_hash,
                     order.order_id,
-                    Address(order.owner).to_string(),
+                    order.owner,
                     order.pair_id,
                     order.direction,
                     order.price,

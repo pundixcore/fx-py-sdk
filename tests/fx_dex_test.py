@@ -1,8 +1,10 @@
 import base64
 import hashlib
 import unittest
-from fx_py_sdk import wallet
-from fx_py_sdk.wallet import Address
+
+from eth_account import Account
+
+
 from fx_py_sdk.grpc_client import GRPCClient, DEFAULT_GRPC_NONE, DEFAULT_DEC
 from fx_py_sdk.builder import TxBuilder
 from fx_py_sdk.codec.cosmos.base.v1beta1.coin_pb2 import Coin
@@ -86,45 +88,41 @@ class MyTestCase(unittest.TestCase):
         print(resp)
 
     def test_create_order(self):
-        priv_key = wallet.seed_to_privkey(
-            "dune antenna hood magic kit blouse film video another pioneer dilemma hobby message rug sail gas culture upgrade twin flag joke people general aunt")
-
-        address = priv_key.to_address()
-        print('address:', address)
+        Account.enable_unaudited_hdwallet_features()
+        account = Account.from_mnemonic(
+        "dune antenna hood magic kit blouse film video another pioneer dilemma hobby message rug sail gas culture upgrade twin flag joke people general aunt")
 
         chain_id = client.query_chain_id()
         print('chain_id:', chain_id)
 
-        account = client.query_account_info(address)
-        print('account number:', account.account_number,
-              'sequence:', account.sequence)
+        account_info = client.query_account_info(account.address)
+        print('account number:', account_info.account_number,
+              'sequence:', account_info.sequence)
 
-        tx_builder = TxBuilder(priv_key, chain_id, account.account_number, Coin(
+        tx_builder = TxBuilder(account, chain_id, account_info.account_number, Coin(
             amount='600', denom='USDT'))
 
         tx_response = client.create_order(tx_builder, 'TSLA:USDT', "SELL", decimal.Decimal(
-            910.1), decimal.Decimal(1.2), 10, account.sequence, mode=BROADCAST_MODE_BLOCK)
+            910.1), decimal.Decimal(1.2), 10, account_info.sequence, mode=BROADCAST_MODE_BLOCK)
         print(MessageToJson(tx_response))
 
     def test_cancel_order(self):
-        priv_key = wallet.seed_to_privkey(
+        Account.enable_unaudited_hdwallet_features()
+        account = Account.from_mnemonic(
             "dune antenna hood magic kit blouse film video another pioneer dilemma hobby message rug sail gas culture upgrade twin flag joke people general aunt")
-
-        address = priv_key.to_address()
-        print('address:', address)
 
         chain_id = client.query_chain_id()
         print('chain_id:', chain_id)
 
-        account = client.query_account_info(address)
-        print('account number:', account.account_number,
-              'sequence:', account.sequence)
+        account_info = client.query_account_info(account.address)
+        print('account number:', account_info.account_number,
+              'sequence:', account_info.sequence)
 
-        tx_builder = TxBuilder(priv_key, chain_id, account.account_number, Coin(
+        tx_builder = TxBuilder(account, chain_id, account_info.account_number, Coin(
             amount='60000000', denom='FX'))
 
         create_tx_response = client.create_order(tx_builder, 'tsla:dai', BUY, decimal.Decimal(
-            1.1), decimal.Decimal(1.2), 10, account.sequence, mode=BROADCAST_MODE_BLOCK)
+            1.1), decimal.Decimal(1.2), 10, account_info.sequence, mode=BROADCAST_MODE_BLOCK)
         res_str = MessageToJson(create_tx_response)
         res = json.loads(res_str)
         order_id = ''
@@ -143,28 +141,26 @@ class MyTestCase(unittest.TestCase):
 
     def test_close_position(self):
         pair_id = "tsla:usdt"
-        priv_key = wallet.seed_to_privkey(
+        Account.enable_unaudited_hdwallet_features()
+        account = Account.from_mnemonic(
             "dune antenna hood magic kit blouse film video another pioneer dilemma hobby message rug sail gas culture upgrade twin flag joke people general aunt")
-
-        address = priv_key.to_address()
-        print('address:', address)
 
         chain_id = client.query_chain_id()
         print('chain_id:', chain_id)
 
-        account = client.query_account_info(address)
-        print('account number:', account.account_number,
-              'sequence:', account.sequence)
+        account_info = client.query_account_info(account.address)
+        print('account number:', account_info.account_number,
+              'sequence:', account_info.sequence)
 
         positions = client.query_positions(
             owner='dex1zgpzdf2uqla7hkx85wnn4p2r3duwqzd8cfus97', pair_id=pair_id)
         print("positions: ", positions)
         self.assertNotEqual(len(positions), 0)
 
-        tx_builder = TxBuilder(priv_key, chain_id, account.account_number, Coin(
+        tx_builder = TxBuilder(account, chain_id, account_info.account_number, Coin(
             amount='60000000', denom='FX'))
         tx_response = client.close_position(tx_builder, pair_id, positions[0].Id, positions[0].MarkPrice, decimal.Decimal(
-            0.1), True, account.sequence, mode=BROADCAST_MODE_BLOCK)
+            0.1), True, account_info.sequence, mode=BROADCAST_MODE_BLOCK)
         print(tx_response)
 
     def test_query_orders_by_account(self):
