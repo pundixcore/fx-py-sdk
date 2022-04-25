@@ -32,6 +32,8 @@ from fx_py_sdk.codec.fx.dex.v1.order_pb2 import Direction
 
 from fx_py_sdk.codec.fx.oracle.v1.query_pb2_grpc import QueryStub as OracleQuery
 from fx_py_sdk.codec.fx.oracle.v1.query_pb2 import QueryPriceRequest
+from fx_py_sdk.codec.fx.ibc.applications.transfer.v1.tx_pb2 import *
+from fx_py_sdk.codec.ibc.core.client.v1.client_pb2 import Height
 
 from fx_py_sdk.constants import *
 from google.protobuf.json_format import MessageToJson
@@ -126,6 +128,12 @@ class GRPCClient:
         response = TendermintClient(self.channel).GetLatestBlock(
             GetBlockByHeightRequest())
         return response.block.header.chain_id
+
+    def get_latest_block(self) -> str:
+        """查询 latest block"""
+        response = TendermintClient(self.channel).GetLatestBlock(
+            GetBlockByHeightRequest())
+        return response.block.header
 
     def query_orders_by_account(self, address: str, page_index: int, page_size: int) -> []:
         """根据账户号查询订单
@@ -756,33 +764,27 @@ class GRPCClient:
         return self.broadcast_tx(tx, mode)
 
 
-    def ibc_transfer(self, tx_builder: TxBuilder, pair_id: str, position_id: str, margin: Decimal,
+    def ibc_transfer(self, tx_builder: TxBuilder, channel: str, token_amount: int, receiver: str,
+                       height: int,
                        acc_seq: int, mode: BroadcastMode = BROADCAST_MODE_BLOCK):
-
-        amount = margin * decimal.Decimal(DEFAULT_DEC)
+        amount = token_amount * decimal.Decimal(DEFAULT_DEC)
         amount = str(amount)
         amount_split = amount.split('.', 1)
+        token = Coin(amount=str(amount_split[0]), denom="USDT")
 
-        msg = MsgAddMargin(owner=tx_builder.account.address, pair_id=pair_id,
-                           position_id=position_id, margin=amount_split[0])
+        height = Height(revision_number=0, revision_height=0)
 
-        msg_any = Any(type_url='/fx.dex.v1.MsgAddMargin',
-                      value=msg.SerializeToString())
-        # DEX 交易设置固定gas
-        tx = self.build_tx(tx_builder, acc_seq, [msg_any], DEFAULT_DEX_GAS)
-        return self.broadcast_tx(tx, mode)
+        msg = MsgTransfer(source_port="transfer",
+                          source_channel=channel,
+                          token=token,
+                          sender=tx_builder.account.address,
+                          receiver=receiver,
+                          timeout_height=height,
+                          timeout_timestamp=86400,
+                          router="",
+                          fee=Coin(amount=str(0), denom="USDT"))
 
-    def ibc_transfer(self, tx_builder: TxBuilder, pair_id: str, position_id: str, margin: Decimal,
-                       acc_seq: int, mode: BroadcastMode = BROADCAST_MODE_BLOCK):
-
-        amount = margin * decimal.Decimal(DEFAULT_DEC)
-        amount = str(amount)
-        amount_split = amount.split('.', 1)
-
-        msg = MsgAddMargin(owner=tx_builder.account.address, pair_id=pair_id,
-                           position_id=position_id, margin=amount_split[0])
-
-        msg_any = Any(type_url='/fx.dex.v1.MsgAddMargin',
+        msg_any = Any(type_url='/fx.ibc.applications.transfer.v1.MsgTransfer',
                       value=msg.SerializeToString())
         # DEX 交易设置固定gas
         tx = self.build_tx(tx_builder, acc_seq, [msg_any], DEFAULT_DEX_GAS)
