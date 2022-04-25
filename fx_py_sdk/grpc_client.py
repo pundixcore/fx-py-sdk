@@ -739,6 +739,55 @@ class GRPCClient:
         tx = self.build_tx(tx_builder, acc_seq, [msg_any], DEFAULT_DEX_GAS)
         return self.broadcast_tx(tx, mode)
 
+    def add_margin(self, tx_builder: TxBuilder, pair_id: str, position_id: str, margin: Decimal,
+                       acc_seq: int, mode: BroadcastMode = BROADCAST_MODE_BLOCK):
+
+        amount = margin * decimal.Decimal(DEFAULT_DEC)
+        amount = str(amount)
+        amount_split = amount.split('.', 1)
+
+        msg = MsgAddMargin(owner=tx_builder.account.address, pair_id=pair_id,
+                           position_id=position_id, margin=amount_split[0])
+
+        msg_any = Any(type_url='/fx.dex.v1.MsgAddMargin',
+                      value=msg.SerializeToString())
+        # DEX 交易设置固定gas
+        tx = self.build_tx(tx_builder, acc_seq, [msg_any], DEFAULT_DEX_GAS)
+        return self.broadcast_tx(tx, mode)
+
+
+    def ibc_transfer(self, tx_builder: TxBuilder, pair_id: str, position_id: str, margin: Decimal,
+                       acc_seq: int, mode: BroadcastMode = BROADCAST_MODE_BLOCK):
+
+        amount = margin * decimal.Decimal(DEFAULT_DEC)
+        amount = str(amount)
+        amount_split = amount.split('.', 1)
+
+        msg = MsgAddMargin(owner=tx_builder.account.address, pair_id=pair_id,
+                           position_id=position_id, margin=amount_split[0])
+
+        msg_any = Any(type_url='/fx.dex.v1.MsgAddMargin',
+                      value=msg.SerializeToString())
+        # DEX 交易设置固定gas
+        tx = self.build_tx(tx_builder, acc_seq, [msg_any], DEFAULT_DEX_GAS)
+        return self.broadcast_tx(tx, mode)
+
+    def ibc_transfer(self, tx_builder: TxBuilder, pair_id: str, position_id: str, margin: Decimal,
+                       acc_seq: int, mode: BroadcastMode = BROADCAST_MODE_BLOCK):
+
+        amount = margin * decimal.Decimal(DEFAULT_DEC)
+        amount = str(amount)
+        amount_split = amount.split('.', 1)
+
+        msg = MsgAddMargin(owner=tx_builder.account.address, pair_id=pair_id,
+                           position_id=position_id, margin=amount_split[0])
+
+        msg_any = Any(type_url='/fx.dex.v1.MsgAddMargin',
+                      value=msg.SerializeToString())
+        # DEX 交易设置固定gas
+        tx = self.build_tx(tx_builder, acc_seq, [msg_any], DEFAULT_DEX_GAS)
+        return self.broadcast_tx(tx, mode)
+
     def build_tx(self, tx_builder: TxBuilder, acc_seq: int, msg: [Any], gas_limit: int = 0) -> Tx:
         """签名交易"""
         if tx_builder.chain_id == '':

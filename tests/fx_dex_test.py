@@ -137,7 +137,6 @@ class MyTestCase(unittest.TestCase):
         print(tx_response)
 
     def test_close_position(self):
-        pair_id = "BTC:USDT"
         Account.enable_unaudited_hdwallet_features()
         account = Account.from_mnemonic(
             "dune antenna hood magic kit blouse film video another pioneer dilemma hobby message rug sail gas culture upgrade twin flag joke people general aunt")
@@ -160,6 +159,31 @@ class MyTestCase(unittest.TestCase):
 
         tx_response = client.close_position(tx_builder, pair_id, positions[0].Id, positions[0].MarkPrice, decimal.Decimal(
             0.1), True, account_info.sequence, mode=BROADCAST_MODE_BLOCK)
+        print(tx_response)
+
+    def test_add_margin(self):
+        Account.enable_unaudited_hdwallet_features()
+        account = Account.from_mnemonic(
+            "dune antenna hood magic kit blouse film video another pioneer dilemma hobby message rug sail gas culture upgrade twin flag joke people general aunt")
+
+        chain_id = client.query_chain_id()
+        print('chain_id:', chain_id)
+
+        account_info = client.query_account_info(account.address)
+        print('account number:', account_info.account_number,
+              'sequence:', account_info.sequence)
+        print(account.address)
+        positions = client.query_positions(owner=account.address, pair_id=pair_id)
+        print("positions: ", positions)
+        if len(positions) == 0:
+            print("please build position first")
+        self.assertNotEqual(len(positions), 0)
+
+        tx_builder = TxBuilder(account, chain_id, account_info.account_number, Coin(
+            amount='600', denom='USDT'))
+
+        tx_response = client.add_margin(tx_builder, pair_id, positions[0].Id, decimal.Decimal(0.1),
+                                        account_info.sequence, mode=BROADCAST_MODE_BLOCK)
         print(tx_response)
 
     def test_query_orders_by_account(self):

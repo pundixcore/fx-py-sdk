@@ -32,7 +32,7 @@ def test_send_tx():
 
     """构造 tx_builder 对象"""
     tx_builder = TxBuilder(account, chain_id, account_info.account_number, Coin(
-        amount='60000000', denom='FX'))
+        amount='600', denom='USDT'))
 
     """构造转账交易msg"""
     send_msg = MsgSend(from_address=account.address, to_address=account.address,
