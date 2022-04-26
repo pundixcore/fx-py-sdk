@@ -1,4 +1,15 @@
+import decimal
+
 import yaml
+from eth_account import Account
+from fx_py_sdk.codec.cosmos.tx.v1beta1.service_pb2 import BROADCAST_MODE_BLOCK
+
+from fx_py_sdk.codec.cosmos.base.v1beta1.coin_pb2 import Coin
+
+from fx_py_sdk import wallet
+from fx_py_sdk.builder import TxBuilder
+
+from fx_py_sdk.grpc_client import GRPCClient
 
 class ConfigsKeys:
     IBC_CHANNELS = "IBC_CHANNELS"
@@ -37,44 +48,58 @@ class ConfigsKeys:
 
     ###########rpc##############
     RPC = "RPC"
-    TSLA_RPC = "TSLA_RPC"
-    TSLA_GRPC = "TSLA_GRPC"
-
-    AAPL_RPC = "AAPL_RPC"
-    AAPL_GRPC = "AAPL_GRPC"
-
-    NFLX_RPC = "NFLX_RPC"
-    NFLX_GRPC = "NFLX_GRPC"
-
-    GOOG_RPC = "GOOG_RPC"
-    GOOG_GRPC = "GOOG_GRPC"
-
-    FB_RPC = "FB_RPC"
-    FB_GRPC = "FB_GRPC"
-
-    AMZN_RPC = "AMZN_RPC"
-    AMZN_GRPC = "AMZN_GRPC"
-
-    BTC_RPC = "BTC_RPC"
-    BTC_GRPC = "BTC_GRPC"
-
-    FX_RPC = "FX_RPC"
-    FX_GRPC = "FX_GRPC"
-
-    SPY_RPC = "SPY_RPC"
-    SPY_GRPC = "SPY_GRPC"
-
-    IWM_RPC = "IWM_RPC"
-    IWM_GRPC = "IWM_GRPC"
-
-    TQQQ_RPC = "TQQQ_RPC"
-    TQQQ_GRPC = "TQQQ_GRPC"
-
+    GRPC = "GRPC"
+    GRPC_List = ["TSLA", "AAPL", "NFLX", "GOOG", "FB", "AMZN", "BTC", "FX", "SPY", "IWM", "TQQQ"]
+    TSLA = "TSLA"
+    AAPL = "AAPL"
+    NFLX = "NFLX"
+    GOOG = "GOOG"
+    FB = "FB"
+    AMZN = "AMZN"
+    BTC = "BTC"
+    FX = "FX"
+    SPY = "SPY"
+    IWM = "IWM"
+    TQQQ = "TQQQ"
 
 class Ibc_transfer:
     def __init__(self):
         with open("config.yaml", "r") as ymlfile:
             self.cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
 
-    def transfer_to_one(self):
-        print("11")
+    def transfer_to_one_chain(self, mnemonic:str, denom:str, to_address:str, to_chain:str):
+        for chain in ConfigsKeys.GRPC_List:
+            url = self.cfg[ConfigsKeys.GRPC][chain]
+            if len(url) > 0 and chain != to_chain:
+                client = GRPCClient(url)
+                Account.enable_unaudited_hdwallet_features()
+                account = Account.from_mnemonic(mnemonic)
+
+                header = client.get_latest_block()
+
+                account_info = client.query_account_info(account.address)
+
+                print('-------------{}-------------\nchain_url: {}\naccount number: {}\naddress: {}'.format(chain, url, account_info.account_number, account_info.address))
+                balance = client.query_balance(account_info.address, denom)
+                gapPrice = Coin(amount='600', denom='USDT')
+                tx_builder = TxBuilder(account,
+                                       None,
+                                       header.chain_id,
+                                       account_info.account_number,
+                                       gapPrice)
+                amount = balance[denom] - 0.003
+                print(str(amount))
+
+                priv_key = wallet.seed_to_privkey(mnemonic)
+
+                fx_address = priv_key.to_address()
+                ibc_conf = Ibc_transfer()
+                receiver = '{}|transfer/{}:{}'.format(fx_address,
+                                                      ibc_conf.cfg[ConfigsKeys.IBC_CHANNELS]["FXCore_" + to_chain],
+                                                      to_address)
+                print('receiver:', receiver)
+                tx_response = client.ibc_transfer(tx_builder,
+                                                  ibc_conf.cfg[ConfigsKeys.IBC_CHANNELS][chain + "_FXCore"],
+                                                  decimal.Decimal(amount), receiver, denom,
+                                                  account_info.sequence, mode=BROADCAST_MODE_BLOCK)
+                print(tx_response)

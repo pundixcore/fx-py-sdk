@@ -770,7 +770,10 @@ class GRPCClient:
                        acc_seq: int, mode: BroadcastMode = BROADCAST_MODE_BLOCK):
         if tx_builder._private_key is not None:
             address = tx_builder._private_key.to_address()
-            amount = token_amount * decimal.Decimal(DEFAULT_DEC_FX)
+            if denom == "USDT":
+                amount = token_amount * decimal.Decimal(DEFAULT_DEC)
+            else:
+                amount = token_amount * decimal.Decimal(DEFAULT_DEC_FX)
         else:
             address = tx_builder.account.address
             amount = token_amount * decimal.Decimal(DEFAULT_DEC)

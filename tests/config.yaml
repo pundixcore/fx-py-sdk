@@ -32,36 +32,28 @@ IBC_CHANNELS:
   TQQQ_FXCore: ""
   FXCore_TQQQ: ""
 
+GRPC:
+  TSLA: ""
+  AAPL: ""
+  NFLX: ""
+  GOOG: ""
+  FB: ""
+  AMZN: ""
+  BTC: "44.196.199.119:9190"
+  FX: ""
+  SPY: "44.196.199.119:9290"
+  IWM: ""
+  TQQQ: ""
+
 RPC:
-  TSLA_RPC: ""
-  TSLA_GRPC: ""
-
-  AAPL_RPC: ""
-  AAPL_GRPC: ""
-
-  NFLX_RPC: ""
-  NFLX_GRPC: ""
-
-  GOOG_RPC: ""
-  GOOG_GRPC: ""
-
-  FB_RPC: ""
-  FB_GRPC: ""
-
-  AMZN_RPC: ""
-  AMZN_GRPC: ""
-
-  BTC_RPC: ""
-  BTC_GRPC: ""
-
-  FX_RPC: ""
-  FX_GRPC: ""
-
-  SPY_RPC: ""
-  SPY_GRPC: ""
-
-  IWM_RPC: ""
-  IWM_GRPC: ""
-
-  TQQQ_RPC: ""
-  TQQQ_GRPC: ""
+  TSLA: ""
+  AAPL: ""
+  NFLX: ""
+  GOOG: ""
+  FB: ""
+  AMZN: ""
+  BTC: ""
+  FX: ""
+  SPY: ""
+  IWM: ""
+  TQQQ: ""
