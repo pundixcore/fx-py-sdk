@@ -1,4 +1,5 @@
 import decimal
+import time
 import datetime
 from urllib.parse import urlparse
 
@@ -45,6 +46,7 @@ from fx_py_sdk.model.model import HedgingOrder, HedgingTrade, Order as CrudOrder
 DEFAULT_DEX_GAS = 5000000
 DEFAULT_GRPC_NONE = "Not found"
 DEFAULT_DEC = 1000000
+DEFAULT_DEC_FX = 1000000000000000000
 Address_Prefix = "0x"
 
 class GRPCClient:
@@ -764,29 +766,35 @@ class GRPCClient:
         return self.broadcast_tx(tx, mode)
 
 
-    def ibc_transfer(self, tx_builder: TxBuilder, channel: str, token_amount: int, receiver: str,
-                       height: int,
+    def ibc_transfer(self, tx_builder: TxBuilder, channel: str, token_amount: int, receiver: str, denom: str,
                        acc_seq: int, mode: BroadcastMode = BROADCAST_MODE_BLOCK):
-        amount = token_amount * decimal.Decimal(DEFAULT_DEC)
+        if tx_builder._private_key is not None:
+            address = tx_builder._private_key.to_address()
+            amount = token_amount * decimal.Decimal(DEFAULT_DEC_FX)
+        else:
+            address = tx_builder.account.address
+            amount = token_amount * decimal.Decimal(DEFAULT_DEC)
         amount = str(amount)
         amount_split = amount.split('.', 1)
-        token = Coin(amount=str(amount_split[0]), denom="USDT")
+        token = Coin(amount=str(amount_split[0]), denom=denom)
 
         height = Height(revision_number=0, revision_height=0)
+        dtime = datetime.datetime.now()
+        ans_time = time.mktime(dtime.timetuple())
+        ans_time = (int(ans_time) + 86400) * 1000 * 1000 * 1000
 
         msg = MsgTransfer(source_port="transfer",
                           source_channel=channel,
                           token=token,
-                          sender=tx_builder.account.address,
+                          sender=address,
                           receiver=receiver,
                           timeout_height=height,
-                          timeout_timestamp=86400,
+                          timeout_timestamp=ans_time,
                           router="",
-                          fee=Coin(amount=str(0), denom="USDT"))
+                          fee=Coin(amount=str(0), denom=denom))
 
         msg_any = Any(type_url='/fx.ibc.applications.transfer.v1.MsgTransfer',
                       value=msg.SerializeToString())
-        # DEX 交易设置固定gas
         tx = self.build_tx(tx_builder, acc_seq, [msg_any], DEFAULT_DEX_GAS)
         return self.broadcast_tx(tx, mode)
 

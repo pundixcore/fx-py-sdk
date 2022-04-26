@@ -4,6 +4,7 @@ import unittest
 
 from eth_account import Account
 
+from fx_py_sdk import wallet
 from fx_py_sdk.grpc_client import GRPCClient, DEFAULT_GRPC_NONE, DEFAULT_DEC
 from fx_py_sdk.builder import TxBuilder
 from fx_py_sdk.codec.cosmos.base.v1beta1.coin_pb2 import Coin
@@ -13,6 +14,8 @@ from fx_py_sdk.codec.cosmos.tx.v1beta1.service_pb2 import BROADCAST_MODE_BLOCK, 
 from google.protobuf.json_format import MessageToJson
 import json
 from google.protobuf.timestamp_pb2 import Timestamp
+
+from fx_py_sdk.ibc_transfer import ConfigsKeys, Ibc_transfer
 
 client = GRPCClient('44.196.199.119:9190')
 # client = GRPCClient('127.0.0.1:9090')
@@ -184,6 +187,100 @@ class MyTestCase(unittest.TestCase):
 
         tx_response = client.add_margin(tx_builder, pair_id, positions[0].Id, decimal.Decimal(0.1),
                                         account_info.sequence, mode=BROADCAST_MODE_BLOCK)
+        print(tx_response)
+
+
+    def test_ibc_transfer_DexToFxCore(self):
+        Account.enable_unaudited_hdwallet_features()
+        account = Account.from_mnemonic(
+            "dune antenna hood magic kit blouse film video another pioneer dilemma hobby message rug sail gas culture upgrade twin flag joke people general aunt")
+
+        header = client.get_latest_block()
+
+        account_info = client.query_account_info(account.address)
+        print('account number:', account_info.account_number,
+              'sequence:', account_info.sequence)
+        print(account.address)
+
+        tx_builder = TxBuilder(account,
+                               None,
+                               header.chain_id,
+                               account_info.account_number,
+                               Coin(amount='600', denom='USDT'))
+        ibc_conf = Ibc_transfer()
+
+        tx_response = client.ibc_transfer(tx_builder,
+                                          ibc_conf.cfg[ConfigsKeys.IBC_CHANNELS][ConfigsKeys.BTC_FXCore],
+                                          decimal.Decimal(0.1),
+                                        "0xd5456f7BFeEB0AC09B73357d960B64A854Da550c",
+                                          "USDT",
+                                          account_info.sequence,
+                                          mode=BROADCAST_MODE_BLOCK)
+        print(tx_response)
+
+    # dex-btc  -> f(x) -> dex-spy
+    def test_ibc_transfer_DexToDex(self):
+        Account.enable_unaudited_hdwallet_features()
+        account = Account.from_mnemonic(
+            "dune antenna hood magic kit blouse film video another pioneer dilemma hobby message rug sail gas culture upgrade twin flag joke people general aunt")
+
+        header = client.get_latest_block()
+
+        account_info = client.query_account_info(account.address)
+        print('account number:', account_info.account_number,
+              'sequence:', account_info.sequence,
+              'address:', account_info.address)
+
+        tx_builder = TxBuilder(account,
+                               None,
+                               header.chain_id,
+                               account_info.account_number,
+                               Coin(amount='600', denom='USDT'))
+
+        priv_key = wallet.seed_to_privkey(
+            "dune antenna hood magic kit blouse film video another pioneer dilemma hobby message rug sail gas culture upgrade twin flag joke people general aunt")
+
+        fx_address = priv_key.to_address()
+        ibc_conf = Ibc_transfer()
+        receiver = '{}|transfer/{}/{}'.format(fx_address,
+                                              ibc_conf.cfg[ConfigsKeys.IBC_CHANNELS][ConfigsKeys.FXCore_SPY],
+                                              account.address)
+        print(receiver)
+        tx_response = client.ibc_transfer(tx_builder,
+                                          ibc_conf.cfg[ConfigsKeys.IBC_CHANNELS][ConfigsKeys.BTC_FXCore],
+                                          decimal.Decimal(0.1), receiver, "USDT",
+                                          account_info.sequence, mode=BROADCAST_MODE_BLOCK)
+        print(tx_response)
+
+    def test_ibc_transfer_fromFxcoreToBTC(self):
+        Account.enable_unaudited_hdwallet_features()
+
+        clientFX = GRPCClient('3.210.229.34:9090')
+
+        priv_key = wallet.seed_to_privkey(
+            "dune antenna hood magic kit blouse film video another pioneer dilemma hobby message rug sail gas culture upgrade twin flag joke people general aunt")
+
+        header = clientFX.get_latest_block()
+        addressFx = priv_key.to_public_key().to_address()
+        account_info = clientFX.query_account_info(addressFx)
+        print('account number:', account_info.account_number,
+              'sequence:', account_info.sequence,
+              'address:', addressFx)
+
+        balance = clientFX.query_all_balances(addressFx)
+        print('balance:', balance)
+
+        tx_builder = TxBuilder(None,
+                               priv_key,
+                               header.chain_id,
+                               account_info.account_number,
+                               Coin(amount='20000000000000000000', denom='FX'))
+        ibc_conf = Ibc_transfer()
+        channel = ibc_conf.cfg[ConfigsKeys.IBC_CHANNELS][ConfigsKeys.FXCore_BTC]
+        print(channel)
+        tx_response = clientFX.ibc_transfer(tx_builder, channel, decimal.Decimal(1.1),
+                                        "0xd5456f7BFeEB0AC09B73357d960B64A854Da550c", "FX",
+                                          account_info.sequence, mode=BROADCAST_MODE_BLOCK)
         print(tx_response)
 
     def test_query_orders_by_account(self):

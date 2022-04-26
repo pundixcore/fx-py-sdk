@@ -1,0 +1,67 @@
+IBC_CHANNELS:
+  TSLA_FXCore: ""
+  FXCore_TSLA: ""
+
+  AAPL_FXCore: ""
+  FXCore_AAPL: ""
+
+  NFLX_FXCore: ""
+  FXCore_NFLX: ""
+
+  GOOG_FXCore: ""
+  FXCore_GOOG: ""
+
+  FB_FXCore: ""
+  FXCore_FB: ""
+
+  AMZ_FXCore: ""
+  FXCore_AMZ: ""
+
+  BTC_FXCore: "channel-0"
+  FXCore_BTC: "channel-19"
+
+  FX_FXCore: ""
+  FXCore_FX: ""
+
+  SPY_FXCore: "channel-0"
+  FXCore_SPY: "channel-20"
+
+  IWM_FXCore: ""
+  FXCore_IWM: ""
+
+  TQQQ_FXCore: ""
+  FXCore_TQQQ: ""
+
+RPC:
+  TSLA_RPC: ""
+  TSLA_GRPC: ""
+
+  AAPL_RPC: ""
+  AAPL_GRPC: ""
+
+  NFLX_RPC: ""
+  NFLX_GRPC: ""
+
+  GOOG_RPC: ""
+  GOOG_GRPC: ""
+
+  FB_RPC: ""
+  FB_GRPC: ""
+
+  AMZN_RPC: ""
+  AMZN_GRPC: ""
+
+  BTC_RPC: ""
+  BTC_GRPC: ""
+
+  FX_RPC: ""
+  FX_GRPC: ""
+
+  SPY_RPC: ""
+  SPY_GRPC: ""
+
+  IWM_RPC: ""
+  IWM_GRPC: ""
+
+  TQQQ_RPC: ""
+  TQQQ_GRPC: ""
