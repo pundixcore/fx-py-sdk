@@ -9,6 +9,7 @@ class MyTestCase(unittest.TestCase):
 
     def test_transfer_to_one_chain(self):
         ibc = Ibc_transfer()
-        mnemonic = "tilt lumber reopen beach logic view purse note unfair harsh already sense affair worry magic century dress captain anger sniff range whip helmet boy"
+        mnemonic = "dune antenna hood magic kit blouse film video another pioneer dilemma hobby message rug sail gas culture upgrade twin flag joke people general aunt"
+
         ibc.transfer_to_one_chain(mnemonic, "USDT", "0xA1FD17f3624B64cE5Cd0d6Ed22298340488507d3", ConfigsKeys.SPY)
 

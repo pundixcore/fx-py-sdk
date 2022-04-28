@@ -18,13 +18,13 @@ IBC_CHANNELS:
   FXCore_AMZ: ""
 
   BTC_FXCore: "channel-0"
-  FXCore_BTC: "channel-19"
+  FXCore_BTC: "channel-0"
 
   FX_FXCore: ""
   FXCore_FX: ""
 
   SPY_FXCore: "channel-0"
-  FXCore_SPY: "channel-20"
+  FXCore_SPY: "channel-1"
 
   IWM_FXCore: ""
   FXCore_IWM: ""
@@ -39,9 +39,9 @@ GRPC:
   GOOG: ""
   FB: ""
   AMZN: ""
-  BTC: "44.196.199.119:9190"
+  BTC: "1.116.72.9:9090"
   FX: ""
-  SPY: "44.196.199.119:9290"
+  SPY: "1.116.72.9:9090"
   IWM: ""
   TQQQ: ""
 

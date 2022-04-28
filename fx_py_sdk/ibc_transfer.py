@@ -87,7 +87,7 @@ class Ibc_transfer:
                                        header.chain_id,
                                        account_info.account_number,
                                        gapPrice)
-                amount = balance[denom] - 0.003
+                amount = balance[denom] - 1000000000000000
                 print(str(amount))
 
                 priv_key = wallet.seed_to_privkey(mnemonic)

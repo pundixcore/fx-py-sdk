@@ -192,7 +192,7 @@ class MyTestCase(unittest.TestCase):
         print(tx_response)
 
 
-    def test_ibc_transfer_DexToFxCore(self):
+    def test_ibc_transfer_dex_to_fxcore(self):
         Account.enable_unaudited_hdwallet_features()
         account = Account.from_mnemonic(
             "dune antenna hood magic kit blouse film video another pioneer dilemma hobby message rug sail gas culture upgrade twin flag joke people general aunt")
@@ -221,7 +221,7 @@ class MyTestCase(unittest.TestCase):
         print(tx_response)
 
     # dex-btc  -> f(x) -> dex-spy
-    def test_ibc_transfer_DexToDex(self):
+    def test_ibc_transfer_dex_to_dex(self):
         Account.enable_unaudited_hdwallet_features()
         account = Account.from_mnemonic(
             "dune antenna hood magic kit blouse film video another pioneer dilemma hobby message rug sail gas culture upgrade twin flag joke people general aunt")
@@ -254,7 +254,7 @@ class MyTestCase(unittest.TestCase):
                                           account_info.sequence, mode=BROADCAST_MODE_BLOCK)
         print(tx_response)
 
-    def test_ibc_transfer_fromFxcoreToBTC_FX(self):
+    def test_ibc_transfer_fxcore_to_dex_fx(self):
         Account.enable_unaudited_hdwallet_features()
 
         clientFX = GRPCClient('3.210.229.34:9090')
@@ -285,7 +285,7 @@ class MyTestCase(unittest.TestCase):
                                           account_info.sequence, mode=BROADCAST_MODE_BLOCK)
         print(tx_response)
 
-    def test_ibc_transfer_fromFxcoreToBTC_USDT(self):
+    def test_ibc_transfer_fx_core_to_dex_usdt(self):
         Account.enable_unaudited_hdwallet_features()
 
         clientFX = GRPCClient('3.210.229.34:9090')
