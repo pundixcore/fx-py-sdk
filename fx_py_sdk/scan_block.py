@@ -18,9 +18,12 @@ class ScanBlockBase:
     """process block event, then update to sql"""
     max_block_height: int = None
 
-    def __init__(self):
+    def __init__(self, pair_id: Optional[str] = None):
         # maps block height to deque
         self.realized_positions: Dict[int, deque] = dict()
+
+        # maintain reference to pair_id
+        self.pair_id: str = pair_id
 
     """
      ************************ process Block ************************
@@ -31,7 +34,6 @@ class ScanBlockBase:
             if BlockResponse.DATA not in message[BlockResponse.RESULT]:
                 logging.info(f"data not in message: {message}")
                 return
-            print(message[BlockResponse.RESULT])
             block_height = message[BlockResponse.RESULT][BlockResponse.DATA][BlockResponse.VALUE][
                 BlockResponse.BLOCK][BlockResponse.HEADER][BlockResponse.HEIGHT]
             block_height = int(block_height)
@@ -54,10 +56,11 @@ class ScanBlockBase:
             self.process_end_block(end_block_events, block_height)
             self.process_best_bid_ask(block_height, True)
             self.process_cumulative_realized_pnl(block_height)
-            self.integrity_check(block_height)
+            if block_height % 10 == 0:
+                self.integrity_check(block_height)
 
             # Update latest block on chain
-            block = Block(height=block_height, time=block_datetime, block_processed=True)
+            block = Block(height=block_height, time=block_datetime, block_processed=True, pair_id=self.pair_id)
             self.process_block_height(block)
 
         except Exception as e:
@@ -313,19 +316,26 @@ class ScanBlockBase:
 class ScanBlock(ScanBlockBase):
     """process block event, then update to sql"""
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, pair_id: Optional[str] = None):
+        super().__init__(pair_id)
         self.client = GRPCClient(constants.Network.get_grpc_url())
         self.crud = self.client.crud
 
     def process_block_height(self, block: Block):
-        sql_block = self.crud.filterone(
-            Block, Block.height == block.height)
+        """
+        Updates block height fields in database, and sets `self.max_block_height`.
+        """
+        block_filters = [Block.height == block.height, Block.pair_id == self.pair_id]
+        sql_block = self.crud.filterone(Block, *block_filters)
+
         if sql_block is None:
             self.crud.insert(block)
         else:
-            self.crud.update(Block, filter=(Block.height == block.height),
-                             updic=block.to_dict())
+            update_dict = block.to_dict()
+            self.crud.update(Block,
+                filter=block_filters,
+                updic=update_dict
+            )
 
         try:    self.max_block_height = max(self.max_block_height or -1, block.height)
         except: pass
@@ -340,8 +350,10 @@ class ScanBlock(ScanBlockBase):
             update_dict = None
 
         if update_dict:
-            self.crud.update(Position, filter=(Position.position_id == position.position_id),
-                             updic=update_dict)
+            self.crud.update(Position,
+                filter=(Position.position_id == position.position_id, Position.pair_id == position.pair_id),
+                updic=update_dict
+            )
 
     def __insert_order(self, order: Order):
         if order.status=='ORDER_FILLED':
@@ -369,24 +381,14 @@ class ScanBlock(ScanBlockBase):
                     update_dict[attr] = attr_val
 
         if update_dict:
-            self.crud.update(Order, filter=(Order.order_id == order.order_id),
-                             updic=update_dict)
+            self.crud.update(Order,
+                filter=(Order.order_id == order.order_id, Order.pair_id == self.pair_id),
+                updic=update_dict
+            )
 
     def process_end_block(self, events: str, block_height: int):
         """process fxdex chain EndBlock events"""
         for event in events:
-            """
-            if 'position' in event[BlockResponse.TYPE].lower():
-                for attr in event[BlockResponse.Attributes]:
-                    if base64.b64decode(attr[BlockResponse.Key]).decode('utf8') in [EventKeys.id, EventKeys.position_id]:
-                        position_id_val = base64.b64decode(attr[BlockResponse.VALUE]).decode('utf8')
-                        if position_id_val.startswith('"') and position_id_val.endswith('"'):
-                            position_id_val = position_id_val[1:-1]
-                        position_id = int(position_id_val)
-                        sql_position = self.crud.filterone(Position, Position.position_id==position_id)
-                        is_new = sql_position is None                
-            """
-
             if event[BlockResponse.TYPE] == EventTypes.New_position:
                 position = self.get_position(event[BlockResponse.Attributes], is_new_position=True)
                 position.status = PositionStatus.Open
@@ -394,7 +396,9 @@ class ScanBlock(ScanBlockBase):
                 position.open_height = block_height
 
                 sql_position = self.crud.filterone(
-                    Position, Position.position_id == position.position_id)
+                    Position,
+                    Position.position_id == position.position_id, Position.pair_id == self.pair_id
+                )
 
                 if sql_position is None:
                     self.crud.insert(position)
@@ -407,7 +411,9 @@ class ScanBlock(ScanBlockBase):
                 position.block_height = block_height
 
                 sql_position = self.crud.filterone(
-                    Position, Position.position_id == position.position_id)
+                    Position,
+                    Position.position_id == position.position_id, Position.pair_id == self.pair_id
+                )
                 if sql_position is None:
                     self.crud.insert(position)
                 else:
@@ -420,7 +426,9 @@ class ScanBlock(ScanBlockBase):
                 position.close_height = block_height
 
                 sql_position = self.crud.filterone(
-                    Position, Position.position_id == position.position_id)
+                    Position,
+                    Position.position_id == position.position_id, Position.pair_id == self.pair_id
+                )
                 if sql_position is None:
                     self.crud.insert(position)
                 else:
@@ -435,7 +443,9 @@ class ScanBlock(ScanBlockBase):
                 position.last_order_fill_height = block_height
 
                 sql_position = self.crud.filterone(
-                    Position, Position.position_id == position.position_id)
+                    Position,
+                    Position.position_id == position.position_id, Position.pair_id == self.pair_id
+                )
                 if sql_position is None:
                     self.crud.insert(position)
                 else:
@@ -450,7 +460,9 @@ class ScanBlock(ScanBlockBase):
                 order.cancel_block_height = block_height
 
                 sql_order = self.crud.filterone(
-                    Order, Order.order_id == order.order_id)
+                    Order,
+                    Order.order_id == order.order_id, Order.pair_id == self.pair_id
+                )
                 if sql_order is None:
                     self.__insert_order(order)
                 else:
@@ -468,7 +480,9 @@ class ScanBlock(ScanBlockBase):
                 order.last_filled_quantity = trade.matched_quantity
 
                 sql_order: Order = self.crud.filterone(
-                    Order, Order.order_id == order.order_id)
+                    Order,
+                    Order.order_id == order.order_id, Order.pair_id == self.pair_id
+                )
                 if order.status=='ORDER_PENDING':
                     # fully filled on same block order was sent
                     if order.open_block_height==block_height and order.base_quantity==order.filled_quantity:
@@ -528,6 +542,7 @@ class ScanBlock(ScanBlockBase):
 
                 if transfer:
                     transfer.block_height = block_height
+                    transfer.pair_id = self.pair_id
                     self.crud.insert(transfer)
 
         return
@@ -543,7 +558,9 @@ class ScanBlock(ScanBlockBase):
                 position.close_height = block_height
 
                 sql_position = self.crud.filterone(
-                    Position, Position.position_id == position.position_id)
+                    Position,
+                    Position.position_id == position.position_id, Position.pair_id == self.pair_id
+                )
                 if sql_position is None:
                     self.crud.insert(position)
                 else:
@@ -556,7 +573,9 @@ class ScanBlock(ScanBlockBase):
                 order.cancel_block_height = block_height
 
                 sql_order = self.crud.filterone(
-                    Order, Order.order_id == order.order_id)
+                    Order,
+                    Order.order_id == order.order_id, Order.pair_id == self.pair_id
+                )
                 if sql_order is None:
                     self.__insert_order(order)
                 else:
@@ -582,7 +601,9 @@ class ScanBlock(ScanBlockBase):
                         break
 
                 sql_order = self.crud.filterone(
-                    Order, Order.order_id == order.order_id)
+                    Order,
+                    Order.order_id == order.order_id, Order.pair_id == order.pair_id
+                )
                 if sql_order is None:
                     self.__insert_order(order)
                 self.process_orderbook(order, True, block_height)
@@ -645,6 +666,7 @@ class ScanBlock(ScanBlockBase):
             error = Error()
             error.log = tx_result[BlockResponse.Log]
             error.block_height = block_height
+            error.pair_id = self.pair_id
 
             for event in tx_result[BlockResponse.EVENTS]:
                 if event[BlockResponse.TYPE]==EventTypes.Message:
@@ -671,7 +693,9 @@ class ScanBlock(ScanBlockBase):
                 order.initial_base_quantity = order.base_quantity
 
                 sql_order = self.crud.filterone(
-                    Order, Order.order_id == order.order_id)
+                    Order,
+                    Order.order_id == order.order_id, Order.pair_id == self.pair_id
+                )
                 if sql_order is None:
                     self.__insert_order(order)
                 else:
@@ -686,7 +710,9 @@ class ScanBlock(ScanBlockBase):
                 order.cancel_block_height = block_height
 
                 sql_order = self.crud.filterone(
-                    Order, Order.order_id == order.order_id)
+                    Order,
+                    Order.order_id == order.order_id, Order.pair_id == self.pair_id
+                )
                 if sql_order is None:
                     self.__insert_order(order)
                 else:
@@ -708,7 +734,7 @@ class ScanBlock(ScanBlockBase):
                 except IntegrityError:  # duplicate
                     pass
 
-        block = Block(height=block_height, tx_events_processed=True)
+        block = Block(height=block_height, tx_events_processed=True, pair_id=self.pair_id)
         self.process_block_height(block)
 
     """
@@ -823,8 +849,9 @@ class ScanBlock(ScanBlockBase):
         interval = 500
         if block_height%interval==0:
             self.crud.update_realized_pnl_logs(
-                start_block_height=block_height-interval+1,
-                end_block_height=block_height
+                start_block_height = block_height-interval+1,
+                end_block_height = block_height,
+                pair_id = self.pair_id
             )
 
     def integrity_check(self, block_height, order_diff_threshold=10):
@@ -835,7 +862,10 @@ class ScanBlock(ScanBlockBase):
         if block_height % 250 == 0:
             logging.info(f'Running integrity check... (blk ht = {block_height})')
 
-        open_order_counts = self.crud.query_open_order_count_by_pairid_and_address(limit_records=10)
+        open_order_counts = self.crud.query_open_order_count_by_pairid_and_address(
+            pair_id=self.pair_id,
+            limit_records=10
+        )
         alert_list = []
 
         for pair_id, owner, db_order_count in open_order_counts:
@@ -850,8 +880,9 @@ class ScanBlock(ScanBlockBase):
                 logging.warn(alert_msg)
 
         if alert_list:
+            alert_title = f'Integrity Check Alert (Blk Ht: {block_height}) [{self.pair_id}]'
             alert_text = os.linesep.join(alert_list)
-            send_mail(f'Integrity Check Alert (Blk Ht: {block_height})', alert_text)
+            send_mail(alert_title, alert_text)
 
     def initialize_order_book(self):
         all_entries = []

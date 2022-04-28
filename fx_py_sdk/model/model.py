@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 import sqlalchemy
-from sqlalchemy import Index, Table, Column, Integer, String, Boolean, ForeignKey, Numeric, DateTime
+from sqlalchemy import (
+    Index, Column, Integer, String, Boolean,
+    Numeric, DateTime, UniqueConstraint
+)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from fx_py_sdk import constants
@@ -22,10 +25,13 @@ Base.to_dict = to_dict
 
 class Order(Base):
     __tablename__ = 'orders'
+    __table_args__ = (
+        UniqueConstraint('order_id', 'pair_id'),
+    )
 
     id = Column('id', Integer, primary_key=True, autoincrement=True)
     block_height = Column(Integer, index=True)
-    order_id = Column(String(100), nullable=False, unique=True)
+    order_id = Column(String(100), nullable=False)
     tx_hash = Column(String(64))
     owner = Column(String(42))
     liquidation_owner = Column(String(42))
@@ -53,10 +59,9 @@ class Order(Base):
 class Position(Base):
     __tablename__ = 'position'
 
-    # id = Column('id', Integer, primary_key=True, autoincrement=True)
     position_id = Column(Integer, primary_key=True, nullable=False)
     owner = Column(String(42))
-    pair_id = Column(String(20))
+    pair_id = Column(String(20), primary_key=True)
     direction = Column(String(10))
     entry_price = Column(Numeric)
     mark_price = Column(Numeric)
@@ -77,6 +82,7 @@ class Position(Base):
 
 class Orderbook(Base):
     __tablename__ = 'orderbook'
+
     id = Column('id', Integer, primary_key=True, autoincrement=True)
     price = Column(Numeric)
     quantity = Column(Numeric)
@@ -86,6 +92,7 @@ class Orderbook(Base):
 
 class Trade(Base):
     __tablename__ = 'trade'
+
     id = Column('id', Integer, primary_key=True, autoincrement=True)
     block_height = Column(Integer, index=True)
     deal_price = Column(Numeric)
@@ -120,13 +127,19 @@ class FundingTransfer(Base):
 
 class Block(Base):
     __tablename__ = 'block'
-    height = Column('height', Integer, primary_key=True, index=True, autoincrement=False)
+    __table_args__ = (
+        Index('ix_block_height_pair_id', 'height', 'pair_id'),
+    )
+
+    height = Column('height', Integer, primary_key=True, autoincrement=False)
+    pair_id = Column(String(20), primary_key=True)
     time = Column(DateTime, index=True)
     block_processed = Column(Boolean, default=False, index=True)
     tx_events_processed = Column(Boolean, default=False, index=True)
 
 class Tx(Base):
     __tablename__ = 'tx'
+
     id = Column('id', Integer, primary_key=True, autoincrement=True)
     sender = Column(String(50))
     send_time = Column(String(50))
@@ -137,13 +150,10 @@ class Tx(Base):
 """ auxillary helper classes """
 class Positioning(Base):
     __tablename__ = 'positioning'
-    __table_args__ = (
-        Index('ix_positioning_owner_pairid_height', 'owner', 'pair_id', 'block_height'),
-    )
 
     id = Column('id', Integer, primary_key=True, autoincrement=True)
-    owner = Column(String(42))
-    pair_id = Column(String(20))
+    owner = Column(String(42), index=True)
+    pair_id = Column(String(20), index=True)
     entry_price = Column(Numeric)
     mark_price = Column(Numeric)
     base_quantity = Column(Numeric)
@@ -153,9 +163,10 @@ class Positioning(Base):
     direction = Column(String(10))
     position_id = Column(Integer)
     locked_fees = Column(Numeric)
-    block_height = Column(Integer)
+    block_height = Column(Integer, index=True)
     is_batch_update = Column(Boolean, default=False)
 
+# Logs realized P&Ls for efficient cumulative calculation
 class Realized_Pnl_Log(Base):
     __tablename__ = 'realized_pnl_log'
 
@@ -168,15 +179,18 @@ class Realized_Pnl_Log(Base):
 
 class Balance(Base):
     __tablename__ = 'balance'
+
     id = Column('id', Integer, primary_key=True, autoincrement=True)
-    owner = Column(String(42))
-    token = Column('pair_id', String(70), index=True)
+    owner = Column(String(42), index=True)
+    token = Column(String(70), index=True)
     amount = Column(Numeric)
-    batch_time = Column(DateTime)
+    batch_time = Column(DateTime, index=True)
     time = Column(DateTime)
+    chain_pair_id = Column(String(20), index=True)
 
 class OrderbookTop(Base):
     __tablename__ = 'orderbook_top'
+
     id = Column('id', Integer, primary_key=True, autoincrement=True)
     pair_id = Column(String(20), index=True)
     best_bid = Column(Numeric)
@@ -185,6 +199,7 @@ class OrderbookTop(Base):
 
 class FundingRate(Base):
     __tablename__ = 'funding_rate'
+
     id = Column('id', Integer, primary_key=True, autoincrement=True)
     pair_id = Column(String(20), index=True)
     rate = Column(Numeric)
@@ -193,6 +208,7 @@ class FundingRate(Base):
 
 class Wallet(Base):
     __tablename__ = 'wallet'
+
     id = Column('id', Integer, primary_key=True, autoincrement=True)
     address = Column(String(42), unique=True)
     owner = Column(String(100))
@@ -202,6 +218,7 @@ class Wallet(Base):
 
 class Margin(Base):
     __tablename__ = 'margin'
+
     id = Column('id', Integer, primary_key=True, autoincrement=True)
     add_amount = Column(Numeric)
     position_id = Column(Integer, index=True)
@@ -219,6 +236,7 @@ class Margin(Base):
 
 class LockedFee(Base):
     __tablename__ = 'locked_fee'
+
     id = Column('id', Integer, primary_key=True, autoincrement=True)
     pair_id = Column(String(20), index=True)
     owner = Column(String(100), index=True)
@@ -228,28 +246,32 @@ class LockedFee(Base):
 
 class Error(Base):
     __tablename__ = 'error'
+
     id = Column('id', Integer, primary_key=True, autoincrement=True)
+    pair_id = Column(String(20), index=True)
     sender = Column(String(42), index=True)
     log = Column(String(1024))
     block_height = Column(Integer, index=True)
 
 class ErrorLog(Base):
     __tablename__ = 'error_log'
-    id = Column('id', Integer, primary_key=True, autoincrement=True)
     height = Column(Integer)
+    pair_id = Column(String(20), primary_key=True)
 
 class Transfer(Base):
     __tablename__ = 'transfer'
+
     id = Column('id', Integer, primary_key=True, autoincrement=True)
     sender = Column(String(100), index=True)
     recipient = Column(String(100), index=True)
     amount = Column(Numeric)
     token = Column(String(70), index=True)
     block_height = Column(Integer, index=True)
-
+    pair_id = Column(String(20))
 class OraclePrice(Base):
     __tablename__ = 'oracle_price'
-    market_id = Column(String(20), primary_key=True, index=True)
+
+    market_id = Column('pair_id', String(20), primary_key=True, index=True)
     price = Column(Numeric)
     block_height = Column(Integer, primary_key=True, index=True)
 
@@ -259,6 +281,7 @@ class TradePair(Base):
 
 class HedgingOrder(Base):
     __tablename__ = 'hedging_order'
+
     id = Column('id', Integer, primary_key=True, autoincrement=True)
     dex_order_id = Column(String(100))
     dex_trade_id = Column(Integer)
@@ -276,6 +299,7 @@ class HedgingOrder(Base):
 
 class HedgingTrade(Base):
     __tablename__ = 'hedging_trade'
+
     id = Column('id', Integer, primary_key=True, autoincrement=True)
     order_id = Column(String(100))      # Hedging exchange order ID
     trade_id = Column(String(100))      # Hedging exchange trade ID (if any)
@@ -349,101 +373,14 @@ AND pid <> pg_backend_pid();''')
     def initialize_trade_pairs(self):
         self.initialize_table('trade_pairs.csv', 'trade_pair')
 
-    def initialize_error_log_height(self, starting_height=None):
+    def initialize_error_log_height(self, pair_id, starting_height=None):
         with self.session() as session:
             if not starting_height:
                 starting_height = session.execute('SELECT MAX(height) FROM block').first()[0] or 1
 
-            session.execute(f'''
-    INSERT INTO error_log (height)
-    SELECT {starting_height}
-    WHERE NOT EXISTS (SELECT * FROM error_log)''')
+            session.execute(f"""
+                INSERT INTO error_log (height, pair_id)
+                SELECT {starting_height}, '{pair_id}'
+                WHERE NOT EXISTS (SELECT * FROM error_log WHERE pair_id = '{pair_id}')
+                """)
             session.commit()
-
-    """
-    Below is create database and table use psycopg2, require your computer install postgresql
-    if pip install psycopg2 have problem, try this: 
-        ubuntu: install postgresql-devel 
-        macos: brew install postgresql
-    """
-    # def create_db(self, db: str):
-    #     self.conn = psycopg2.connect(database=self.database, user=self.user, password=self.pw, host=self.host,
-    #                                  port=self.port)
-    #     self.conn.autocommit = True
-    #     cursor = self.conn.cursor()
-    #     sql = "CREATE database %s" % db
-    #     cursor.execute(sql)
-    #     print("Database created successfully........")
-    #     self.conn.close()
-    #
-    # def create_table(self, db: str):
-    #     commands = (
-    #         '''DROP TABLE if EXISTS orders''',
-    #         '''CREATE TABLE orders(
-    #                    id serial4 PRIMARY KEY,
-    #                    block_height INT,
-    #                    tx_hash varchar(20) not NULL,
-    #                    order_id varchar(20),
-    #                    owner varchar(42),
-    #                    pair_id varchar(10),
-    #                    direction varchar(10),
-    #                    price FLOAT,
-    #                    base_quantity FLOAT,
-    #                    quote_quantity FLOAT,
-    #                    filled_quantity FLOAT,
-    #                    filled_avg_price FLOAT ,
-    #                    remain_locked FLOAT ,
-    #                    created_at varchar(50),
-    #                    leverage INT,
-    #                    status  varchar(30),
-    #                    order_type varchar(30),
-    #                    cost_fee FLOAT ,
-    #                    locked_fee FLOAT);''',
-    #         '''create unique index idx_orders_order_id   on orders using btree (order_id);''',
-    #
-    #
-    #         '''DROP TABLE if EXISTS positions;''',
-    #         '''CREATE TABLE positions(
-    #                    id serial4 PRIMARY KEY,
-    #                    position_id varchar(20) not NULL,
-    #                    owner varchar(42),
-    #                    pair_id varchar(10),
-    #                    direction varchar(10),
-    #                    entry_price  FLOAT,
-    #                    mark_price FLOAT,
-    #                    liquidation_price FLOAT,
-    #                    base_quantity FLOAT,
-    #                    margin FLOAT,
-    #                    leverage INT,
-    #                    unrealized_pnl FLOAT,
-    #                    margin_rate FLOAT,
-    #                    initial_margin FLOAT,
-    #                    pending_order_quantity FLOAT);''',
-    #         '''create unique index idx_positions_position_id on positions using btree (position_id);''',
-    #
-    #
-    #         """DROP TABLE if EXISTS orderbook;""",
-    #         '''CREATE TABLE orderbook(
-    #                    id serial4 PRIMARY KEY,
-    #                    price FLOAT ,
-    #                    quantity FLOAT ,
-    #                    type varchar(10));'''
-    #         '''create unique index idx_orderbook_price on orderbook using btree (price);''',
-    #     )
-    #     try:
-    #         self.conn = psycopg2.connect(database=db, user=self.user, password=self.pw, host=self.host,
-    #                                      port=self.port)
-    #
-    #         cur = self.conn.cursor()
-    #         # create table one by one
-    #         for command in commands:
-    #             cur.execute(command)
-    #         cur.close()
-    #         self.conn.commit()
-    #
-    #     except (Exception, psycopg2.DatabaseError) as error:
-    #         print("sql caught: ", error)
-    #
-    #     finally:
-    #         if self.conn is not None:
-    #             self.conn.close()

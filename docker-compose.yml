@@ -1,39 +1,36 @@
 version: "3.7"
 
 # This file allows you to maintain a copy of database
+# Multichain infrastructure requires multiple WS instances
 services:
-  listener:
-    build: .
-    platform: linux/amd64
-    image: fxdex/fx_ws
-    logging:
-      options:
-        max-size: "512m"
+  btc-listener:
+    extends:
+      file: docker-compose-base.yml
+      service: base-listener
     environment:
-      # Toggles between different endpoint URLs
-      - NETWORK=testnet                   # "local", "devnet", "testnet" or "mainnet"
-
-      # Database connection credentials
-      - database=fxdex
-      - user=postgres
-      - password=
-      - host=
-      - port=5432
-
-      # RPC parameters
-      - RPC_PAGE_SIZE=5                   # number of blocks to get in each multithread call
-      - RPC_MAX_RETRIES=999               # number of times to retry before backing off
-      - START_BLOCK=1                     # block to start tracking from
-      - POSITIONING_UPDATE_INTERVAL=100   # block interval to update (unrealized) P&Ls
+      PAIR_ID: BTC:USDT
+      INIT_DB: 1
 
       # Endpoint URLs to DEX
-      - TESTNET_RPC_URL=
-      - TESTNET_GRPC_URL=
-      - TESTNET_WS_URL=
+      TESTNET_RPC_URL:
+      TESTNET_GRPC_URL:
+      TESTNET_WS_URL:
 
-      # For notifying user (in event of database/WS error)
-      - GMAIL_APP_EMAIL=
-      - GMAIL_APP_PASSWORD=
+    networks:
+      - default_network
+
+  spy-listener:
+    extends:
+      file: docker-compose-base.yml
+      service: base-listener
+    environment:
+      PAIR_ID: SPY:USDT
+
+      # Endpoint URLs to DEX
+      TESTNET_RPC_URL:
+      TESTNET_GRPC_URL:
+      TESTNET_WS_URL:
+
     networks:
       - default_network
 
