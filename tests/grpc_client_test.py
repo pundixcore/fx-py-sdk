@@ -44,7 +44,7 @@ class MyTestCase(unittest.TestCase):
 
     def test_query_account(self):
         account = client.query_account_info(
-            address="0x61bd2030908d658dd5a2139D2C13Af55b9138efb")
+            address="0x527d29e0067d5913AF44F140C329f8d782D03D0E")
         print(account)
 
     def test_query_oracle_price(self):
