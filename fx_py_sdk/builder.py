@@ -36,7 +36,7 @@ class TxBuilder:
         self._memo = memo
 
     def address(self) -> str:
-        if len(self._private_key.to_address()) > 0:
+        if self._private_key is not None:
             return self._private_key.to_address()
         else:
             return self.account.address

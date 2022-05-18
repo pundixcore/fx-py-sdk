@@ -101,7 +101,7 @@ class MyTestCase(unittest.TestCase):
         print('account number:', account_info.account_number,
               'sequence:', account_info.sequence)
 
-        tx_builder = TxBuilder(account, chain_id, account_info.account_number, Coin(
+        tx_builder = TxBuilder(account, None, chain_id, account_info.account_number, Coin(
             amount='600', denom='USDT'))
 
         tx_response = client.create_order(tx_builder, 'BTC:USDT', "SELL", decimal.Decimal(
@@ -110,8 +110,7 @@ class MyTestCase(unittest.TestCase):
 
     def test_cancel_order(self):
         Account.enable_unaudited_hdwallet_features()
-        account = Account.from_mnemonic(
-            "dune antenna hood magic kit blouse film video another pioneer dilemma hobby message rug sail gas culture upgrade twin flag joke people general aunt")
+        account = Account.from_mnemonic("dune antenna hood magic kit blouse film video another pioneer dilemma hobby message rug sail gas culture upgrade twin flag joke people general aunt")
 
         chain_id = client.query_chain_id()
         print('chain_id:', chain_id)
@@ -120,7 +119,7 @@ class MyTestCase(unittest.TestCase):
         print('account number:', account_info.account_number,
               'sequence:', account_info.sequence)
 
-        tx_builder = TxBuilder(account, chain_id, account_info.account_number, Coin(
+        tx_builder = TxBuilder(account, None, chain_id, account_info.account_number, Coin(
             amount='600', denom='USDT'))
 
         create_tx_response = client.create_order(tx_builder, 'BTC:USDT', BUY, decimal.Decimal(
@@ -159,7 +158,7 @@ class MyTestCase(unittest.TestCase):
             print("please build position first")
         self.assertNotEqual(len(positions), 0)
 
-        tx_builder = TxBuilder(account, chain_id, account_info.account_number, Coin(
+        tx_builder = TxBuilder(account, None, chain_id, account_info.account_number, Coin(
             amount='600', denom='USDT'))
 
         tx_response = client.close_position(tx_builder, pair_id, positions[0].Id, positions[0].MarkPrice, decimal.Decimal(
@@ -184,7 +183,7 @@ class MyTestCase(unittest.TestCase):
             print("please build position first")
         self.assertNotEqual(len(positions), 0)
 
-        tx_builder = TxBuilder(account, chain_id, account_info.account_number, Coin(
+        tx_builder = TxBuilder(account, None, chain_id, account_info.account_number, Coin(
             amount='600', denom='USDT'))
 
         tx_response = client.add_margin(tx_builder, pair_id, positions[0].Id, decimal.Decimal(0.1),

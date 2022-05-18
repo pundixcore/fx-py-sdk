@@ -807,10 +807,8 @@ class GRPCClient:
             # 查询chain_id
             tx_builder.chain_id = self.query_chain_id()
 
-        if tx_builder.account_number <= -1:
-            # 查询账户信息
-            account = self.query_account_info(tx_builder.address())
-            tx_builder.account_number = account.account_number
+        account = self.query_account_info(tx_builder.address())
+        tx_builder.account_number = account.account_number
 
         gas_price_amount = int(tx_builder.gas_price.amount) / DEFAULT_DEC
         fee_denom = tx_builder.gas_price.denom
