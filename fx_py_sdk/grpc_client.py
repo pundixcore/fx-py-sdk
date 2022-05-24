@@ -1,7 +1,9 @@
 import decimal
+import time
 import datetime
 from urllib.parse import urlparse
 
+import eth_utils
 import grpc
 from fx_py_sdk.codec.cosmos.auth.v1beta1.auth_pb2 import BaseAccount
 from fx_py_sdk.codec.cosmos.auth.v1beta1.query_pb2 import QueryAccountRequest
@@ -24,15 +26,16 @@ from fx_py_sdk.codec.fx.other.query_pb2_grpc import QueryStub as OtherQuery
 from google.protobuf.any_pb2 import Any
 from fx_py_sdk.builder import TxBuilder
 
-from fx_py_sdk.codec.fx.dex.query_pb2_grpc import QueryStub as DexQuery
-from fx_py_sdk.codec.fx.dex.query_pb2 import *
-from fx_py_sdk.codec.fx.dex.tx_pb2 import *
-from fx_py_sdk.codec.fx.dex.order_pb2 import Direction
+from fx_py_sdk.codec.fx.dex.v1.query_pb2_grpc import QueryStub as DexQuery
+from fx_py_sdk.codec.fx.dex.v1.query_pb2 import *
+from fx_py_sdk.codec.fx.dex.v1.tx_pb2 import *
+from fx_py_sdk.codec.fx.dex.v1.order_pb2 import Direction
 
-from fx_py_sdk.codec.fx.oracle.query_pb2_grpc import QueryStub as OracleQuery
-from fx_py_sdk.codec.fx.oracle.query_pb2 import QueryPriceRequest
+from fx_py_sdk.codec.fx.oracle.v1.query_pb2_grpc import QueryStub as OracleQuery
+from fx_py_sdk.codec.fx.oracle.v1.query_pb2 import QueryPriceRequest
+from fx_py_sdk.codec.fx.ibc.applications.transfer.v1.tx_pb2 import *
+from fx_py_sdk.codec.ibc.core.client.v1.client_pb2 import Height
 
-from fx_py_sdk.wallet import Address
 from fx_py_sdk.constants import *
 from google.protobuf.json_format import MessageToJson
 import json
@@ -43,7 +46,8 @@ from fx_py_sdk.model.model import HedgingOrder, HedgingTrade, Order as CrudOrder
 DEFAULT_DEX_GAS = 5000000
 DEFAULT_GRPC_NONE = "Not found"
 DEFAULT_DEC = 1000000
-
+DEFAULT_DEC_FX = 1000000000000000000
+Address_Prefix = "0x"
 
 class GRPCClient:
     def __init__(self, url: str = 'localhost:9090'):
@@ -126,6 +130,12 @@ class GRPCClient:
         response = TendermintClient(self.channel).GetLatestBlock(
             GetBlockByHeightRequest())
         return response.block.header.chain_id
+
+    def get_latest_block(self) -> str:
+        """查询 latest block"""
+        response = TendermintClient(self.channel).GetLatestBlock(
+            GetBlockByHeightRequest())
+        return response.block.header
 
     def query_orders_by_account(self, address: str, page_index: int, page_size: int) -> []:
         """根据账户号查询订单
@@ -223,7 +233,7 @@ class GRPCClient:
         positions = []
         try:
             response = DexQuery(self.channel).QueryPosition(
-                QueryPositionReq(owner=Address(owner).to_bytes(), pair_id=pair_id))
+                QueryPositionReq(owner=owner, pair_id=pair_id))
             for pos in response.positions:
                 entry_price = decimal.Decimal(pos.entry_price)
                 entry_price = entry_price / decimal.Decimal(DEFAULT_DEC)
@@ -255,9 +265,10 @@ class GRPCClient:
                 pending_order_quantity = pending_order_quantity / \
                     decimal.Decimal(DEFAULT_DEC)
 
+                checksumAddr = eth_utils.to_checksum_address(Address_Prefix + pos.owner.hex())
                 position = Position(
                     pos.id,
-                    Address(pos.owner).to_string(),
+                    checksumAddr,
                     pos.pair_id,
                     pos.direction,
                     entry_price,
@@ -331,10 +342,12 @@ class GRPCClient:
 
             locked_fee = decimal.Decimal(order.locked_fee)
             locked_fee = locked_fee / decimal.Decimal(DEFAULT_DEC)
+            checksumAddr = eth_utils.to_checksum_address(Address_Prefix + order.owner.hex())
+
             new_order = Order(
                 # order.tx_hash,
                 order.id,
-                Address(order.owner).to_string(),
+                checksumAddr,
                 order.pair_id,
                 order.direction,
                 price,
@@ -362,7 +375,7 @@ class GRPCClient:
             new_order = Order(
                 # order.tx_hash,
                 order.order_id,
-                Address(order.owner).to_string(),
+                order.owner,
                 order.pair_id,
                 order.direction,
                 order.price,
@@ -422,7 +435,7 @@ class GRPCClient:
 
         if not use_db:
             response = DexQuery(self.channel).QueryOrders(QueryOrdersRequest(
-                owner=Address(owner).to_bytes(), pair_id=pair_id, page=page, limit=limit))
+                owner=owner, pair_id=pair_id, page=page, limit=limit))
 
             for order in response.orders:
                 price = decimal.Decimal(order.price)
@@ -450,11 +463,12 @@ class GRPCClient:
 
                 locked_fee = decimal.Decimal(order.locked_fee)
                 locked_fee = locked_fee / decimal.Decimal(DEFAULT_DEC)
+                checksumAddr = eth_utils.to_checksum_address(Address_Prefix + order.owner.hex())
 
                 new_order = Order(
                     # order.tx_hash,
                     order.id,
-                    Address(order.owner).to_string(),
+                    checksumAddr,
                     order.pair_id,
                     order.direction,
                     price,
@@ -505,7 +519,7 @@ class GRPCClient:
                 new_order = Order(
                     # order.tx_hash,
                     order.order_id,
-                    Address(order.owner).to_string(),
+                    order.owner,
                     order.pair_id,
                     order.direction,
                     order.price,
@@ -571,7 +585,7 @@ class GRPCClient:
             print("query error: ", e)
             return e
 
-    def query_funding_rate(self, pair_id, funding_times, query_all):
+    def query_funding_rate(self):
         """查询资金费率, fundingRate字段需要精度转换.
             Args:
                 pair_id: 交易对
@@ -694,11 +708,11 @@ class GRPCClient:
         base_quantity = str(base_quantity)
         base_quantity_split = base_quantity.split('.', 1)
 
-        msg = MsgCreateOrder(owner=tx_builder.acc_address(), pair_id=pair_id, direction=direction, price=price_split[0],
+        msg = MsgCreateOrder(owner=tx_builder.account.address, pair_id=pair_id, direction=direction, price=price_split[0],
                              base_quantity=base_quantity_split[0],
                              leverage=leverage)
 
-        msg_any = Any(type_url='/fx.dex.MsgCreateOrder',
+        msg_any = Any(type_url='/fx.dex.v1.MsgCreateOrder',
                       value=msg.SerializeToString())
         # DEX 交易设置固定gas
         tx = self.build_tx(tx_builder, acc_seq, [msg_any], DEFAULT_DEX_GAS)
@@ -708,8 +722,8 @@ class GRPCClient:
     def cancel_order(self, tx_builder: TxBuilder, order_id: str,
                      acc_seq: int, mode: BroadcastMode = BROADCAST_MODE_BLOCK):
         """取消订单"""
-        msg = MsgCancelOrder(owner=tx_builder.acc_address(), order_id=order_id)
-        msg_any = Any(type_url='/fx.dex.MsgCancelOrder',
+        msg = MsgCancelOrder(owner=tx_builder.account.address, order_id=order_id)
+        msg_any = Any(type_url='/fx.dex.v1.MsgCancelOrder',
                       value=msg.SerializeToString())
         # DEX 交易设置固定gas
         tx = self.build_tx(tx_builder, acc_seq, [msg_any], DEFAULT_DEX_GAS)
@@ -725,12 +739,64 @@ class GRPCClient:
         base_quantity = str(base_quantity)
         base_quantity_split = base_quantity.split('.', 1)
 
-        msg = MsgClosePosition(owner=tx_builder.acc_address(), pair_id=pair_id, position_id=position_id, price=price_split[0],
+        msg = MsgClosePosition(owner=tx_builder.account.address, pair_id=pair_id, position_id=position_id, price=price_split[0],
                                base_quantity=base_quantity_split[0], full_close=full_close)
 
-        msg_any = Any(type_url='/fx.dex.MsgClosePosition',
+        msg_any = Any(type_url='/fx.dex.v1.MsgClosePosition',
                       value=msg.SerializeToString())
         # DEX 交易设置固定gas
+        tx = self.build_tx(tx_builder, acc_seq, [msg_any], DEFAULT_DEX_GAS)
+        return self.broadcast_tx(tx, mode)
+
+    def add_margin(self, tx_builder: TxBuilder, pair_id: str, position_id: str, margin: Decimal,
+                       acc_seq: int, mode: BroadcastMode = BROADCAST_MODE_BLOCK):
+
+        amount = margin * decimal.Decimal(DEFAULT_DEC)
+        amount = str(amount)
+        amount_split = amount.split('.', 1)
+
+        msg = MsgAddMargin(owner=tx_builder.account.address, pair_id=pair_id,
+                           position_id=position_id, margin=amount_split[0])
+
+        msg_any = Any(type_url='/fx.dex.v1.MsgAddMargin',
+                      value=msg.SerializeToString())
+        # DEX 交易设置固定gas
+        tx = self.build_tx(tx_builder, acc_seq, [msg_any], DEFAULT_DEX_GAS)
+        return self.broadcast_tx(tx, mode)
+
+
+    def ibc_transfer(self, tx_builder: TxBuilder, channel: str, token_amount: int, receiver: str, denom: str,
+                       acc_seq: int, mode: BroadcastMode = BROADCAST_MODE_BLOCK):
+        if tx_builder._private_key is not None:
+            address = tx_builder._private_key.to_address()
+            if denom == "USDT":
+                amount = token_amount * decimal.Decimal(DEFAULT_DEC)
+            else:
+                amount = token_amount * decimal.Decimal(DEFAULT_DEC_FX)
+        else:
+            address = tx_builder.account.address
+            amount = token_amount * decimal.Decimal(DEFAULT_DEC)
+        amount = str(amount)
+        amount_split = amount.split('.', 1)
+        token = Coin(amount=str(amount_split[0]), denom=denom)
+
+        height = Height(revision_number=0, revision_height=0)
+        dtime = datetime.datetime.now()
+        ans_time = time.mktime(dtime.timetuple())
+        ans_time = (int(ans_time) + 86400) * 1000 * 1000 * 1000
+
+        msg = MsgTransfer(source_port="transfer",
+                          source_channel=channel,
+                          token=token,
+                          sender=address,
+                          receiver=receiver,
+                          timeout_height=height,
+                          timeout_timestamp=ans_time,
+                          router="",
+                          fee=Coin(amount=str(0), denom=denom))
+
+        msg_any = Any(type_url='/fx.ibc.applications.transfer.v1.MsgTransfer',
+                      value=msg.SerializeToString())
         tx = self.build_tx(tx_builder, acc_seq, [msg_any], DEFAULT_DEX_GAS)
         return self.broadcast_tx(tx, mode)
 
@@ -740,10 +806,8 @@ class GRPCClient:
             # 查询chain_id
             tx_builder.chain_id = self.query_chain_id()
 
-        if tx_builder.account_number <= -1:
-            # 查询账户信息
-            account = self.query_account_info(tx_builder.address())
-            tx_builder.account_number = account.account_number
+        account = self.query_account_info(tx_builder.address())
+        tx_builder.account_number = account.account_number
 
         gas_price_amount = int(tx_builder.gas_price.amount) / DEFAULT_DEC
         fee_denom = tx_builder.gas_price.denom

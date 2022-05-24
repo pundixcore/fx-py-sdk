@@ -1,0 +1,59 @@
+IBC_CHANNELS:
+  TSLA_FXCore: ""
+  FXCore_TSLA: ""
+
+  AAPL_FXCore: ""
+  FXCore_AAPL: ""
+
+  NFLX_FXCore: ""
+  FXCore_NFLX: ""
+
+  GOOG_FXCore: ""
+  FXCore_GOOG: ""
+
+  FB_FXCore: ""
+  FXCore_FB: ""
+
+  AMZ_FXCore: ""
+  FXCore_AMZ: ""
+
+  BTC_FXCore: "channel-0"
+  FXCore_BTC: "channel-0"
+
+  FX_FXCore: ""
+  FXCore_FX: ""
+
+  SPY_FXCore: "channel-0"
+  FXCore_SPY: "channel-1"
+
+  IWM_FXCore: ""
+  FXCore_IWM: ""
+
+  TQQQ_FXCore: ""
+  FXCore_TQQQ: ""
+
+GRPC:
+  TSLA: "https://testnet-tsla-fxdex-grpc.functionx.io:9090"
+  AAPL: "https://testnet-aapl-fxdex-grpc.functionx.io:9090"
+  NFLX: "https://testnet-nflx-fxdex-grpc.functionx.io:9090"
+  GOOG: "https://testnet-goog-fxdex-grpc.functionx.io:9090"
+  FB:   "https://testnet-fb-fxdex-grpc.functionx.io:9090"
+  AMZN: "https://testnet-amzn-fxdex-grpc.functionx.io:9090"
+  BTC:  "https://testnet-btc-fxdex-grpc.functionx.io:9090"
+  FX:   "https://testnet-fx-fxdex-grpc.functionx.io:9090"
+  SPY:  "https://testnet-spy-fxdex-grpc.functionx.io:9090"
+  IWM:  "https://testnet-iwm-fxdex-grpc.functionx.io:9090"
+  TQQQ: "https://testnet-tqqq-fxdex-grpc.functionx.io:9090"
+
+RPC:
+  TSLA: "https://testnet-tsla-fxdex-json.functionx.io:26657"
+  AAPL: "https://testnet-aapl-fxdex-json.functionx.io:26657"
+  NFLX: "https://testnet-nflx-fxdex-json.functionx.io:26657"
+  GOOG: "https://testnet-goog-fxdex-json.functionx.io:26657"
+  FB:   "https://testnet-fb-fxdex-json.functionx.io:26657"
+  AMZN: "https://testnet-amzn-fxdex-json.functionx.io:26657"
+  BTC:  "https://testnet-btc-fxdex-json.functionx.io:26657"
+  FX:   "https://testnet-fx-fxdex-json.functionx.io:26657"
+  SPY:  "https://testnet-spy-fxdex-json.functionx.io:26657"
+  IWM:  "https://testnet-iwm-fxdex-json.functionx.io:26657"
+  TQQQ: "https://testnet-tqqq-fxdex-json.functionx.io:26657"

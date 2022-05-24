@@ -15,7 +15,6 @@ class NetworkENV:
     TESTNET = "testnet"
     MAINNET = "mainnet"
 
-
 class Network:
     LOCAL_RPC = "http://127.0.0.1:26657"
     DEVNET_RPC = "http://44.196.199.119:26657"
