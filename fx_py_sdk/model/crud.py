@@ -1,12 +1,17 @@
 import datetime
 from decimal import Decimal
-from typing import Dict, Iterable, List, Union
+from typing import Dict, Iterable, List, Union, TypeVar
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import case, create_engine, text
+from sqlalchemy import case, text
 from sqlalchemy.orm.session import Session
+
 from fx_py_sdk.codec.fx.dex.v1.match_pb2 import OrderBook
+from sqlalchemy.orm import Query
+
 from fx_py_sdk.model.model import *
 from sqlalchemy import or_, and_, func
+
+T = TypeVar("T")
 
 class Crud:
     def __init__(self):
@@ -25,14 +30,16 @@ class Crud:
         self.session.add_all(objectlist)
         self.session.commit()
 
-    def filterone(self, object, filter):
-        return self.session.query(object).filter(filter).first()
+    def filterone(self, object: T, *filter) -> T:
+        return self.session.query(object).filter(*filter).first()
 
-    def filter_many(self, object, filter):
-        return self.session.query(object).filter(filter)
+    def filter_many(self, object, *filter) -> Query:
+        return self.session.query(object).filter(*filter)
 
     def update(self, object, filter, updic):
-        self.session.query(object).filter(filter).update(updic)
+        if not isinstance(filter, Iterable):
+            filter = [filter]
+        self.session.query(object).filter(*filter).update(updic)
         self.session.commit()
 
     def delete(self, object):
@@ -62,11 +69,15 @@ class Crud:
 
     def get_orderbook_from_orderbook(self, pair_id: str):
         """get orderbook from sql orderbook table"""
-        orderbook_ask = self.session.query(Orderbook.price, Orderbook.quantity).filter(Orderbook.pair_id == pair_id,
-                                             Orderbook.direction == 'ASK').order_by(Orderbook.price).limit(100)
+        orderbook_ask = (self.session.query(Orderbook.price, Orderbook.quantity)
+                                     .filter(Orderbook.pair_id == pair_id, Orderbook.direction == 'ASK')
+                                     .order_by(Orderbook.price)
+                                     .limit(100))
 
-        orderbook_bid = self.session.query(Orderbook.price, Orderbook.quantity).filter(Orderbook.pair_id == pair_id,
-                                             Orderbook.direction == 'BID').order_by(Orderbook.price.desc()).limit(100)
+        orderbook_bid = (self.session.query(Orderbook.price, Orderbook.quantity)
+                                     .filter(Orderbook.pair_id == pair_id, Orderbook.direction == 'BID')
+                                     .order_by(Orderbook.price.desc())
+                                     .limit(100))
         orderbook = dict()
         asks = []
         bids = []
@@ -286,8 +297,9 @@ class Crud:
                              .limit(limit_records))
         return query.all()
 
-    def update_realized_pnl_logs(self, start_block_height: int, end_block_height: int):
-        update_query = """
+    def update_realized_pnl_logs(self, start_block_height: int, end_block_height: int, pair_id: str = None):
+        pair_id_condition = "CASE WHEN :pair_id IS NULL THEN TRUE ELSE {}.pair_id = :pair_id END"
+        update_query = f"""
         INSERT INTO realized_pnl_log
             SELECT owner, pair_id, SUM(realized_pnl) AS realized_pnl, SUM(funding_gain) AS funding_gain, SUM(liquidated_margin) AS liquidated_margin, :end_block_height AS block_height FROM (
                 SELECT
@@ -307,6 +319,7 @@ class Crud:
                     WHERE
                         p.block_height BETWEEN :start_block_height AND :end_block_height
                         AND COALESCE(p.is_batch_update, FALSE) = FALSE
+                        AND {pair_id_condition.format('p')}
                     GROUP BY 1,2) q1
                 FULL OUTER JOIN
                     (SELECT
@@ -316,7 +329,8 @@ class Crud:
                     FROM funding_transfer f
                     WHERE
                         f.block_height BETWEEN :start_block_height AND :end_block_height
-                    GROUP BY 1,2) q2 ON q1.owner=q2.owner AND q1.pair_id=q2.pair_id
+                        AND {pair_id_condition.format('f')}
+                    GROUP BY 1,2) q2 ON q1.owner = q2.owner AND q1.pair_id = q2.pair_id
                 FULL OUTER JOIN
                     (SELECT
                         p.owner,
@@ -326,11 +340,13 @@ class Crud:
                     WHERE
                         p.block_height BETWEEN :start_block_height AND :end_block_height
                         AND p.status='liquidated'
-                    GROUP BY 1,2) q3 ON q1.owner=q3.owner AND q1.pair_id=q3.pair_id
+                        AND {pair_id_condition.format('p')}
+                    GROUP BY 1,2) q3 ON q1.owner = q3.owner AND q1.pair_id = q3.pair_id
                 FULL OUTER JOIN
                     (SELECT DISTINCT ON (owner, pair_id) owner, pair_id, realized_pnl, funding_gain, liquidated_margin, block_height
-                    FROM realized_pnl_log
-                    ORDER BY owner ASC, pair_id ASC, block_height DESC) q4 ON q1.owner=q4.owner AND q1.pair_id=q4.pair_id
+                     FROM realized_pnl_log log
+                     WHERE {pair_id_condition.format('log')}
+                     ORDER BY owner ASC, pair_id ASC, block_height DESC) q4 ON q1.owner = q4.owner AND q1.pair_id = q4.pair_id
                 ) q
             GROUP BY 1,2
         """
@@ -338,45 +354,70 @@ class Crud:
         self.session.execute(update_query, params=
         {
             'start_block_height': start_block_height,
-            'end_block_height': end_block_height
+            'end_block_height': end_block_height,
+            'pair_id': pair_id
         })
         self.session.commit()
 
-    def delete_data(self, from_block_height: int, verbose=True):
-        """Deletes all data starting from block height"""
+    def delete_data(self,
+                    from_block_height: int,
+                    verbose=True,
+                    pair_id=None):
+        """
+        Deletes all data starting from block height
+        :param from_block_height: Block height to start deleting data from (inclusive)
+        :param verbose: If True, logs error/success messages
+        :param pair_id: Deletes only data relating to `pair_id`
+        """
         if not from_block_height:
             if verbose:
-                logging.info('No initial block height specified, delete_data() did not remove any data')
+                logging.warning('No initial block height specified, delete_data() did not remove any data')
             return
 
-        delete_query = """
+        block_height_condition = "block_height >= bh"
+        pair_id_condition = "CASE WHEN pid IS NULL THEN TRUE ELSE pair_id=pid END"
+
+        delete_query = f"""
         DO $$
         DECLARE bh integer;
+        DECLARE pid varchar;
         BEGIN
             SELECT :from_block_height INTO bh;
+            SELECT :pair_id INTO pid;
 
-            DELETE FROM block WHERE height>=bh;
-            DELETE FROM funding_transfer WHERE block_height>=bh;
-            DELETE FROM orderbook WHERE block_height>=bh;
-            DELETE FROM orders WHERE block_height>=bh;
-            DELETE FROM position WHERE block_height>=bh;
-            DELETE FROM trade WHERE block_height>=bh;
-            DELETE FROM orderbook_top WHERE block_height>=bh;
-            DELETE FROM positioning WHERE block_height>=bh;
-            DELETE FROM error WHERE block_height>=bh;
-            DELETE FROM transfer WHERE block_height>=bh;
-            DELETE FROM margin WHERE block_height>=bh;
-            DELETE FROM oracle_price WHERE block_height>=bh;
-            DELETE FROM realized_pnl_log wHERE block_height>=bh;
+            DELETE FROM block WHERE height >= bh AND {pair_id_condition};
+            DELETE FROM funding_transfer WHERE {block_height_condition} AND {pair_id_condition};
+            DELETE FROM orderbook WHERE {block_height_condition} AND {pair_id_condition};
+            DELETE FROM orders WHERE {block_height_condition} AND {pair_id_condition};
+            DELETE FROM position WHERE {block_height_condition} AND {pair_id_condition};
+            DELETE FROM trade WHERE {block_height_condition} AND {pair_id_condition};
+            DELETE FROM orderbook_top WHERE {block_height_condition} AND {pair_id_condition};
+            DELETE FROM positioning WHERE {block_height_condition} AND {pair_id_condition};
+            DELETE FROM error WHERE {block_height_condition} AND {pair_id_condition};
+            DELETE FROM transfer WHERE {block_height_condition} AND {pair_id_condition};
+            DELETE FROM margin WHERE {block_height_condition} AND {pair_id_condition};
+            DELETE FROM oracle_price WHERE {block_height_condition} AND {pair_id_condition};
+            DELETE FROM realized_pnl_log wHERE {block_height_condition} AND {pair_id_condition};
 
             UPDATE error_log SET height=el.height
-            FROM (SELECT CASE WHEN bh<height THEN bh-1 ELSE height END as height FROM error_log) el;
+            FROM (SELECT CASE WHEN bh<height THEN bh-1 ELSE height END as height FROM error_log WHERE {pair_id_condition}) el
+            WHERE {pair_id_condition};
         END $$;"""
 
-        self.session.execute(delete_query, params={'from_block_height': from_block_height})
-        self.session.commit()
-        if verbose:
-            logging.info(f'All data from {from_block_height} onward (inclusive) removed from database')
+        try:
+            self.session.execute(
+                statement = delete_query,
+                params={
+                    'from_block_height': from_block_height,
+                    'pair_id': pair_id
+                }
+            )
+            self.session.commit()
+            if verbose:
+                logging.info(f'All data from {from_block_height} onward (inclusive) removed from database')
+        except Exception as ex:
+            if verbose:
+                logging.error(f'Could not delete data from {from_block_height}: {ex}')
 
     def query_latest_block_height(self):
         """Query latest valid block height from database (where both `block_processed` and `tx_events_processed` are true)"""
@@ -390,8 +431,14 @@ class Crud:
                             .filter(or_(Block.block_processed==False, Block.tx_events_processed==False))
                             .scalar())
 
-    def delete_data_from_lowest_incomplete_height(self):
-        """Deletes data from max block height (i.e. removes topmost block data)"""
-        block_height = self.query_lowest_incomplete_height()
-        self.delete_data(block_height)
+    def delete_data_from_lowest_incomplete_height(self,
+                                                  pair_id: str = None,
+                                                  default_block_height: int = None):
+        """
+        Deletes data from max block height (i.e. removes topmost block data)
+        :param pair_id: `pair_id` of data to delete
+        :param default_block_height: In case data is complete, deletes from this height instead
+        """
+        block_height = self.query_lowest_incomplete_height() or default_block_height
+        self.delete_data(block_height, pair_id=pair_id)
             

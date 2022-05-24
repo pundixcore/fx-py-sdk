@@ -22,14 +22,22 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     logging.info('Waiting for database to initialize...')
 
-    time.sleep(10)      # give some time for db to initialize
+    time.sleep(5)      # give some time for db to initialize
 
     # Initialize database
     sql = Sql(database="fxdex")
+    if bool(os.environ.get('INIT_DB', 0)):
+        sql.create_table()  # creates tables only if not created
+        sql.initialize_wallets()
+    else:
+        time.sleep(10)      # wait for other instance to create database
 
-    sql.create_table()  # creates tables only if not created
-    sql.initialize_wallets()
+    pair_id = os.environ.get('PAIR_ID')
+    if not pair_id:
+        logging.warn('PAIR_ID not found in environment variables')
+
     sql.initialize_error_log_height(
+        pair_id=os.environ.get('PAIR_ID'),
         starting_height=os.environ.get('INITIAL_ERROR_LOG_HEIGHT')
     )
 

@@ -200,7 +200,6 @@ class GRPCClient:
         try:
             response = OracleQuery(self.channel).GetCurrentPrice(
                 QueryPriceRequest(pair_id=pair_id))
-            print(response)
             price = decimal.Decimal(response.currentPrice.price)
             price = price / decimal.Decimal(DEFAULT_DEC)
             return price

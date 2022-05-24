@@ -29,7 +29,8 @@ history_file_prefix = 'fxdex_blocks'
 
 class ScanManager:
     def __init__(self, rpc_page_size=5, rpc_max_retries=3):
-        self.scan = ScanBlock()
+        self.pair_id = os.environ.get('PAIR_ID')
+        self.scan = ScanBlock(self.pair_id)
 
         self.ws_scan = WebsocketScan(self)
         self.rpc_scan = RpcScan(self,
@@ -46,7 +47,9 @@ class RpcScan:
 
     def __init__(self, scan_manager: ScanManager, page_size=10, rpc_max_retries=3):
         self.manager = scan_manager
-        self.scan = ScanBlock()
+        self.pair_id = scan_manager.pair_id
+
+        self.scan = ScanBlock(self.pair_id)
         self.page_size = page_size
 
         self.rpc_url = constants.Network.get_rpc_url()
@@ -71,15 +74,13 @@ class RpcScan:
             if not start_block:
                 start_block = int(os.environ.get('START_BLOCK', '1'))
 
-            print("start_block", start_block)
             block_heights = [blk_ht for blk_ht, in (self.scan.crud.session.query(Block)
-                                                                         .filter(Block.height >= start_block)
-                                                                         .with_entities(Block.height)
-                                                                         .order_by(Block.height))]
+                                                                          .filter(Block.height >= start_block, Block.pair_id == self.pair_id)
+                                                                          .with_entities(Block.height)
+                                                                          .order_by(Block.height))]
             missing_blocks = list(sorted(
                 set(range(start_block, latest_block_height+1)).difference(set(block_heights))
             ))
-            print("missing_blocks", missing_blocks)
             if not missing_blocks:  # use WebSockets if fully synced
                 logging.info(
                     'Synced with latest block. Switching to WebSockets...')
@@ -138,7 +139,7 @@ class RpcScan:
                             self.scan.process_tx_events(tx_events, block_height, tx_hash)
                     # Else update block height in any case
                     else:
-                        block = Block(height=block_height, time=block_datetime, tx_events_processed=True)
+                        block = Block(height=block_height, time=block_datetime, tx_events_processed=True, pair_id=self.pair_id)
                         self.scan.process_block_height(block)
 
                     if block_result[BlockResponse.Begin_block_events] is not None:
@@ -154,7 +155,7 @@ class RpcScan:
                     self.scan.process_cumulative_realized_pnl(block_height)
 
                     # Update latest block on chain
-                    block = Block(height=block_height, time=block_datetime, block_processed=True)
+                    block = Block(height=block_height, time=block_datetime, block_processed=True, pair_id=self.pair_id)
                     self.scan.process_block_height(block)
 
             # Read the block directly after all missing blocks previously acquired
@@ -163,11 +164,16 @@ class RpcScan:
 class WebsocketScan:
     """use websocket connect fxdex, scan block event"""
 
-    def __init__(self, scan_manager: ScanManager=None, subscribe_events: Iterable=None, scan: ScanBlockBase = None):
+    def __init__(self, 
+                 scan_manager: ScanManager=None,
+                 subscribe_events: List[str]=None,
+                 scan: ScanBlockBase = None,
+                 ws_url = None):
         self.manager = scan_manager
-        self.scan: ScanBlockBase = scan or ScanBlock()
+        self.scan: ScanBlockBase = scan or ScanBlock(scan_manager.pair_id)
 
-        self.wss_url = constants.Network.get_ws_url()
+        self.wss_url = ws_url or constants.Network.get_ws_url()
+        logging.info(self.wss_url)
 
         self.ws_block = None
         self.rpc_ready = False
@@ -182,7 +188,7 @@ class WebsocketScan:
         was_ready = self.rpc_ready
         self.rpc_ready = False
 
-        title = f'WS error in handling message: {str(error)} (Blk Ht: {self.scan.max_block_height})'
+        title = f'WS error: {str(error)} (Blk Ht: {self.scan.max_block_height}) [{self.scan.pair_id}]'
         exception_traceback = traceback.format_exc()
         logging.warning(title)
         logging.warning(exception_traceback)
@@ -207,7 +213,10 @@ class WebsocketScan:
                 # reinstate connection (in case of idle-in-transaction timeout)
                 self.manager.rpc_scan.scan.crud.init_session()
                 # delete all data from the most recent block height with incomplete data
-                self.manager.rpc_scan.scan.crud.delete_data_from_lowest_incomplete_height()
+                self.manager.rpc_scan.scan.crud.delete_data_from_lowest_incomplete_height(
+                    pair_id = self.scan.pair_id,
+                    default_block_height = self.scan.max_block_height
+                )
                 # process RPC data sequentially
                 self.manager.rpc_scan.process_block_threaded()
 
@@ -295,6 +304,8 @@ class WebsocketScan:
 class AccountScan:
     def __init__(self, scan_manager: ScanManager, update_interval_seconds=60):
         self.manager = scan_manager
+        self.pair_id = scan_manager.pair_id
+
         self.owners = None
         self.last_updated = None
 
@@ -308,7 +319,15 @@ class AccountScan:
         now = datetime.datetime.utcnow()
 
         if not self.owners or (now - self.last_updated) > datetime.timedelta(seconds=self.update_interval*9.5):
-            query_result = self.manager.scan.crud.session.execute('SELECT DISTINCT owner FROM trade;').fetchall()
+            query_owners = 'SELECT DISTINCT owner FROM trade'
+            if self.pair_id:
+                query_owners += ' WHERE pair_id=:pair_id'
+
+            query_result = self.manager.scan.crud.session.execute(
+                statement = query_owners,
+                params = { 'pair_id': self.pair_id }
+            ).fetchall()
+
             self.owners = [res[0] for res in query_result]
             self.last_updated = now
 
@@ -323,24 +342,35 @@ class AccountScan:
             balances = self.client.query_all_balances(owner)
             
             for symbol, balance_amount in balances.items():
-                bal = Balance(owner=owner, token=symbol, amount=balance_amount, batch_time=batch_time, time=time_updated)
+                bal = Balance(
+                    owner=owner,
+                    token=symbol,
+                    amount=balance_amount,
+                    batch_time=batch_time,
+                    time=time_updated,
+                    chain_pair_id=self.pair_id
+                )
                 all_balances.append(bal)
         
         self.client.crud.insert_many(all_balances)
 
-    def update_account_balances_looped(self):
+    def update_account_balances_looped(self, retry_times=3):
         while True:
-            try:
-                self.update_account_balances()
-            except Exception as ex:
-                logging.error(f'Error updating balances: {ex}')
-                self.client = GRPCClient(constants.Network.get_grpc_url())  # refresh client
-            finally:
-                time.sleep(self.update_interval)
+            for _ in range(retry_times):
+                try:
+                    self.update_account_balances()
+                    break
+                except Exception as ex:
+                    logging.error(f'Error updating balances: {ex}')
+                    self.client = GRPCClient(constants.Network.get_grpc_url())  # refresh client
+                    time.sleep(5)
+
+            time.sleep(self.update_interval)
 
 class ErrorScan:
     def __init__(self, scan_manager: ScanManager, update_interval_seconds=1, rpc_max_retries=3):
         self.manager = scan_manager
+        self.pair_id = scan_manager.pair_id
         self.owners = None
         self.last_updated = None
 
@@ -357,7 +387,7 @@ class ErrorScan:
         max_block_height = self.crud.session.query(func.max(Block.height)).scalar()
         if not max_block_height:
             return  # wait until we at least have a single block
-        max_error_height = self.crud.session.query(ErrorLog.height).first()[0]
+        max_error_height = self.crud.filterone(ErrorLog, ErrorLog.pair_id == self.pair_id).height
 
         for block_height in range(max_error_height+1, max_block_height+1):
             self.rpc_client = HttpRpcClient(self.rpc_url, max_retries=self.rpc_max_retries)
@@ -368,12 +398,14 @@ class ErrorScan:
                     self.scan.process_tx_errors(tx_result, block_height)
 
             # Update current error log height
-            sql_log = self.crud.session.query(ErrorLog).first()
-            error_log = ErrorLog(height=block_height)
+            sql_log = self.crud.filterone(ErrorLog, ErrorLog.pair_id == self.pair_id)
+            error_log = ErrorLog(height=block_height, pair_id=self.pair_id)
 
             if sql_log:
-                self.crud.update(ErrorLog, filter=(ErrorLog.height==sql_log.height),
-                                 updic=error_log.to_dict())
+                self.crud.update(ErrorLog,
+                    filter=(ErrorLog.height==sql_log.height, ErrorLog.pair_id==self.pair_id),
+                    updic=error_log.to_dict()
+                )
             else:
                 self.crud.insert(error_log)
 
