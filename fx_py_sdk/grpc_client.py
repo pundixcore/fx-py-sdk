@@ -586,7 +586,7 @@ class GRPCClient:
             print("query error: ", e)
             return e
 
-    def query_funding_rate(self, pair_id, funding_times, query_all):
+    def query_funding_rate(self):
         """查询资金费率, fundingRate字段需要精度转换.
             Args:
                 pair_id: 交易对
