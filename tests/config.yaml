@@ -1,36 +1,36 @@
 IBC_CHANNELS:
-  TSLA_FXCore: ""
-  FXCore_TSLA: ""
+  TSLA_FXCore: "channel-0"
+  FXCore_TSLA: "channel-25"
 
-  AAPL_FXCore: ""
-  FXCore_AAPL: ""
+  AAPL_FXCore: "channel-0"
+  FXCore_AAPL: "channel-15"
 
-  NFLX_FXCore: ""
-  FXCore_NFLX: ""
+  NFLX_FXCore: "channel-0"
+  FXCore_NFLX: "channel-22"
 
-  GOOG_FXCore: ""
-  FXCore_GOOG: ""
+  GOOG_FXCore: "channel-0"
+  FXCore_GOOG: "channel-20"
 
-  FB_FXCore: ""
-  FXCore_FB: ""
+  FB_FXCore: "channel-0"
+  FXCore_FB: "channel-18"
 
-  AMZ_FXCore: ""
-  FXCore_AMZ: ""
+  AMZ_FXCore: "channel-0"
+  FXCore_AMZ: "channel-16"
 
   BTC_FXCore: "channel-0"
-  FXCore_BTC: "channel-0"
+  FXCore_BTC: "channel-17"
 
-  FX_FXCore: ""
-  FXCore_FX: ""
+  FX_FXCore: "channel-0"
+  FXCore_FX: "channel-19"
 
   SPY_FXCore: "channel-0"
-  FXCore_SPY: "channel-1"
+  FXCore_SPY: "channel-23"
 
-  IWM_FXCore: ""
-  FXCore_IWM: ""
+  IWM_FXCore: "channel-0"
+  FXCore_IWM: "channel-21"
 
-  TQQQ_FXCore: ""
-  FXCore_TQQQ: ""
+  TQQQ_FXCore: "channel-0"
+  FXCore_TQQQ: "channel-24"
 
 GRPC:
   TSLA: "https://testnet-tsla-grpc.marginx.io:9090"
@@ -44,6 +44,7 @@ GRPC:
   SPY:  "https://testnet-spy-grpc.marginx.io:9090"
   IWM:  "https://testnet-iwm-grpc.marginx.io:9090"
   TQQQ: "https://testnet-tqqq-grpc.marginx.io:9090"
+  FXCORE: "https://testnet-fx-grpc.functionx.io:9090"
 
 RPC:
   TSLA: "https://testnet-tsla-json.marginx.io:26657"
@@ -57,3 +58,6 @@ RPC:
   SPY:  "https://testnet-spy-json.marginx.io:26657"
   IWM:  "https://testnet-iwm-json.marginx.io:26657"
   TQQQ: "https://testnet-tqqq-json.marginx.io:26657"
+  FXCORE: "https://testnet-fx-json.functionx.io:26657"
+
+

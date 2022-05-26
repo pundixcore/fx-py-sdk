@@ -14,7 +14,7 @@ import json
 
 from fx_py_sdk.ibc_transfer import ConfigsKeys, Ibc_transfer
 
-client = GRPCClient('44.196.199.119:9190')
+client = GRPCClient('https://testnet-tsla-grpc.marginx.io:9090')
 # client = GRPCClient('127.0.0.1:9090')
 pair_id = "BTC:USDT"
 
@@ -223,7 +223,7 @@ class MyTestCase(unittest.TestCase):
     def test_ibc_transfer_dex_to_dex(self):
         Account.enable_unaudited_hdwallet_features()
         account = Account.from_mnemonic(
-            "dune antenna hood magic kit blouse film video another pioneer dilemma hobby message rug sail gas culture upgrade twin flag joke people general aunt")
+            "forum welcome cute hen dance winner bubble ski actor neutral usage cherry bullet play collect shift peasant step private grow arrive fade early alarm")
 
         header = client.get_latest_block()
 
@@ -239,7 +239,7 @@ class MyTestCase(unittest.TestCase):
                                Coin(amount='600', denom='USDT'))
 
         priv_key = wallet.seed_to_privkey(
-            "dune antenna hood magic kit blouse film video another pioneer dilemma hobby message rug sail gas culture upgrade twin flag joke people general aunt")
+            "forum welcome cute hen dance winner bubble ski actor neutral usage cherry bullet play collect shift peasant step private grow arrive fade early alarm")
 
         fx_address = priv_key.to_address()
         ibc_conf = Ibc_transfer()
