@@ -315,7 +315,6 @@ class Crud:
                         p.pair_id,
                         SUM(p.realized_pnl) AS realized_pnl
                     FROM positioning p
-                    LEFT JOIN block b on p.block_height=b.height
                     WHERE
                         p.block_height BETWEEN :start_block_height AND :end_block_height
                         AND COALESCE(p.is_batch_update, FALSE) = FALSE
@@ -379,8 +378,9 @@ class Crud:
 
         delete_query = f"""
         DO $$
-        DECLARE bh integer;
-        DECLARE pid varchar;
+        DECLARE
+            bh integer;
+            pid varchar;
         BEGIN
             SELECT :from_block_height INTO bh;
             SELECT :pair_id INTO pid;
@@ -425,10 +425,14 @@ class Crud:
                     .filter(and_(Block.tx_events_processed==True, Block.block_processed==True))
                     .scalar())
 
-    def query_lowest_incomplete_height(self):
+    def query_lowest_incomplete_height(self, pair_id: str = None):
         """Query lowest block height where either `block_processed` or `tx_events_processed` is false (i.e. block processing is incomplete)"""
+        conditions = [or_(Block.block_processed==False, Block.tx_events_processed==False)]
+        if pair_id:
+            conditions.append(Block.pair_id==pair_id)
+
         return (self.session.query(func.min(Block.height))
-                            .filter(or_(Block.block_processed==False, Block.tx_events_processed==False))
+                            .filter(*conditions)
                             .scalar())
 
     def delete_data_from_lowest_incomplete_height(self,

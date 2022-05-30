@@ -56,8 +56,6 @@ class ScanBlockBase:
             self.process_end_block(end_block_events, block_height)
             self.process_best_bid_ask(block_height, True)
             self.process_cumulative_realized_pnl(block_height)
-            if block_height % 10 == 0:
-                self.integrity_check(block_height)
 
             # Update latest block on chain
             block = Block(height=block_height, time=block_datetime, block_processed=True, pair_id=self.pair_id)
@@ -95,13 +93,7 @@ class ScanBlockBase:
         position = Position()
         for attribute in attributes:
             key = base64.b64decode(attribute[BlockResponse.Key]).decode('utf8')
-            value = base64.b64decode(
-                attribute[BlockResponse.VALUE]).decode('utf8')
-
-            # fx.dex.position is proto generate, different from other events
-            if is_new_position:
-                try:    value = eval(value)
-                except: pass
+            value = base64.b64decode(attribute[BlockResponse.VALUE]).decode('utf8')
 
             if key in self.position_id_keys:
                 position.position_id = int(value)
@@ -267,7 +259,7 @@ class ScanBlockBase:
                     transfer.token = token
             except:
                 if key=='amount':
-                    if attribute[BlockResponse.VALUE] is not None:
+                    if attribute[BlockResponse.VALUE]:
                         logging.error(f'Error parsing transfer: amount value = {attribute[BlockResponse.VALUE]}')
                     return None
 
@@ -859,30 +851,30 @@ class ScanBlock(ScanBlockBase):
         Compare top n open order counts (grouped by `owner`, `pair_id`) between database and SDK.
         E-mail alerts will be sent for open order counts differing more than `order_diff_threshold`.
         """
-        if block_height % 250 == 0:
+        if block_height % 25 == 0:
             logging.info(f'Running integrity check... (blk ht = {block_height})')
 
-        open_order_counts = self.crud.query_open_order_count_by_pairid_and_address(
-            pair_id=self.pair_id,
-            limit_records=10
-        )
-        alert_list = []
+            open_order_counts = self.crud.query_open_order_count_by_pairid_and_address(
+                pair_id=self.pair_id,
+                limit_records=10
+            )
+            alert_list = []
 
-        for pair_id, owner, db_order_count in open_order_counts:
-            try:
-                sdk_order_count = len(self.client.query_orders(owner=owner, pair_id=pair_id, page="1", limit="10000", use_db=False))
-            except:
-                sdk_order_count = 0
-                
-            if abs(db_order_count - sdk_order_count) > order_diff_threshold:
-                alert_msg = f'{owner} has {sdk_order_count} open orders on chain, but {db_order_count} in database'
-                alert_list.append(alert_msg)
-                logging.warn(alert_msg)
+            for pair_id, owner, db_order_count in open_order_counts:
+                try:
+                    sdk_order_count = len(self.client.query_orders(owner=owner, pair_id=pair_id, page="1", limit="10000", use_db=False))
+                except:
+                    sdk_order_count = 0
+                    
+                if abs(db_order_count - sdk_order_count) > order_diff_threshold:
+                    alert_msg = f'{owner} has {sdk_order_count} open orders on chain, but {db_order_count} in database'
+                    alert_list.append(alert_msg)
+                    logging.warn(alert_msg)
 
-        if alert_list:
-            alert_title = f'Integrity Check Alert (Blk Ht: {block_height}) [{self.pair_id}]'
-            alert_text = os.linesep.join(alert_list)
-            send_mail(alert_title, alert_text)
+            if alert_list:
+                alert_title = f'Integrity Check Alert (Blk Ht: {block_height}) [{self.pair_id}]'
+                alert_text = os.linesep.join(alert_list)
+                send_mail(alert_title, alert_text)
 
     def initialize_order_book(self):
         all_entries = []

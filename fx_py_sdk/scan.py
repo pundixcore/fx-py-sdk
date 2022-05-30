@@ -335,9 +335,9 @@ class AccountScan:
             return
 
         all_balances = []
-
         batch_time = datetime.datetime.utcnow()
-        for owner in self.owners:
+
+        def append_balances(owner: str):
             time_updated = datetime.datetime.utcnow()
             balances = self.client.query_all_balances(owner)
             
@@ -351,6 +351,13 @@ class AccountScan:
                     chain_pair_id=self.pair_id
                 )
                 all_balances.append(bal)
+
+        threads = [threading.Thread(target=append_balances, args=(owner,))
+                   for owner in self.owners]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join(7.5)
         
         self.client.crud.insert_many(all_balances)
 
