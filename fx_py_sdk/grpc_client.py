@@ -585,7 +585,7 @@ class GRPCClient:
             print("query error: ", e)
             return e
 
-    def query_funding_rate(self, last_or_realtime: bool = True)
+    def query_funding_rate(self, last_or_realtime: bool = True):
         """查询资金费率, fundingRate字段需要精度转换.
             Args:
                 last_or_realtime: if True, returns last (previous funding rate)
