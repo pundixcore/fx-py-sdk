@@ -9,7 +9,7 @@ from fx_py_sdk.codec.cosmos.tx.v1beta1.service_pb2 import BROADCAST_MODE_BLOCK, 
 
 from fx_py_sdk.ibc_transfer import ConfigsKeys, Ibc_transfer
 
-client = GRPCClient('https://testnet-tsla-grpc.marginx.io:9090')
+client = GRPCClient('127.0.0.1:9090')
 pair_id = "BTC:USDT"
 
 class MyTestCase(unittest.TestCase):
@@ -41,8 +41,7 @@ class MyTestCase(unittest.TestCase):
                                           mode=BROADCAST_MODE_BLOCK)
         print(tx_response)
 
-        # dex-btc  -> f(x) -> dex-spy
-
+    # dex-btc  -> f(x) -> dex-spy
     def test_ibc_transfer_dex_to_dex(self):
         Account.enable_unaudited_hdwallet_features()
         account = Account.from_mnemonic(
@@ -72,7 +71,7 @@ class MyTestCase(unittest.TestCase):
         print(receiver)
         tx_response = client.ibc_transfer(tx_builder,
                                           ibc_conf.cfg[ConfigsKeys.IBC_CHANNELS][ConfigsKeys.BTC_FXCore],
-                                          decimal.Decimal(0.1), receiver, "USDT",
+                                          decimal.Decimal(100), receiver, "USDT",
                                           account_info.sequence, mode=BROADCAST_MODE_BLOCK)
         print(tx_response)
 
