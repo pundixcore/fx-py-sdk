@@ -45,7 +45,7 @@ def main():
 
         res_str = MessageToJson(tx_response)
         print(res_str)
-        sequence = sequence + 2
+        sequence = sequence + 1
 
 
 
