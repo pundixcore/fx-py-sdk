@@ -1,3 +1,5 @@
+import re
+
 from eth_account import Account
 from fx_py_sdk.grpc_client import GRPCClient
 from fx_py_sdk.builder import TxBuilder
@@ -27,13 +29,24 @@ def main():
     account_info = client.query_account_info(account.address)
     print('account number:', account_info.account_number,
           'sequence:', account_info.sequence)
-    sequence =  account_info.sequence
-    for i in range (0, 100):
+    sequence = account_info.sequence
+    for i in range(0, 10):
         tx_response = client.create_order(tx_builder, 'TSLA:USDT', "SELL", decimal.Decimal(
             900), decimal.Decimal(1.2), 5, sequence, mode=BROADCAST_MODE_SYNC)
+
+        if tx_response.code == 20:
+            continue
+
+        if tx_response.code == 32:
+            if "account sequence mismatch" in tx_response.raw_log:
+                find = re.findall(r"expected ([0-9]+)", tx_response.raw_log)
+                sequence = int(find[0])
+                continue
+
         res_str = MessageToJson(tx_response)
-        sequence = sequence + 1
         print(res_str)
+        sequence = sequence + 2
+
 
 
 if __name__ == "__main__":
