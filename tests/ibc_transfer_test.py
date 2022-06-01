@@ -43,45 +43,52 @@ class MyTestCase(unittest.TestCase):
 
     # dex-btc  -> f(x) -> dex-spy
     def test_ibc_transfer_dex_to_dex(self):
-        Account.enable_unaudited_hdwallet_features()
-        account = Account.from_mnemonic(
-            "forum welcome cute hen dance winner bubble ski actor neutral usage cherry bullet play collect shift peasant step private grow arrive fade early alarm")
 
-        header = client.get_latest_block()
+        for chain in ConfigsKeys.GRPC_List:
+            if chain == "AAPL":
+                continue
 
-        account_info = client.query_account_info(account.address)
-        print('account number:', account_info.account_number,
-              'sequence:', account_info.sequence,
-              'address:', account_info.address)
+            to_chain = chain + "_FXCore"
+            print(to_chain)
+            Account.enable_unaudited_hdwallet_features()
+            account = Account.from_mnemonic(
+                "forum welcome cute hen dance winner bubble ski actor neutral usage cherry bullet play collect shift peasant step private grow arrive fade early alarm")
 
-        tx_builder = TxBuilder(account,
-                               None,
-                               header.chain_id,
-                               account_info.account_number,
-                               Coin(amount='600', denom='USDT'))
+            header = client.get_latest_block()
 
-        priv_key = wallet.seed_to_privkey(
-            "forum welcome cute hen dance winner bubble ski actor neutral usage cherry bullet play collect shift peasant step private grow arrive fade early alarm")
+            account_info = client.query_account_info(account.address)
+            print('account number:', account_info.account_number,
+                  'sequence:', account_info.sequence,
+                  'address:', account_info.address)
 
-        fx_address = priv_key.to_address()
-        ibc_conf = Ibc_transfer()
-        receiver = '{}|transfer/{}:{}'.format(fx_address,
-                                              ibc_conf.cfg[ConfigsKeys.IBC_CHANNELS][ConfigsKeys.FXCore_SPY],
-                                              account.address)
-        print(receiver)
-        tx_response = client.ibc_transfer(tx_builder,
-                                          ibc_conf.cfg[ConfigsKeys.IBC_CHANNELS][ConfigsKeys.BTC_FXCore],
-                                          decimal.Decimal(100), receiver, "USDT",
-                                          account_info.sequence, mode=BROADCAST_MODE_BLOCK)
-        print(tx_response)
+            tx_builder = TxBuilder(account,
+                                   None,
+                                   header.chain_id,
+                                   account_info.account_number,
+                                   Coin(amount='600', denom='USDT'))
+
+            priv_key = wallet.seed_to_privkey(
+                "forum welcome cute hen dance winner bubble ski actor neutral usage cherry bullet play collect shift peasant step private grow arrive fade early alarm")
+
+            fx_address = priv_key.to_address()
+            ibc_conf = Ibc_transfer()
+            receiver = '{}|transfer/{}:{}'.format(fx_address,
+                                                  ibc_conf.cfg[ConfigsKeys.IBC_CHANNELS][ConfigsKeys.FXCore_AAPL],
+                                                  account.address)
+            print(receiver)
+            tx_response = client.ibc_transfer(tx_builder,
+                                              ibc_conf.cfg[ConfigsKeys.IBC_CHANNELS][to_chain],
+                                              decimal.Decimal(1000), receiver, "FX",
+                                              account_info.sequence, mode=BROADCAST_MODE_BLOCK)
+            print(tx_response)
 
     def test_ibc_transfer_fxcore_to_dex_fx(self):
         Account.enable_unaudited_hdwallet_features()
 
-        clientFX = GRPCClient('3.210.229.34:9090')
+        clientFX = GRPCClient(ConfigsKeys.GRPC)
 
         priv_key = wallet.seed_to_privkey(
-            "dune antenna hood magic kit blouse film video another pioneer dilemma hobby message rug sail gas culture upgrade twin flag joke people general aunt")
+            "forum welcome cute hen dance winner bubble ski actor neutral usage cherry bullet play collect shift peasant step private grow arrive fade early alarm")
 
         header = clientFX.get_latest_block()
         addressFx = priv_key.to_public_key().to_address()
@@ -97,12 +104,12 @@ class MyTestCase(unittest.TestCase):
                                priv_key,
                                header.chain_id,
                                account_info.account_number,
-                               Coin(amount='20000000000000000000', denom='FX'))
+                               Coin(amount='200000000', denom='FX'))
         ibc_conf = Ibc_transfer()
         channel = ibc_conf.cfg[ConfigsKeys.IBC_CHANNELS][ConfigsKeys.FXCore_BTC]
         print(channel)
         tx_response = clientFX.ibc_transfer(tx_builder, channel, decimal.Decimal(1.1),
-                                            "0xd5456f7BFeEB0AC09B73357d960B64A854Da550c", "FX",
+                                            "0xF48DF2739495e30949f8985a0cF1e47BDd927123", "FX",
                                             account_info.sequence, mode=BROADCAST_MODE_BLOCK)
         print(tx_response)
 
