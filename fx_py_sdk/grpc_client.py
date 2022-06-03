@@ -600,7 +600,7 @@ class GRPCClient:
         """
         try:
             response = DexQuery(self.channel).QueryPairFundingRates(QueryPairFundingRatesReq(
-                last_or_realtime=True))
+                last_or_realtime=last_or_realtime))
             res_str = MessageToJson(response)
             res = json.loads(res_str)
             for rate in res['pairFundingRates']:
@@ -729,7 +729,7 @@ class GRPCClient:
         return self.broadcast_tx(tx, mode)
 
     def close_position(self, tx_builder: TxBuilder, pair_id: str, position_id: str, price: Decimal, base_quantity: Decimal,
-                       full_close: bool, acc_seq: int, mode: BroadcastMode = BROADCAST_MODE_BLOCK):
+                       full_close: bool, acc_seq: int, market_close = False, mode: BroadcastMode = BROADCAST_MODE_BLOCK):
 
         price = price * decimal.Decimal(DEFAULT_DEC)
         price = str(price)
@@ -739,7 +739,7 @@ class GRPCClient:
         base_quantity_split = base_quantity.split('.', 1)
 
         msg = MsgClosePosition(owner=tx_builder.account.address, pair_id=pair_id, position_id=position_id, price=price_split[0],
-                               base_quantity=base_quantity_split[0], full_close=full_close)
+                               base_quantity=base_quantity_split[0], full_close=full_close, market_close=market_close)
 
         msg_any = Any(type_url='/fx.dex.v1.MsgClosePosition',
                       value=msg.SerializeToString())
@@ -768,7 +768,7 @@ class GRPCClient:
                        acc_seq: int, mode: BroadcastMode = BROADCAST_MODE_BLOCK):
         if tx_builder._private_key is not None:
             address = tx_builder._private_key.to_address()
-            if denom == "USDT" or denom == "FX":
+            if denom == "USDT":
                 amount = token_amount * decimal.Decimal(DEFAULT_DEC)
             else:
                 amount = token_amount * decimal.Decimal(DEFAULT_DEC_FX)

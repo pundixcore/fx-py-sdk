@@ -208,12 +208,9 @@ class FundingRate(Base):
 
 class Wallet(Base):
     __tablename__ = 'wallet'
-    __table_args__ = (
-        UniqueConstraint('address', 'pair_id'),
-    )
 
     id = Column('id', Integer, primary_key=True, autoincrement=True)
-    address = Column(String(42))
+    address = Column(String(42), unique=True)
     owner = Column(String(100))
     pair_id = Column(String(20))
     comment = Column(String(256))

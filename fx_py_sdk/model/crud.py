@@ -1,6 +1,6 @@
 import datetime
 from decimal import Decimal
-from typing import Dict, Iterable, List, Union, TypeVar
+from typing import Dict, Iterable, List, Optional, Union, TypeVar
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import case, text
 from sqlalchemy.orm.session import Session
@@ -237,18 +237,39 @@ class Crud:
         return self.session.query(object).count()
 
     # Exposure
-    def __get_exposure(self, address=None, pair_id=None, is_bot=True, as_dollar_value=False) -> Union[Decimal, Dict[str, Decimal]]:
+    def __get_exposure(self,
+                       addresses: Optional[Union[List[str], str]] = None,
+                       pair_ids: Optional[Union[List[str], str]] = None,
+                       is_bot: bool = True,
+                       as_dollar_value: bool = False) -> Union[Decimal, Dict[str, Decimal]]:
+        """
+        Gets contract/dollar exposure from database.
+
+        :param addresses:
+        :param pair_ids:
+        :param is_bot:
+        :param as_dollar_value:
+
+        :return: Dictionary of pair_id -> exposure
+        """
+
         # Apply SQL conditions based on parameters
         conditions = [Position.status=='open']
 
-        if address:
-            conditions.append(Position.owner==address)
+        if addresses:
+            if isinstance(addresses, str):
+                conditions.append(Position.owner==addresses)
+            else:
+                conditions.append(Position.owner.in_(addresses))
         elif is_bot:
             bot_addresses = self.session.query(Wallet.address)
             conditions.append(Position.owner.in_(bot_addresses))
 
-        if pair_id:
-            conditions.append(Position.pair_id==pair_id)
+        if pair_ids:
+            if isinstance(pair_ids, str):
+                conditions.append(Position.pair_id==pair_ids)
+            else:
+                conditions.append(Position.pair_id.in_(pair_ids))
 
         # Retrieve from DB
         result = (self.session.query(Position.pair_id, func.sum(Position.base_quantity * case([(Position.direction=='LONG', 1)], else_=-1)))
@@ -266,18 +287,24 @@ class Crud:
                         result_dict[trade_pair] = exposure * mark_price
                         break
 
-        if pair_id:
-            return result_dict.get(pair_id, Decimal('0'))
+        if isinstance(pair_ids, str):
+            return result_dict.get(pair_ids, Decimal('0'))
         else:
             return result_dict
 
-    def get_contract_exposure(self, address=None, pair_id=None, is_bot=True):
+    def get_contract_exposure(self,
+                              addresses: Optional[Union[List[str], str]] = None,
+                              pair_ids: Optional[Union[List[str], str]] = None,
+                              is_bot: bool = True):
         """Returns a single net contract quantity exposure if pair_id is provided. Otherwise, returns dictionary."""
-        return self.__get_exposure(address, pair_id, is_bot)
+        return self.__get_exposure(addresses, pair_ids, is_bot)
     
-    def get_dollar_exposure(self, address=None, pair_id=None, is_bot=True):
+    def get_dollar_exposure(self,
+                            addresses: Optional[Union[List[str], str]] = None,
+                            pair_ids: Optional[Union[List[str], str]] = None,
+                            is_bot: bool = True):
         """Returns a single exposure marked to mark price if pair_id is provided. Otherwise, returns dictionary."""
-        return self.__get_exposure(address, pair_id, is_bot, as_dollar_value=True)
+        return self.__get_exposure(addresses, pair_ids, is_bot, as_dollar_value=True)
 
     def get_funding_transfers(self, address: str=None, pair_id: str=None, from_datetime: datetime.datetime=None):
         limit_records = 100
@@ -315,6 +342,7 @@ class Crud:
                         p.pair_id,
                         SUM(p.realized_pnl) AS realized_pnl
                     FROM positioning p
+                    LEFT JOIN block b on p.block_height=b.height
                     WHERE
                         p.block_height BETWEEN :start_block_height AND :end_block_height
                         AND COALESCE(p.is_batch_update, FALSE) = FALSE
@@ -378,9 +406,8 @@ class Crud:
 
         delete_query = f"""
         DO $$
-        DECLARE
-            bh integer;
-            pid varchar;
+        DECLARE bh integer;
+        DECLARE pid varchar;
         BEGIN
             SELECT :from_block_height INTO bh;
             SELECT :pair_id INTO pid;
@@ -425,14 +452,10 @@ class Crud:
                     .filter(and_(Block.tx_events_processed==True, Block.block_processed==True))
                     .scalar())
 
-    def query_lowest_incomplete_height(self, pair_id: str = None):
+    def query_lowest_incomplete_height(self):
         """Query lowest block height where either `block_processed` or `tx_events_processed` is false (i.e. block processing is incomplete)"""
-        conditions = [or_(Block.block_processed==False, Block.tx_events_processed==False)]
-        if pair_id:
-            conditions.append(Block.pair_id==pair_id)
-
         return (self.session.query(func.min(Block.height))
-                            .filter(*conditions)
+                            .filter(or_(Block.block_processed==False, Block.tx_events_processed==False))
                             .scalar())
 
     def delete_data_from_lowest_incomplete_height(self,
