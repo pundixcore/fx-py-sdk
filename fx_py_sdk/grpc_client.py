@@ -42,6 +42,8 @@ import json
 import requests
 from fx_py_sdk.model.crud import Crud
 from fx_py_sdk.model.model import HedgingOrder, HedgingTrade, Order as CrudOrder, Trade as CrudTrade, Block
+from fx_py_sdk.codec.cosmos.gov.v1beta1.query_pb2_grpc import QueryStub as GovQuery
+from fx_py_sdk.codec.cosmos.gov.v1beta1.query_pb2 import *
 
 DEFAULT_DEX_GAS = 5000000
 DEFAULT_GRPC_NONE = "Not found"
@@ -58,6 +60,11 @@ class GRPCClient:
             self.channel = grpc.insecure_channel(url)
 
         self.crud = Crud()
+
+    def Proposal(self, proposal_id):
+        response = GovQuery(self.channel).Proposal(QueryProposalRequest(proposal_id=proposal_id))
+        return response
+
 
     def query_account_info(self, address: str) -> BaseAccount:
         """查询账户信息

@@ -695,7 +695,7 @@ class ScanBlock(ScanBlockBase):
 
                 self.process_orderbook(order, True, block_height)
 
-            elif event[BlockResponse.TYPE] == EventTypes.Cancel_order:
+            elif event[BlockResponse.TYPE] == EventTypes.Cancel_order_user or event[BlockResponse.TYPE] == EventTypes.Cancel_order_liq:
                 """only update order, but in case of not listened create order"""
                 order = self.get_order(event[BlockResponse.Attributes])
                 order.block_height = block_height

@@ -33,7 +33,7 @@ class EventTypes:
     New_position = "fx.dex.Position"
     Part_close_position = "dex.part_close_position"
     Full_close_position = "dex.full_close_position"
-    Cancel_order_expire = "dex.cancel_order" # expire block
+    Cancel_order_expire = "dex.expire_cancel" #order because of expire
     Cancel_order_partial_order = "dex.cancel_order" # will not happen from 2021/12/21
 
     """BeginBlock"""
@@ -46,7 +46,8 @@ class EventTypes:
 
     """Tx event"""
     Order = "fx.dex.Order"
-    Cancel_order = "dex.cancel_order"
+    Cancel_order_user = "dex.user_cancel" #order because of user cancel
+    Cancel_order_liq = "dex.liq_cancel" #cancel order because of liquidation
     Close_position_order = "dex.close_position_order"
     Message = "message"
     Add_margin = 'dex.add_margin'
