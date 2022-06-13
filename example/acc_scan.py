@@ -45,8 +45,7 @@ def main():
         client = GRPCClient(f"https://testnet-${pair.lower()}-grpc.marginx.io:9090")
         # client = GRPCClient(f"127.0.0.1:9090")
 
-
-        book_name_xls = "chaindata.xls"
+        book_name_xls = pair + ".xls"
         sheet_balance = "balance"
         sheet_position = "position"
 
