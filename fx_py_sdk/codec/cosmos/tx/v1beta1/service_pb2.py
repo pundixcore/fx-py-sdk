@@ -17,18 +17,51 @@ from fx_py_sdk.codec.cosmos.base.abci.v1beta1 import abci_pb2 as cosmos_dot_base
 from fx_py_sdk.codec.cosmos.tx.v1beta1 import tx_pb2 as cosmos_dot_tx_dot_v1beta1_dot_tx__pb2
 from fx_py_sdk.codec.gogoproto import gogo_pb2 as gogoproto_dot_gogo__pb2
 from fx_py_sdk.codec.cosmos.base.query.v1beta1 import pagination_pb2 as cosmos_dot_base_dot_query_dot_v1beta1_dot_pagination__pb2
+from fx_py_sdk.codec.tendermint.types import block_pb2 as tendermint_dot_types_dot_block__pb2
+from fx_py_sdk.codec.tendermint.types import types_pb2 as tendermint_dot_types_dot_types__pb2
 
 
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='cosmos/tx/v1beta1/service.proto',
   package='cosmos.tx.v1beta1',
   syntax='proto3',
-  serialized_options=b'Z%github.com/cosmos/cosmos-sdk/types/tx',
+  serialized_options=b'Z%github.com/cosmos/cosmos-sdk/types/tx\300\343\036\001',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x1f\x63osmos/tx/v1beta1/service.proto\x12\x11\x63osmos.tx.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a#cosmos/base/abci/v1beta1/abci.proto\x1a\x1a\x63osmos/tx/v1beta1/tx.proto\x1a\x14gogoproto/gogo.proto\x1a*cosmos/base/query/v1beta1/pagination.proto\"`\n\x12GetTxsEventRequest\x12\x0e\n\x06\x65vents\x18\x01 \x03(\t\x12:\n\npagination\x18\x02 \x01(\x0b\x32&.cosmos.base.query.v1beta1.PageRequest\"\xb2\x01\n\x13GetTxsEventResponse\x12\"\n\x03txs\x18\x01 \x03(\x0b\x32\x15.cosmos.tx.v1beta1.Tx\x12:\n\x0ctx_responses\x18\x02 \x03(\x0b\x32$.cosmos.base.abci.v1beta1.TxResponse\x12;\n\npagination\x18\x03 \x01(\x0b\x32\'.cosmos.base.query.v1beta1.PageResponse\"V\n\x12\x42roadcastTxRequest\x12\x10\n\x08tx_bytes\x18\x01 \x01(\x0c\x12.\n\x04mode\x18\x02 \x01(\x0e\x32 .cosmos.tx.v1beta1.BroadcastMode\"P\n\x13\x42roadcastTxResponse\x12\x39\n\x0btx_response\x18\x01 \x01(\x0b\x32$.cosmos.base.abci.v1beta1.TxResponse\"4\n\x0fSimulateRequest\x12!\n\x02tx\x18\x01 \x01(\x0b\x32\x15.cosmos.tx.v1beta1.Tx\"y\n\x10SimulateResponse\x12\x33\n\x08gas_info\x18\x01 \x01(\x0b\x32!.cosmos.base.abci.v1beta1.GasInfo\x12\x30\n\x06result\x18\x02 \x01(\x0b\x32 .cosmos.base.abci.v1beta1.Result\"\x1c\n\x0cGetTxRequest\x12\x0c\n\x04hash\x18\x01 \x01(\t\"m\n\rGetTxResponse\x12!\n\x02tx\x18\x01 \x01(\x0b\x32\x15.cosmos.tx.v1beta1.Tx\x12\x39\n\x0btx_response\x18\x02 \x01(\x0b\x32$.cosmos.base.abci.v1beta1.TxResponse*|\n\rBroadcastMode\x12\x1e\n\x1a\x42ROADCAST_MODE_UNSPECIFIED\x10\x00\x12\x18\n\x14\x42ROADCAST_MODE_BLOCK\x10\x01\x12\x17\n\x13\x42ROADCAST_MODE_SYNC\x10\x02\x12\x18\n\x14\x42ROADCAST_MODE_ASYNC\x10\x03\x32\xf8\x03\n\x07Service\x12{\n\x08Simulate\x12\".cosmos.tx.v1beta1.SimulateRequest\x1a#.cosmos.tx.v1beta1.SimulateResponse\"&\x82\xd3\xe4\x93\x02 \"\x1b/cosmos/tx/v1beta1/simulate:\x01*\x12q\n\x05GetTx\x12\x1f.cosmos.tx.v1beta1.GetTxRequest\x1a .cosmos.tx.v1beta1.GetTxResponse\"%\x82\xd3\xe4\x93\x02\x1f\x12\x1d/cosmos/tx/v1beta1/txs/{hash}\x12\x7f\n\x0b\x42roadcastTx\x12%.cosmos.tx.v1beta1.BroadcastTxRequest\x1a&.cosmos.tx.v1beta1.BroadcastTxResponse\"!\x82\xd3\xe4\x93\x02\x1b\"\x16/cosmos/tx/v1beta1/txs:\x01*\x12|\n\x0bGetTxsEvent\x12%.cosmos.tx.v1beta1.GetTxsEventRequest\x1a&.cosmos.tx.v1beta1.GetTxsEventResponse\"\x1e\x82\xd3\xe4\x93\x02\x18\x12\x16/cosmos/tx/v1beta1/txsB\'Z%github.com/cosmos/cosmos-sdk/types/txb\x06proto3'
+  serialized_pb=b'\n\x1f\x63osmos/tx/v1beta1/service.proto\x12\x11\x63osmos.tx.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a#cosmos/base/abci/v1beta1/abci.proto\x1a\x1a\x63osmos/tx/v1beta1/tx.proto\x1a\x14gogoproto/gogo.proto\x1a*cosmos/base/query/v1beta1/pagination.proto\x1a\x1ctendermint/types/block.proto\x1a\x1ctendermint/types/types.proto\"\x8e\x01\n\x12GetTxsEventRequest\x12\x0e\n\x06\x65vents\x18\x01 \x03(\t\x12:\n\npagination\x18\x02 \x01(\x0b\x32&.cosmos.base.query.v1beta1.PageRequest\x12,\n\x08order_by\x18\x03 \x01(\x0e\x32\x1a.cosmos.tx.v1beta1.OrderBy\"\xb2\x01\n\x13GetTxsEventResponse\x12\"\n\x03txs\x18\x01 \x03(\x0b\x32\x15.cosmos.tx.v1beta1.Tx\x12:\n\x0ctx_responses\x18\x02 \x03(\x0b\x32$.cosmos.base.abci.v1beta1.TxResponse\x12;\n\npagination\x18\x03 \x01(\x0b\x32\'.cosmos.base.query.v1beta1.PageResponse\"V\n\x12\x42roadcastTxRequest\x12\x10\n\x08tx_bytes\x18\x01 \x01(\x0c\x12.\n\x04mode\x18\x02 \x01(\x0e\x32 .cosmos.tx.v1beta1.BroadcastMode\"P\n\x13\x42roadcastTxResponse\x12\x39\n\x0btx_response\x18\x01 \x01(\x0b\x32$.cosmos.base.abci.v1beta1.TxResponse\"J\n\x0fSimulateRequest\x12%\n\x02tx\x18\x01 \x01(\x0b\x32\x15.cosmos.tx.v1beta1.TxB\x02\x18\x01\x12\x10\n\x08tx_bytes\x18\x02 \x01(\x0c\"y\n\x10SimulateResponse\x12\x33\n\x08gas_info\x18\x01 \x01(\x0b\x32!.cosmos.base.abci.v1beta1.GasInfo\x12\x30\n\x06result\x18\x02 \x01(\x0b\x32 .cosmos.base.abci.v1beta1.Result\"\x1c\n\x0cGetTxRequest\x12\x0c\n\x04hash\x18\x01 \x01(\t\"m\n\rGetTxResponse\x12!\n\x02tx\x18\x01 \x01(\x0b\x32\x15.cosmos.tx.v1beta1.Tx\x12\x39\n\x0btx_response\x18\x02 \x01(\x0b\x32$.cosmos.base.abci.v1beta1.TxResponse\"d\n\x16GetBlockWithTxsRequest\x12\x0e\n\x06height\x18\x01 \x01(\x03\x12:\n\npagination\x18\x02 \x01(\x0b\x32&.cosmos.base.query.v1beta1.PageRequest\"\xcf\x01\n\x17GetBlockWithTxsResponse\x12\"\n\x03txs\x18\x01 \x03(\x0b\x32\x15.cosmos.tx.v1beta1.Tx\x12+\n\x08\x62lock_id\x18\x02 \x01(\x0b\x32\x19.tendermint.types.BlockID\x12&\n\x05\x62lock\x18\x03 \x01(\x0b\x32\x17.tendermint.types.Block\x12;\n\npagination\x18\x04 \x01(\x0b\x32\'.cosmos.base.query.v1beta1.PageResponse*H\n\x07OrderBy\x12\x18\n\x14ORDER_BY_UNSPECIFIED\x10\x00\x12\x10\n\x0cORDER_BY_ASC\x10\x01\x12\x11\n\rORDER_BY_DESC\x10\x02*|\n\rBroadcastMode\x12\x1e\n\x1a\x42ROADCAST_MODE_UNSPECIFIED\x10\x00\x12\x18\n\x14\x42ROADCAST_MODE_BLOCK\x10\x01\x12\x17\n\x13\x42ROADCAST_MODE_SYNC\x10\x02\x12\x18\n\x14\x42ROADCAST_MODE_ASYNC\x10\x03\x32\x92\x05\n\x07Service\x12{\n\x08Simulate\x12\".cosmos.tx.v1beta1.SimulateRequest\x1a#.cosmos.tx.v1beta1.SimulateResponse\"&\x82\xd3\xe4\x93\x02 \"\x1b/cosmos/tx/v1beta1/simulate:\x01*\x12q\n\x05GetTx\x12\x1f.cosmos.tx.v1beta1.GetTxRequest\x1a .cosmos.tx.v1beta1.GetTxResponse\"%\x82\xd3\xe4\x93\x02\x1f\x12\x1d/cosmos/tx/v1beta1/txs/{hash}\x12\x7f\n\x0b\x42roadcastTx\x12%.cosmos.tx.v1beta1.BroadcastTxRequest\x1a&.cosmos.tx.v1beta1.BroadcastTxResponse\"!\x82\xd3\xe4\x93\x02\x1b\"\x16/cosmos/tx/v1beta1/txs:\x01*\x12|\n\x0bGetTxsEvent\x12%.cosmos.tx.v1beta1.GetTxsEventRequest\x1a&.cosmos.tx.v1beta1.GetTxsEventResponse\"\x1e\x82\xd3\xe4\x93\x02\x18\x12\x16/cosmos/tx/v1beta1/txs\x12\x97\x01\n\x0fGetBlockWithTxs\x12).cosmos.tx.v1beta1.GetBlockWithTxsRequest\x1a*.cosmos.tx.v1beta1.GetBlockWithTxsResponse\"-\x82\xd3\xe4\x93\x02\'\x12%/cosmos/tx/v1beta1/txs/block/{height}B+Z%github.com/cosmos/cosmos-sdk/types/tx\xc0\xe3\x1e\x01\x62\x06proto3'
   ,
-  dependencies=[google_dot_api_dot_annotations__pb2.DESCRIPTOR,cosmos_dot_base_dot_abci_dot_v1beta1_dot_abci__pb2.DESCRIPTOR,cosmos_dot_tx_dot_v1beta1_dot_tx__pb2.DESCRIPTOR,gogoproto_dot_gogo__pb2.DESCRIPTOR,cosmos_dot_base_dot_query_dot_v1beta1_dot_pagination__pb2.DESCRIPTOR,])
+  dependencies=[google_dot_api_dot_annotations__pb2.DESCRIPTOR,cosmos_dot_base_dot_abci_dot_v1beta1_dot_abci__pb2.DESCRIPTOR,cosmos_dot_tx_dot_v1beta1_dot_tx__pb2.DESCRIPTOR,gogoproto_dot_gogo__pb2.DESCRIPTOR,cosmos_dot_base_dot_query_dot_v1beta1_dot_pagination__pb2.DESCRIPTOR,tendermint_dot_types_dot_block__pb2.DESCRIPTOR,tendermint_dot_types_dot_types__pb2.DESCRIPTOR,])
 
+_ORDERBY = _descriptor.EnumDescriptor(
+  name='OrderBy',
+  full_name='cosmos.tx.v1beta1.OrderBy',
+  filename=None,
+  file=DESCRIPTOR,
+  create_key=_descriptor._internal_create_key,
+  values=[
+    _descriptor.EnumValueDescriptor(
+      name='ORDER_BY_UNSPECIFIED', index=0, number=0,
+      serialized_options=None,
+      type=None,
+      create_key=_descriptor._internal_create_key),
+    _descriptor.EnumValueDescriptor(
+      name='ORDER_BY_ASC', index=1, number=1,
+      serialized_options=None,
+      type=None,
+      create_key=_descriptor._internal_create_key),
+    _descriptor.EnumValueDescriptor(
+      name='ORDER_BY_DESC', index=2, number=2,
+      serialized_options=None,
+      type=None,
+      create_key=_descriptor._internal_create_key),
+  ],
+  containing_type=None,
+  serialized_options=None,
+  serialized_start=1423,
+  serialized_end=1495,
+)
+_sym_db.RegisterEnumDescriptor(_ORDERBY)
+
+OrderBy = enum_type_wrapper.EnumTypeWrapper(_ORDERBY)
 _BROADCASTMODE = _descriptor.EnumDescriptor(
   name='BroadcastMode',
   full_name='cosmos.tx.v1beta1.BroadcastMode',
@@ -59,12 +92,15 @@ _BROADCASTMODE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=982,
-  serialized_end=1106,
+  serialized_start=1497,
+  serialized_end=1621,
 )
 _sym_db.RegisterEnumDescriptor(_BROADCASTMODE)
 
 BroadcastMode = enum_type_wrapper.EnumTypeWrapper(_BROADCASTMODE)
+ORDER_BY_UNSPECIFIED = 0
+ORDER_BY_ASC = 1
+ORDER_BY_DESC = 2
 BROADCAST_MODE_UNSPECIFIED = 0
 BROADCAST_MODE_BLOCK = 1
 BROADCAST_MODE_SYNC = 2
@@ -94,6 +130,13 @@ _GETTXSEVENTREQUEST = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='order_by', full_name='cosmos.tx.v1beta1.GetTxsEventRequest.order_by', index=2,
+      number=3, type=14, cpp_type=8, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -106,8 +149,8 @@ _GETTXSEVENTREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=215,
-  serialized_end=311,
+  serialized_start=276,
+  serialized_end=418,
 )
 
 
@@ -152,8 +195,8 @@ _GETTXSEVENTRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=314,
-  serialized_end=492,
+  serialized_start=421,
+  serialized_end=599,
 )
 
 
@@ -191,8 +234,8 @@ _BROADCASTTXREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=494,
-  serialized_end=580,
+  serialized_start=601,
+  serialized_end=687,
 )
 
 
@@ -223,8 +266,8 @@ _BROADCASTTXRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=582,
-  serialized_end=662,
+  serialized_start=689,
+  serialized_end=769,
 )
 
 
@@ -242,6 +285,13 @@ _SIMULATEREQUEST = _descriptor.Descriptor(
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
+      serialized_options=b'\030\001', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='tx_bytes', full_name='cosmos.tx.v1beta1.SimulateRequest.tx_bytes', index=1,
+      number=2, type=12, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"",
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
@@ -255,8 +305,8 @@ _SIMULATEREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=664,
-  serialized_end=716,
+  serialized_start=771,
+  serialized_end=845,
 )
 
 
@@ -294,8 +344,8 @@ _SIMULATERESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=718,
-  serialized_end=839,
+  serialized_start=847,
+  serialized_end=968,
 )
 
 
@@ -326,8 +376,8 @@ _GETTXREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=841,
-  serialized_end=869,
+  serialized_start=970,
+  serialized_end=998,
 )
 
 
@@ -365,11 +415,104 @@ _GETTXRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=871,
-  serialized_end=980,
+  serialized_start=1000,
+  serialized_end=1109,
+)
+
+
+_GETBLOCKWITHTXSREQUEST = _descriptor.Descriptor(
+  name='GetBlockWithTxsRequest',
+  full_name='cosmos.tx.v1beta1.GetBlockWithTxsRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='height', full_name='cosmos.tx.v1beta1.GetBlockWithTxsRequest.height', index=0,
+      number=1, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='pagination', full_name='cosmos.tx.v1beta1.GetBlockWithTxsRequest.pagination', index=1,
+      number=2, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1111,
+  serialized_end=1211,
+)
+
+
+_GETBLOCKWITHTXSRESPONSE = _descriptor.Descriptor(
+  name='GetBlockWithTxsResponse',
+  full_name='cosmos.tx.v1beta1.GetBlockWithTxsResponse',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='txs', full_name='cosmos.tx.v1beta1.GetBlockWithTxsResponse.txs', index=0,
+      number=1, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='block_id', full_name='cosmos.tx.v1beta1.GetBlockWithTxsResponse.block_id', index=1,
+      number=2, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='block', full_name='cosmos.tx.v1beta1.GetBlockWithTxsResponse.block', index=2,
+      number=3, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='pagination', full_name='cosmos.tx.v1beta1.GetBlockWithTxsResponse.pagination', index=3,
+      number=4, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1214,
+  serialized_end=1421,
 )
 
 _GETTXSEVENTREQUEST.fields_by_name['pagination'].message_type = cosmos_dot_base_dot_query_dot_v1beta1_dot_pagination__pb2._PAGEREQUEST
+_GETTXSEVENTREQUEST.fields_by_name['order_by'].enum_type = _ORDERBY
 _GETTXSEVENTRESPONSE.fields_by_name['txs'].message_type = cosmos_dot_tx_dot_v1beta1_dot_tx__pb2._TX
 _GETTXSEVENTRESPONSE.fields_by_name['tx_responses'].message_type = cosmos_dot_base_dot_abci_dot_v1beta1_dot_abci__pb2._TXRESPONSE
 _GETTXSEVENTRESPONSE.fields_by_name['pagination'].message_type = cosmos_dot_base_dot_query_dot_v1beta1_dot_pagination__pb2._PAGERESPONSE
@@ -380,6 +523,11 @@ _SIMULATERESPONSE.fields_by_name['gas_info'].message_type = cosmos_dot_base_dot_
 _SIMULATERESPONSE.fields_by_name['result'].message_type = cosmos_dot_base_dot_abci_dot_v1beta1_dot_abci__pb2._RESULT
 _GETTXRESPONSE.fields_by_name['tx'].message_type = cosmos_dot_tx_dot_v1beta1_dot_tx__pb2._TX
 _GETTXRESPONSE.fields_by_name['tx_response'].message_type = cosmos_dot_base_dot_abci_dot_v1beta1_dot_abci__pb2._TXRESPONSE
+_GETBLOCKWITHTXSREQUEST.fields_by_name['pagination'].message_type = cosmos_dot_base_dot_query_dot_v1beta1_dot_pagination__pb2._PAGEREQUEST
+_GETBLOCKWITHTXSRESPONSE.fields_by_name['txs'].message_type = cosmos_dot_tx_dot_v1beta1_dot_tx__pb2._TX
+_GETBLOCKWITHTXSRESPONSE.fields_by_name['block_id'].message_type = tendermint_dot_types_dot_types__pb2._BLOCKID
+_GETBLOCKWITHTXSRESPONSE.fields_by_name['block'].message_type = tendermint_dot_types_dot_block__pb2._BLOCK
+_GETBLOCKWITHTXSRESPONSE.fields_by_name['pagination'].message_type = cosmos_dot_base_dot_query_dot_v1beta1_dot_pagination__pb2._PAGERESPONSE
 DESCRIPTOR.message_types_by_name['GetTxsEventRequest'] = _GETTXSEVENTREQUEST
 DESCRIPTOR.message_types_by_name['GetTxsEventResponse'] = _GETTXSEVENTRESPONSE
 DESCRIPTOR.message_types_by_name['BroadcastTxRequest'] = _BROADCASTTXREQUEST
@@ -388,6 +536,9 @@ DESCRIPTOR.message_types_by_name['SimulateRequest'] = _SIMULATEREQUEST
 DESCRIPTOR.message_types_by_name['SimulateResponse'] = _SIMULATERESPONSE
 DESCRIPTOR.message_types_by_name['GetTxRequest'] = _GETTXREQUEST
 DESCRIPTOR.message_types_by_name['GetTxResponse'] = _GETTXRESPONSE
+DESCRIPTOR.message_types_by_name['GetBlockWithTxsRequest'] = _GETBLOCKWITHTXSREQUEST
+DESCRIPTOR.message_types_by_name['GetBlockWithTxsResponse'] = _GETBLOCKWITHTXSRESPONSE
+DESCRIPTOR.enum_types_by_name['OrderBy'] = _ORDERBY
 DESCRIPTOR.enum_types_by_name['BroadcastMode'] = _BROADCASTMODE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
@@ -447,8 +598,23 @@ GetTxResponse = _reflection.GeneratedProtocolMessageType('GetTxResponse', (_mess
   })
 _sym_db.RegisterMessage(GetTxResponse)
 
+GetBlockWithTxsRequest = _reflection.GeneratedProtocolMessageType('GetBlockWithTxsRequest', (_message.Message,), {
+  'DESCRIPTOR' : _GETBLOCKWITHTXSREQUEST,
+  '__module__' : 'cosmos.tx.v1beta1.service_pb2'
+  # @@protoc_insertion_point(class_scope:cosmos.tx.v1beta1.GetBlockWithTxsRequest)
+  })
+_sym_db.RegisterMessage(GetBlockWithTxsRequest)
+
+GetBlockWithTxsResponse = _reflection.GeneratedProtocolMessageType('GetBlockWithTxsResponse', (_message.Message,), {
+  'DESCRIPTOR' : _GETBLOCKWITHTXSRESPONSE,
+  '__module__' : 'cosmos.tx.v1beta1.service_pb2'
+  # @@protoc_insertion_point(class_scope:cosmos.tx.v1beta1.GetBlockWithTxsResponse)
+  })
+_sym_db.RegisterMessage(GetBlockWithTxsResponse)
+
 
 DESCRIPTOR._options = None
+_SIMULATEREQUEST.fields_by_name['tx']._options = None
 
 _SERVICE = _descriptor.ServiceDescriptor(
   name='Service',
@@ -457,8 +623,8 @@ _SERVICE = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=1109,
-  serialized_end=1613,
+  serialized_start=1624,
+  serialized_end=2282,
   methods=[
   _descriptor.MethodDescriptor(
     name='Simulate',
@@ -498,6 +664,16 @@ _SERVICE = _descriptor.ServiceDescriptor(
     input_type=_GETTXSEVENTREQUEST,
     output_type=_GETTXSEVENTRESPONSE,
     serialized_options=b'\202\323\344\223\002\030\022\026/cosmos/tx/v1beta1/txs',
+    create_key=_descriptor._internal_create_key,
+  ),
+  _descriptor.MethodDescriptor(
+    name='GetBlockWithTxs',
+    full_name='cosmos.tx.v1beta1.Service.GetBlockWithTxs',
+    index=4,
+    containing_service=None,
+    input_type=_GETBLOCKWITHTXSREQUEST,
+    output_type=_GETBLOCKWITHTXSRESPONSE,
+    serialized_options=b'\202\323\344\223\002\'\022%/cosmos/tx/v1beta1/txs/block/{height}',
     create_key=_descriptor._internal_create_key,
   ),
 ])

@@ -6,10 +6,10 @@ from urllib.parse import urlparse
 import eth_utils
 import grpc
 from fx_py_sdk.codec.cosmos.auth.v1beta1.auth_pb2 import BaseAccount
-from fx_py_sdk.codec.cosmos.auth.v1beta1.query_pb2 import QueryAccountRequest
+from fx_py_sdk.codec.cosmos.base.query.v1beta1.pagination_pb2 import PageRequest
+from fx_py_sdk.codec.cosmos.auth.v1beta1.query_pb2 import QueryAccountRequest, QueryAccountsRequest
 from fx_py_sdk.codec.cosmos.auth.v1beta1.query_pb2_grpc import QueryStub as AuthQuery
-from fx_py_sdk.codec.cosmos.bank.v1beta1.query_pb2 import QueryAllBalancesRequest
-from fx_py_sdk.codec.cosmos.bank.v1beta1.query_pb2 import QueryBalanceRequest
+from fx_py_sdk.codec.cosmos.bank.v1beta1.query_pb2 import QueryAllBalancesRequest, QueryBalanceRequest
 from fx_py_sdk.codec.cosmos.bank.v1beta1.query_pb2_grpc import QueryStub as BankQuery
 from fx_py_sdk.codec.cosmos.base.tendermint.v1beta1.query_pb2 import GetBlockByHeightRequest
 from fx_py_sdk.codec.cosmos.base.tendermint.v1beta1.query_pb2_grpc import ServiceStub as TendermintClient
@@ -19,6 +19,7 @@ from fx_py_sdk.codec.cosmos.tx.v1beta1.service_pb2_grpc import ServiceStub as Tx
 from fx_py_sdk.codec.cosmos.tx.v1beta1.service_pb2 import (
     SimulateRequest, BroadcastTxRequest, GetTxRequest, BroadcastMode, BROADCAST_MODE_BLOCK, BROADCAST_MODE_SYNC
 )
+
 from fx_py_sdk.codec.cosmos.tx.v1beta1.tx_pb2 import Tx, TxRaw, Fee
 from fx_py_sdk.codec.cosmos.base.v1beta1.coin_pb2 import Coin
 from fx_py_sdk.codec.fx.other.query_pb2 import GasPriceRequest
@@ -66,6 +67,11 @@ class GRPCClient:
         return response
 
 
+    def query_accounts(self, page: int):
+        accounts = AuthQuery(self.channel).Accounts(QueryAccountsRequest(pagination=PageRequest())).accounts
+        return accounts
+
+
     def query_account_info(self, address: str) -> BaseAccount:
         """查询账户信息
             Args:
@@ -84,8 +90,7 @@ class GRPCClient:
         """
         try:
             # Any 类型转换 - BaseAccount
-            account_any = AuthQuery(self.channel).Account(
-                QueryAccountRequest(address=address)).account
+            account_any = AuthQuery(self.channel).Account(QueryAccountRequest(address=address)).account
             account = BaseAccount()
             if account_any.Is(account.DESCRIPTOR):
                 account_any.Unpack(account)
@@ -239,8 +244,7 @@ class GRPCClient:
 
         positions = []
         try:
-            response = DexQuery(self.channel).QueryPosition(
-                QueryPositionReq(owner=owner, pair_id=pair_id))
+            response = DexQuery(self.channel).QueryPosition(QueryPositionReq(owner=owner, pair_id=pair_id))
             for pos in response.positions:
                 entry_price = decimal.Decimal(pos.entry_price)
                 entry_price = entry_price / decimal.Decimal(DEFAULT_DEC)
@@ -272,12 +276,18 @@ class GRPCClient:
                 pending_order_quantity = pending_order_quantity / \
                     decimal.Decimal(DEFAULT_DEC)
 
+                pos_direction = ""
+                if str(pos.direction) == '1':
+                    pos_direction = "long"
+                elif str(pos.direction) == '2':
+                    pos_direction = "short"
+
                 checksumAddr = eth_utils.to_checksum_address(Address_Prefix + pos.owner.hex())
                 position = Position(
                     pos.id,
                     checksumAddr,
                     pos.pair_id,
-                    pos.direction,
+                    pos_direction,
                     entry_price,
                     mark_price,
                     liquidation_price,
