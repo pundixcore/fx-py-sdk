@@ -214,8 +214,8 @@ class Crud:
         return query.all()
 
     def query_best_bid_ask(self, block_height):
-        bid_query = self.__query_best_price(block_height, 'BID').subquery()
-        ask_query = self.__query_best_price(block_height, 'ASK').subquery()
+        bid_query = self.__query_best_price(block_height, 'BUY').subquery()
+        ask_query = self.__query_best_price(block_height, 'SELL').subquery()
 
         query = self.session.query(
             func.coalesce(bid_query.c.pair_id, ask_query.c.pair_id),

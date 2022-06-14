@@ -1,7 +1,8 @@
 import base64
 import hashlib
-from collections import deque
+from collections import defaultdict, deque
 import datetime
+from typing import Callable
 import websocket
 import json
 import logging
@@ -237,7 +238,7 @@ class WebsocketScan:
         msg = json.loads(message)
 
         try:
-            if str(msg[BlockResponse.RESULT]) != '{}':
+            if BlockResponse.RESULT in msg and str(msg[BlockResponse.RESULT]) != '{}':
                 if msg[BlockResponse.RESULT][BlockResponse.QUERY] == tm_event_Tx:
                     if BlockResponse.RESULT not in msg:
                         logging.debug(f"result not in message yet {msg}")
@@ -338,26 +339,31 @@ class AccountScan:
         batch_time = datetime.datetime.utcnow()
 
         def append_balances(owner: str):
-            time_updated = datetime.datetime.utcnow()
-            balances = self.client.query_all_balances(owner)
-            
-            for symbol, balance_amount in balances.items():
-                bal = Balance(
-                    owner=owner,
-                    token=symbol,
-                    amount=balance_amount,
-                    batch_time=batch_time,
-                    time=time_updated,
-                    chain_pair_id=self.pair_id
-                )
-                all_balances.append(bal)
+            try:
+                time_updated = datetime.datetime.utcnow()
+                balances = self.client.query_all_balances(owner)
+                
+                for symbol, balance_amount in balances.items():
+                    bal = Balance(
+                        owner=owner,
+                        token=symbol,
+                        amount=balance_amount,
+                        batch_time=batch_time,
+                        time=time_updated,
+                        pair_id=self.pair_id
+                    )
+                    all_balances.append(bal)
+            except Exception as ex:
+                logging.info(f"Error encountered when getting balance for {owner}. Retrying... {ex}")
+            finally:
+                pass
 
         threads = [threading.Thread(target=append_balances, args=(owner,))
                    for owner in self.owners]
         for t in threads:
             t.start()
         for t in threads:
-            t.join(7.5)
+            t.join(15.0)
         
         self.client.crud.insert_many(all_balances)
 
@@ -373,6 +379,103 @@ class AccountScan:
                     time.sleep(5)
 
             time.sleep(self.update_interval)
+
+class PricingScan:
+    def __init__(self,
+                 base_url: str = None,
+                 update_interval_seconds=1):
+        self._update_interval_seconds = update_interval_seconds
+        self.crud = Crud()
+        self._pricing_dict: Dict[str, Pricing] = None
+
+        base_url = base_url or constants.BASE_URL
+        self._orderbook_url = base_url + constants.ORDERBOOK_ENDPOINT
+        self._pricing_url = base_url + constants.PRICING_ENDPOINT
+
+    def _orderbook_callback(self, data: Dict):
+        pair_id: str = data["pair"]
+        bids = data["bidOrderBookList"]
+        asks = data["askOrderBookList"]
+
+        pricing = self._pricing_dict[pair_id]
+        pricing.pair_id = pair_id
+        pricing.block_height = int(data["blockHeight"])
+        if bids:
+            pricing.best_bid = Decimal(bids[0]["price"])
+        if asks:
+            pricing.best_ask = Decimal(asks[0]["price"])
+
+    def _pricing_callback(self, data: Dict):
+        for pair_data in data:
+            pair_id: str = pair_data["pair"]
+
+            pricing = self._pricing_dict[pair_id]
+            pricing.oracle_price = Decimal(pair_data["oraclePrice"])
+            pricing.mark_price = Decimal(pair_data["markPrice"])
+
+    def response_with_callback(
+        self,
+        rest_url: str,
+        json_payload: Dict,
+        response_callback: Callable,
+    ):
+
+        try:
+            response = requests.post(
+                url=rest_url,
+                json=json_payload,
+            )
+
+            if response.ok:
+                data = response.json()["data"]
+                response_callback(data)
+            else:
+                logging.error(f"Error response from OrderBook endpoint: {response.json()}")
+        except Exception as ex:
+            logging.error(f"Error updating bid/ask and oracle/mark prices from web endpoints: {ex}")
+        finally:
+            time.sleep(1)
+
+
+    def update_pricings(self):
+        self._pricing_dict = defaultdict(lambda: Pricing())
+        thread_list: List[threading.Thread] = []
+
+        # Orderbook queries
+        for pair_id in constants.PAIR_IDS:
+            thread_list.append(threading.Thread(
+                target=self.response_with_callback,
+                args=(self._orderbook_url, { "pair": pair_id }, self._orderbook_callback),
+            ))
+
+        # Oracle + mark price query
+        thread_list.append(threading.Thread(
+            target=self.response_with_callback,
+            args=(self._pricing_url, {}, self._pricing_callback),
+        ))
+
+        for t in thread_list:
+            t.start()
+        for t in thread_list:
+            t.join()
+
+        for pricing in self._pricing_dict.values():
+            sql_pricing = self.crud.filterone(
+                Pricing,
+                Pricing.pair_id == pricing.pair_id, Pricing.block_height == pricing.block_height            
+            )
+
+            if not sql_pricing:
+                self.crud.insert(pricing)
+
+    def update_pricings_looped(self):
+        while True:
+            try:
+                self.update_pricings()
+            except Exception as ex:
+                logging.error(f"Error updating pricings {ex}")
+            finally:
+                time.sleep(self._update_interval_seconds)
 
 class ErrorScan:
     def __init__(self, scan_manager: ScanManager, update_interval_seconds=1, rpc_max_retries=3):

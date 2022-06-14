@@ -558,7 +558,7 @@ class ScanBlock(ScanBlockBase):
                 else:
                     self.__update_position(position, sql_position)
 
-            elif event[BlockResponse.TYPE] == EventTypes.Liq_cancel_order:
+            elif event[BlockResponse.TYPE] == EventTypes.Cancel_order_liq:
                 """liquidation cancel pending close-position order, only update order"""
                 order = self.get_order(event[BlockResponse.Attributes])
                 order.block_height = block_height
@@ -671,60 +671,58 @@ class ScanBlock(ScanBlockBase):
 
     def process_tx_events(self, tx_events, block_height, tx_hash):
         """process fxdex chain Transaction events"""
-        if tx_events is None:
-            return
+        if tx_events is not None:
+            for event in tx_events:
+                if event[BlockResponse.TYPE] == EventTypes.Order or event[
+                        BlockResponse.TYPE] == EventTypes.Close_position_order:
+                    """only insert order, if sql order is none, then do not update"""
+                    order = self.get_order(event[BlockResponse.Attributes])
+                    order.tx_hash = tx_hash
+                    order.open_block_height = block_height
+                    order.block_height = block_height
+                    order.initial_base_quantity = order.base_quantity
 
-        for event in tx_events:
-            if event[BlockResponse.TYPE] == EventTypes.Order or event[
-                    BlockResponse.TYPE] == EventTypes.Close_position_order:
-                """only insert order, if sql order is none, then do not update"""
-                order = self.get_order(event[BlockResponse.Attributes])
-                order.tx_hash = tx_hash
-                order.open_block_height = block_height
-                order.block_height = block_height
-                order.initial_base_quantity = order.base_quantity
+                    sql_order = self.crud.filterone(
+                        Order,
+                        Order.order_id == order.order_id, Order.pair_id == self.pair_id
+                    )
+                    if sql_order is None:
+                        self.__insert_order(order)
+                    else:
+                        self.__update_order(order, sql_order)  # updates open_block_height, created_at, remain_locked
 
-                sql_order = self.crud.filterone(
-                    Order,
-                    Order.order_id == order.order_id, Order.pair_id == self.pair_id
-                )
-                if sql_order is None:
-                    self.__insert_order(order)
-                else:
-                    self.__update_order(order, sql_order)  # updates open_block_height, created_at, remain_locked
+                    self.process_orderbook(order, True, block_height)
 
-                self.process_orderbook(order, True, block_height)
+                elif event[BlockResponse.TYPE] == EventTypes.Cancel_order_user:
+                    """only update order, but in case of not listened create order"""
+                    order = self.get_order(event[BlockResponse.Attributes])
+                    order.block_height = block_height
+                    order.cancel_block_height = block_height
 
-            elif event[BlockResponse.TYPE] == EventTypes.Cancel_order_user:
-                """only update order, but in case of not listened create order"""
-                order = self.get_order(event[BlockResponse.Attributes])
-                order.block_height = block_height
-                order.cancel_block_height = block_height
+                    sql_order = self.crud.filterone(
+                        Order,
+                        Order.order_id == order.order_id, Order.pair_id == self.pair_id
+                    )
+                    if sql_order is None:
+                        self.__insert_order(order)
+                    else:
+                        self.__update_order(order, sql_order)
 
-                sql_order = self.crud.filterone(
-                    Order,
-                    Order.order_id == order.order_id, Order.pair_id == self.pair_id
-                )
-                if sql_order is None:
-                    self.__insert_order(order)
-                else:
-                    self.__update_order(order, sql_order)
+                    self.process_orderbook(order, False, block_height)
 
-                self.process_orderbook(order, False, block_height)
+                elif event[BlockResponse.TYPE] == EventTypes.Add_margin:
+                    """user adds margin to existing position"""
+                    margin = self.get_margin(event[BlockResponse.Attributes])
+                    margin.block_height = block_height
+                    self.crud.insert(margin)
 
-            elif event[BlockResponse.TYPE] == EventTypes.Add_margin:
-                """user adds margin to existing position"""
-                margin = self.get_margin(event[BlockResponse.Attributes])
-                margin.block_height = block_height
-                self.crud.insert(margin)
-
-            elif event[BlockResponse.TYPE] == EventTypes.Oracle_updated_price:
-                oracle_price = self.get_oracle_price(event[BlockResponse.Attributes])
-                oracle_price.block_height = block_height
-                try:
-                    self.crud.insert(oracle_price)
-                except IntegrityError:  # duplicate
-                    pass
+                elif event[BlockResponse.TYPE] == EventTypes.Oracle_updated_price:
+                    oracle_price = self.get_oracle_price(event[BlockResponse.Attributes])
+                    oracle_price.block_height = block_height
+                    try:
+                        self.crud.insert(oracle_price)
+                    except IntegrityError:  # duplicate
+                        pass
 
         block = Block(height=block_height, tx_events_processed=True, pair_id=self.pair_id)
         self.process_block_height(block)
@@ -761,6 +759,7 @@ class ScanBlock(ScanBlockBase):
         # t0 = time.time()
 
         # Query best bid-ask from orders table
+        """
         query_result = self.crud.query_best_bid_ask(block_height)
         for pair_id, best_bid, best_ask, update_block_height in query_result:
             best_bid_ask = OrderbookTop(pair_id=pair_id,
@@ -770,6 +769,7 @@ class ScanBlock(ScanBlockBase):
 
             if block_height==update_block_height:
                 orderbook_tops.append(best_bid_ask)
+        """
 
         """Process positionings (i.e. record historical realized & unrealized P&L)"""
         # Realized P&L
@@ -875,22 +875,7 @@ class ScanBlock(ScanBlockBase):
                 alert_title = f'Integrity Check Alert (Blk Ht: {block_height}) [{self.pair_id}]'
                 alert_text = os.linesep.join(alert_list)
                 send_mail(alert_title, alert_text)
-
-    def initialize_order_book(self):
-        all_entries = []
-
-        if self.crud.count(Orderbook)==0:
-            client = GRPCClient(constants.Network.get_rpc_url())
-
-            for pair_id in ['aapl:usdt']:
-                order_book = client.query_orderbook(pair_id)
-
-                for side, orders in order_book.items():
-                    direction = { 'Bids': 'BID', 'Asks': 'ASK' }[side]
-                    entries = [Orderbook(price=o['price'], quantity=o['quantity'], direction=direction, pair_id=pair_id, block_height=0) for o in orders]
-                    all_entries.extend(entries)
-        
-        self.crud.insert_many(all_entries)
+                
 
 class TradingScanBlock(ScanBlockBase):
 
@@ -919,29 +904,30 @@ class TradingScanBlock(ScanBlockBase):
         pass
 
     def process_tx_events(self, tx_events, block_height, tx_hash):
-        for event in tx_events:
-            if event[BlockResponse.TYPE] == EventTypes.Order or event[
-                    BlockResponse.TYPE] == EventTypes.Close_position_order:
-                """new order on chain (both open & closing position"""
-                order = self.get_order(event[BlockResponse.Attributes])
-                order.tx_hash = tx_hash
-                order.open_block_height = block_height
-                order.block_height = block_height
-                order.initial_base_quantity = order.base_quantity
+        if tx_events is not None:
+            for event in tx_events:
+                if event[BlockResponse.TYPE] == EventTypes.Order or event[
+                        BlockResponse.TYPE] == EventTypes.Close_position_order:
+                    """new order on chain (both open & closing position"""
+                    order = self.get_order(event[BlockResponse.Attributes])
+                    order.tx_hash = tx_hash
+                    order.open_block_height = block_height
+                    order.block_height = block_height
+                    order.initial_base_quantity = order.base_quantity
 
-                self.on_new_order(order, block_height)
-            elif event[BlockResponse.TYPE] == EventTypes.Cancel_order_user:
-                """order cancelled"""
-                order = self.get_order(event[BlockResponse.Attributes])
-                order.block_height = block_height
-                order.cancel_block_height = block_height
+                    self.on_new_order(order, block_height)
+                elif event[BlockResponse.TYPE] == EventTypes.Cancel_order_user:
+                    """order cancelled"""
+                    order = self.get_order(event[BlockResponse.Attributes])
+                    order.block_height = block_height
+                    order.cancel_block_height = block_height
 
-                self.on_order_cancel(order, block_height)
-            elif event[BlockResponse.TYPE] == EventTypes.Oracle_updated_price:
-                """change in oracle price"""
-                oracle_price = self.get_oracle_price(event[BlockResponse.Attributes])
-                oracle_price.block_height = block_height
-                self.on_oracle_price_change(oracle_price, block_height)
+                    self.on_order_cancel(order, block_height)
+                elif event[BlockResponse.TYPE] == EventTypes.Oracle_updated_price:
+                    """change in oracle price"""
+                    oracle_price = self.get_oracle_price(event[BlockResponse.Attributes])
+                    oracle_price.block_height = block_height
+                    self.on_oracle_price_change(oracle_price, block_height)
 
     def process_end_block(self, events: str, block_height: int):
         for event in events:

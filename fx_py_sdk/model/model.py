@@ -186,16 +186,25 @@ class Balance(Base):
     amount = Column(Numeric)
     batch_time = Column(DateTime, index=True)
     time = Column(DateTime)
-    chain_pair_id = Column(String(20), index=True)
+    pair_id = Column(String(20), index=True)
 
-class OrderbookTop(Base):
-    __tablename__ = 'orderbook_top'
+class Pricing(Base):
+    __tablename__ = 'pricing'
 
     id = Column('id', Integer, primary_key=True, autoincrement=True)
     pair_id = Column(String(20), index=True)
     best_bid = Column(Numeric)
     best_ask = Column(Numeric)
-    block_height = Column(Integer)
+    oracle_price = Column(Numeric)
+    mark_price = Column(Numeric)
+    block_height = Column(Integer, index=True)
+
+    def __repr__(self) -> str:
+        return (
+            f"[{self.pair_id}] Bid: {self.best_bid}, Ask: {self.best_ask}, " +
+            f"Oracle px: {self.oracle_price}, Mark px: {self.mark_price} " +
+            f"(blk ht: {self.block_height})"
+        )
 
 class FundingRate(Base):
     __tablename__ = 'funding_rate'

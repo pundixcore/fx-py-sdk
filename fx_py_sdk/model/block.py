@@ -38,7 +38,7 @@ class EventTypes:
 
     """BeginBlock"""
     Forced_liquidation_position = "dex.forced_liquidation_position"
-    Liq_cancel_order = "dex.liq_cancel_order"
+    # Liq_cancel_order = "dex.liq_cancel_order"
     Liquidation_position_order = "dex.liquidation_position_order"
     Log_funding_rate = "dex.log_funding_rate"
     Settle_funding = "dex.settle_funding"
