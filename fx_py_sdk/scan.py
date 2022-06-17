@@ -82,11 +82,20 @@ class RpcScan:
             missing_blocks = list(sorted(
                 set(range(start_block, latest_block_height+1)).difference(set(block_heights))
             ))
+
+            # Switching from RPC to WebSockets logic
+            use_ws = False
             if not missing_blocks:  # use WebSockets if fully synced
-                logging.info(
-                    'Synced with latest block. Switching to WebSockets...')
-                self.manager.ws_scan.rpc_ready = True
-                return
+                if use_ws:
+                    logging.info(
+                        'Synced with latest block. Switching to WebSockets...')
+                    self.manager.ws_scan.rpc_ready = True
+                    return
+                else:
+                    # 17/06/22: Occasionally sockets don't push TxEvent, or report "events not in tx_result"
+                    #           Code block below lets it remain on RPC polling
+                    time.sleep(60)
+                    continue
             
             first_block_height = missing_blocks[0]  # min
             last_block_height = missing_blocks[-1]  # max
@@ -103,8 +112,6 @@ class RpcScan:
                     except Exception as ex:
                         logging.error(f'Error retrieving block: {ex}')
                         time.sleep(10)
-
-            data = {}
 
             for i in range(0, len(missing_blocks), self.page_size):
                 if i > 0 and i % 10000 <= self.page_size:
@@ -178,6 +185,7 @@ class WebsocketScan:
 
         self.ws_block = None
         self.rpc_ready = False
+        self._subscribed_endpoints = None
 
         self.subscribe_events = subscribe_events or [tm_event_NewBlock, tm_event_Tx]
         threading.Thread(target=self.subscribe_block).start()
@@ -229,36 +237,48 @@ class WebsocketScan:
     def on_error(self, error):
         self._handle_exception(error)
 
-    def on_message(self, message):        
-        if self.manager and not self.rpc_ready:
-            return
-
+    def on_message(self, message):
         global reconnect_block_count
         reconnect_block_count = 0
         msg = json.loads(message)
 
         try:
+            connect_id = msg["id"]
+            if connect_id not in self._subscribed_endpoints:
+                self._subscribed_endpoints.add(connect_id)
+                logging.info(f"Successfully subscribed to {self.subscribe_events[connect_id]}")
+
+            current_time = time.time()
+            if not len(self._subscribed_endpoints) == len(self.subscribe_events) and (current_time - self._subscribe_time) > 2.5:
+                logging.warning("Have not successfully subscribed to all endpoints, resending...")
+                self._subscribe_time = current_time
+                self._send_subscribe()
+
+            if self.manager and not self.rpc_ready:
+                return
+
+            reconnect_block_count = 0
+
             if BlockResponse.RESULT in msg and str(msg[BlockResponse.RESULT]) != '{}':
                 if msg[BlockResponse.RESULT][BlockResponse.QUERY] == tm_event_Tx:
                     if BlockResponse.RESULT not in msg:
-                        logging.debug(f"result not in message yet {msg}")
+                        logging.info(f"result not in message yet {msg}")
                         return
                     if BlockResponse.DATA not in msg[BlockResponse.RESULT]:
-                        logging.debug(f"data not in message yet {msg}")
+                        logging.info(f"data not in message yet {msg}")
                         return
                     if BlockResponse.VALUE not in msg[BlockResponse.RESULT][BlockResponse.DATA]:
-                        logging.debug(f"value not in message yet {msg}")
+                        logging.info(f"value not in message yet {msg}")
                         return
                     if BlockResponse.TxResult not in msg[BlockResponse.RESULT][BlockResponse.DATA][
                         BlockResponse.VALUE]:
-                        logging.debug(f"tx_result not in message yet {msg}")
+                        logging.info(f"tx_result not in message yet {msg}")
                         return
                     
                     tx_result = msg[BlockResponse.RESULT][BlockResponse.DATA][BlockResponse.VALUE][
                         BlockResponse.TxResult]
                     if BlockResponse.EVENTS not in tx_result[BlockResponse.RESULT]:
-                        logging.debug(f"events not in tx_result yet {msg}")
-                        return
+                        logging.info(f"events not in tx_result yet {msg}")
 
                     block_height = int(tx_result[BlockResponse.HEIGHT])
                     if tx_result is not None and BlockResponse.EVENTS in tx_result[BlockResponse.RESULT]:
@@ -274,20 +294,28 @@ class WebsocketScan:
 
     def on_open(self):
         logging.info("connection to fxdex...")
-        for event in self.subscribe_events:
+        self._send_subscribe()
+
+    def _send_subscribe(self, wait_interval: float = .25):
+        for id, event in enumerate(self.subscribe_events):
             data = {
                 "jsonrpc": "2.0",
                 "method": "subscribe",
                 "params": [event],
-                "id": 1
+                "id": id
             }
             data = json.dumps(data).encode()
             self.ws_block.send(data)
+            logging.info(f"Subscribed to {event} (id: {id})")
+            time.sleep(wait_interval)
 
     def on_close(self):
         logging.info("connection to fxdex websocket is closed")
 
     def subscribe_block(self):
+        self._subscribe_time = time.time()
+        self._subscribed_endpoints = set()
+
         websocket.enableTrace(False)    # prevent debug messages
         logging.info(self._get_ws_endpoint_url())
         self.ws_block = websocket.WebSocketApp(self._get_ws_endpoint_url(),
@@ -295,6 +323,7 @@ class WebsocketScan:
                                                on_error=self.on_error,
                                                on_close=self.on_close,
                                                on_open=self.on_open)
+
         try:
             self.ws_block.run_forever()
         except KeyboardInterrupt:

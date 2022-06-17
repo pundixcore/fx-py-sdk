@@ -418,7 +418,6 @@ class Crud:
             DELETE FROM orders WHERE {block_height_condition} AND {pair_id_condition};
             DELETE FROM position WHERE {block_height_condition} AND {pair_id_condition};
             DELETE FROM trade WHERE {block_height_condition} AND {pair_id_condition};
-            DELETE FROM orderbook_top WHERE {block_height_condition} AND {pair_id_condition};
             DELETE FROM positioning WHERE {block_height_condition} AND {pair_id_condition};
             DELETE FROM error WHERE {block_height_condition} AND {pair_id_condition};
             DELETE FROM transfer WHERE {block_height_condition} AND {pair_id_condition};

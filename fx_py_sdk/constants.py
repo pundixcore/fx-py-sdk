@@ -124,3 +124,21 @@ class Trade(NamedTuple):
 
 class BackEndApi:
     query_order_page = "http://44.195.213.51:30225/api/address/queryOrderPage"
+
+PAIR_IDS = [
+    "BTC:USDT",
+    "TSLA:USDT",
+    "AAPL:USDT",
+    "NFLX:USDT",
+    "GOOG:USDT",
+    "FB:USDT",
+    "AMZN:USDT",
+    "SPY:USDT",
+    "FX:USDT",
+    "IWM:USDT",
+    "TQQQ:USDT",
+]
+
+BASE_URL = "https://trade.testnet.marginx.io/dex/common/"
+ORDERBOOK_ENDPOINT = "queryOrderBook"
+PRICING_ENDPOINT = "queryPair"

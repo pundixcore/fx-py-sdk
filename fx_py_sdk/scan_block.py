@@ -367,7 +367,7 @@ class ScanBlock(ScanBlockBase):
                 del update_dict['owner']    # we don't want to overwrite owner
         else:
             update_dict = {}
-            for attr in ['created_at', 'open_block_height', 'remain_locked']:
+            for attr in ['open_block_height', 'remain_locked']:
                 attr_val = getattr(order, attr)
                 if attr_val is not None and getattr(sql_order, attr) is None:
                     update_dict[attr] = attr_val
@@ -799,7 +799,10 @@ class ScanBlock(ScanBlockBase):
             if block_height % int(os.environ.get('POSITIONING_UPDATE_INTERVAL', '250')) == 0:
                 logging.info(f'Marking unrealied P&L to market... (blk ht = {block_height})')
 
-                open_positions = self.crud.filter_many(Position, Position.status=='open')
+                open_positions = self.crud.filter_many(
+                    Position,
+                    Position.status=='open', Position.pair_id==self.pair_id
+                )
                 mark_prices = { res[0]: res[1] for res in self.crud.query_mark_prices() }
 
                 for position in open_positions:
