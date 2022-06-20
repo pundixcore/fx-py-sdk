@@ -378,6 +378,38 @@ class ScanBlock(ScanBlockBase):
                 updic=update_dict
             )
 
+    def update_from_order_fill(self, event: Dict, block_height: int):
+        order = self.get_order(event[BlockResponse.Attributes])
+        trade = self.get_trade(event[BlockResponse.Attributes])
+
+        order.block_height = block_height
+        order.filled_block_height = block_height
+        order.last_filled_quantity = trade.matched_quantity
+
+        sql_order: Order = self.crud.filterone(
+            Order,
+            Order.order_id == order.order_id, Order.pair_id == self.pair_id
+        )
+        if order.status=='ORDER_PENDING':
+            # fully filled on same block order was sent
+            if order.open_block_height==block_height and order.base_quantity==order.filled_quantity:
+                order.status = 'ORDER_FILLED'
+            else:
+                order.status = 'ORDER_PARTIAL_FILLED'
+
+        if sql_order is None:
+            order.open_block_height = block_height  # could be incorrect
+            order.initial_base_quantity = order.base_quantity
+            self.__insert_order(order)
+        else:
+            self.__update_order(order, sql_order)
+
+        trade.block_height = block_height
+        if order.order_type=='ORDER_TYPE_LIQUIDATION':
+            trade.liquidation_owner = trade.owner
+            trade.owner = sql_order.owner if sql_order else order.owner
+        self.crud.insert(trade)
+
     def process_end_block(self, events: str, block_height: int):
         """process fxdex chain EndBlock events"""
         for event in events:
@@ -464,70 +496,7 @@ class ScanBlock(ScanBlockBase):
 
             elif event[BlockResponse.TYPE] == EventTypes.Order_fill:
                 """store order & trade"""
-                order = self.get_order(event[BlockResponse.Attributes])
-                trade = self.get_trade(event[BlockResponse.Attributes])
-
-                order.block_height = block_height
-                order.filled_block_height = block_height
-                order.last_filled_quantity = trade.matched_quantity
-
-                sql_order: Order = self.crud.filterone(
-                    Order,
-                    Order.order_id == order.order_id, Order.pair_id == self.pair_id
-                )
-                if order.status=='ORDER_PENDING':
-                    # fully filled on same block order was sent
-                    if order.open_block_height==block_height and order.base_quantity==order.filled_quantity:
-                        order.status = 'ORDER_FILLED'
-                    else:
-                        order.status = 'ORDER_PARTIAL_FILLED'
-
-                if sql_order is None:
-                    order.open_block_height = block_height  # could be incorrect
-                    order.initial_base_quantity = order.base_quantity
-                    self.__insert_order(order)
-                else:
-                    self.__update_order(order, sql_order)
-
-                trade.block_height = block_height
-                if order.order_type=='ORDER_TYPE_LIQUIDATION':
-                    trade.liquidation_owner = trade.owner
-                    trade.owner = sql_order.owner if sql_order else order.owner
-                self.crud.insert(trade)
-
-                """process orderbook"""
-                """
-                if sql_order and sql_order.open_block_height==block_height:
-                    orderbook_price = sql_order.price
-                else:
-                    orderbook_price = trade.deal_price
-
-                sql_orderbook = self.crud.get_latest_orderbook_record(
-                    orderbook_price, order.pair_id, order.direction)
-                orderbook = Orderbook(price=orderbook_price, quantity=order.base_quantity,
-                                      direction=order.direction, pair_id=order.pair_id,
-                                      block_height=block_height)
-                if sql_orderbook:
-                    orderbook.quantity = sql_orderbook.quantity - trade.matched_quantity
-                self.crud.insert(orderbook)
-                """
-
-                """
-                sql_orderbook = self.crud.filterone(Orderbook, and_(Orderbook.price==order.price, Orderbook.pair_id==order.pair_id))
-                orderbook = Orderbook(price=order.price, quantity=order.base_quantity,
-                                      direction=order.direction, pair_id=order.pair_id)
-                if sql_orderbook is None:
-                    self.crud.insert(orderbook)
-                else:
-                    quantity = sql_orderbook.quantity - order.filled_quantity
-                    if quantity == 0:
-                        self.crud.delete(sql_orderbook)
-                    else:
-                        orderbook.quantity = quantity
-                        orderbook.id = sql_orderbook.id
-                        self.crud.update(Orderbook, filter=(Orderbook.id==orderbook.id),
-                                         updic=orderbook.to_dict())
-                """
+                self.update_from_order_fill(event, block_height)
 
             elif event[BlockResponse.TYPE] == EventTypes.Transfer:
                 transfer = self.get_transfer(event[BlockResponse.Attributes])
@@ -715,6 +684,12 @@ class ScanBlock(ScanBlockBase):
                     margin = self.get_margin(event[BlockResponse.Attributes])
                     margin.block_height = block_height
                     self.crud.insert(margin)
+
+                elif event[BlockResponse.TYPE] == EventTypes.Order_fill:
+                    """
+                    store orders & trade
+                    """
+                    self.update_from_order_fill(event, block_height)
 
                 elif event[BlockResponse.TYPE] == EventTypes.Oracle_updated_price:
                     oracle_price = self.get_oracle_price(event[BlockResponse.Attributes])

@@ -36,9 +36,9 @@ class Order(Base):
     owner = Column(String(42))
     liquidation_owner = Column(String(42))
     pair_id = Column(String(20), index=True)
-    direction = Column(String(10))
-    price = Column(Numeric)
-    base_quantity = Column(Numeric)
+    direction = Column(String(10), index=True)
+    price = Column(Numeric, index=True)
+    base_quantity = Column(Numeric, index=True)
     quote_quantity = Column(Numeric)
     filled_quantity = Column(Numeric)
     last_filled_quantity = Column(Numeric)
@@ -46,23 +46,23 @@ class Order(Base):
     remain_locked = Column(Numeric)
     leverage = Column(Integer)
     status = Column(String(50), index=True)
-    order_type = Column(String(50))
+    order_type = Column(String(50), index=True)
     cost_fee = Column(Numeric)
     locked_fee = Column(Numeric)
-    open_block_height = Column(Integer)
+    open_block_height = Column(Integer, index=True)
     cancel_block_height = Column(Integer)
     filled_block_height = Column(Integer)
     cancel_time = Column(DateTime)
-    block_height = Column(Integer)
+    block_height = Column(Integer, index=True)
     initial_base_quantity = Column(Numeric)
 
 class Position(Base):
     __tablename__ = 'position'
 
     position_id = Column(Integer, primary_key=True, nullable=False)
-    owner = Column(String(42))
+    owner = Column(String(42), index=True)
     pair_id = Column(String(20), primary_key=True)
-    direction = Column(String(10))
+    direction = Column(String(10), index=True)
     entry_price = Column(Numeric)
     mark_price = Column(Numeric)
     liquidation_price = Column(Numeric)
@@ -75,9 +75,9 @@ class Position(Base):
     initial_margin = Column(Numeric)
     pending_order_quantity = Column(Numeric)
     status = Column(String(20))  # open, close
-    open_height = Column(Integer)
-    close_height = Column(Integer)
-    block_height = Column(Integer)
+    open_height = Column(Integer, index=True)
+    close_height = Column(Integer, index=True)
+    block_height = Column(Integer, index=True)
     last_order_fill_height = Column(Integer)
 
 class Orderbook(Base):
@@ -95,8 +95,8 @@ class Trade(Base):
 
     id = Column('id', Integer, primary_key=True, autoincrement=True)
     block_height = Column(Integer, index=True)
-    deal_price = Column(Numeric)
-    matched_quantity = Column(Numeric)
+    deal_price = Column(Numeric, index=True)
+    matched_quantity = Column(Numeric, index=True)
     order_id = Column(String(100), nullable=False, unique=False)
     owner = Column(String(42), index=True)
     liquidation_owner = Column(String(42))
@@ -110,7 +110,7 @@ class Trade(Base):
     order_type = Column(String(50))
     cost_fee = Column(Numeric)
     locked_fee = Column(Numeric)
-    block_height = Column(Integer)
+    block_height = Column(Integer, index=True)
 
 class FundingTransfer(Base):
     __tablename__ = 'funding_transfer'
@@ -123,7 +123,7 @@ class FundingTransfer(Base):
     pair_id = Column(String(20), index=True)
     owner = Column(String(42), index=True)
     funding_fee = Column(Numeric)
-    block_height = Column(Integer)
+    block_height = Column(Integer, index=True)
 
 class Block(Base):
     __tablename__ = 'block'
@@ -144,7 +144,7 @@ class Tx(Base):
     sender = Column(String(50))
     send_time = Column(String(50))
     type = Column(String(50))  # send_coin, create_order, close_position_order, cancel_order
-    tx_hash = Column(String(66))
+    tx_hash = Column(String(66), index=True)
     result = Column(String(66))  # error, success
 
 """ auxillary helper classes """
@@ -164,7 +164,7 @@ class Positioning(Base):
     position_id = Column(Integer)
     locked_fees = Column(Numeric)
     block_height = Column(Integer, index=True)
-    is_batch_update = Column(Boolean, default=False)
+    is_batch_update = Column(Boolean, default=False, index=True)
 
 # Logs realized P&Ls for efficient cumulative calculation
 class Realized_Pnl_Log(Base):
@@ -190,6 +190,9 @@ class Balance(Base):
 
 class Pricing(Base):
     __tablename__ = 'pricing'
+    __table_args__ = (
+        UniqueConstraint('pair_id', 'block_height'),
+    )
 
     id = Column('id', Integer, primary_key=True, autoincrement=True)
     pair_id = Column(String(20), index=True)
@@ -213,14 +216,17 @@ class FundingRate(Base):
     pair_id = Column(String(20), index=True)
     rate = Column(Numeric)
     funding_times = Column(Integer)
-    block_height = Column(Integer)
+    block_height = Column(Integer, index=True)
 
 class Wallet(Base):
     __tablename__ = 'wallet'
+    __table_args__ = (
+        UniqueConstraint('address', 'pair_id'),
+    )
 
     id = Column('id', Integer, primary_key=True, autoincrement=True)
-    address = Column(String(42), unique=True)
-    owner = Column(String(100))
+    address = Column(String(42))
+    owner = Column(String(100), index=True)
     pair_id = Column(String(20))
     comment = Column(String(256))
     leverage = Column(Integer)
@@ -241,7 +247,7 @@ class Margin(Base):
     liquidation_price = Column(Numeric)
     margin_rate = Column(Numeric)
     margin = Column(Numeric)
-    block_height = Column(Integer)
+    block_height = Column(Integer, index=True)
 
 class LockedFee(Base):
     __tablename__ = 'locked_fee'
@@ -251,7 +257,7 @@ class LockedFee(Base):
     owner = Column(String(100), index=True)
     direction = Column(String(10))
     fees = Column(Numeric)
-    block_height = Column(Integer)
+    block_height = Column(Integer, index=True)
 
 class Error(Base):
     __tablename__ = 'error'

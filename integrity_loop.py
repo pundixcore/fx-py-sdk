@@ -19,7 +19,7 @@ from fx_py_sdk.notify_service import send_mail
 BLOCK_TIME = 3
 REFRESH_INTERVAL = int(os.environ.get("INTEGRITY_REFRESH_INTERVAL", "300"))
 INCOMPLETE_THRESHOLD = int(os.environ.get("INCOMPLETE_THRESHOLD", "100"))
-BLOCK_HEIGHT_DIFF_THRESOLD = REFRESH_INTERVAL // (BLOCK_TIME + 2)
+BLOCK_HEIGHT_DIFF_THRESOLD = REFRESH_INTERVAL // (BLOCK_TIME + 3)
 
 
 if __name__ == "__main__":
@@ -57,6 +57,7 @@ if __name__ == "__main__":
                 incomplete_diff = df["num_incomplete_blocks"] - df["num_incomplete_blocks_old"]
                 incomplete_diff = incomplete_diff[incomplete_diff > INCOMPLETE_THRESHOLD]
                 if not incomplete_diff.empty:
+                    error_messages.append("** Number of ambiguous blocks exceeded threshold for following pairs **")
                     error_messages.append(incomplete_diff.to_string())
 
             df_incomplete = df_incomplete_new
@@ -79,6 +80,7 @@ if __name__ == "__main__":
                 height_diff = df["max_block_height"] - df["max_block_height_old"]
                 height_diff = height_diff[height_diff < BLOCK_HEIGHT_DIFF_THRESOLD]
                 if not height_diff.empty:
+                    error_messages.append("** Number of blocks synced below threshold for following pairs **")
                     error_messages.append(height_diff.to_string())
 
             df_max_height = df_max_height_new
