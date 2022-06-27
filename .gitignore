@@ -10,3 +10,4 @@ dist/
 *.pickle
 *.csv
 *.xlsx
+*.xls

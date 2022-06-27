@@ -14,8 +14,8 @@ import json
 
 from fx_py_sdk.ibc_transfer import ConfigsKeys, Ibc_transfer
 
-client = GRPCClient('https://testnet-tsla-grpc.marginx.io:9090')
-# client = GRPCClient('127.0.0.1:9090')
+# client = GRPCClient('https://testnet-tsla-grpc.marginx.io:9090')
+client = GRPCClient('127.0.0.1:9090')
 pair_id = "BTC:USDT"
 
 class MyTestCase(unittest.TestCase):
@@ -46,6 +46,17 @@ class MyTestCase(unittest.TestCase):
         account = client.query_account_info(
             address="0x527d29e0067d5913AF44F140C329f8d782D03D0E")
         print(account)
+
+    def test_query_accounts(self):
+        resp = client.query_accounts(b"")
+        print(resp.accounts)
+        print(len(resp.accounts))
+
+        resp = client.query_accounts(resp.pagination.next_key)
+        print(resp.accounts)
+        print(len(resp.accounts))
+
+
 
     def test_query_oracle_price(self):
         oracle_price = client.query_oracle_price(pair_id="BTC:USDT")

@@ -67,9 +67,12 @@ class GRPCClient:
         return response
 
 
-    def query_accounts(self, page: int):
-        accounts = AuthQuery(self.channel).Accounts(QueryAccountsRequest(pagination=PageRequest())).accounts
-        return accounts
+    def query_accounts(self, key: bytes):
+        resp = AuthQuery(self.channel).Accounts(QueryAccountsRequest(pagination=PageRequest(
+            key=key,
+            limit=100,
+        )))
+        return resp
 
 
     def query_account_info(self, address: str) -> BaseAccount:
