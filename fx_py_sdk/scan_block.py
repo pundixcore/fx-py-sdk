@@ -1,5 +1,5 @@
 import base64
-from collections import deque
+from collections import defaultdict, deque
 import datetime as dt
 from sqlite3 import IntegrityError
 from fx_py_sdk.model.block import *
@@ -20,7 +20,7 @@ class ScanBlockBase:
 
     def __init__(self, pair_id: Optional[str] = None):
         # maps block height to deque
-        self.realized_positions: Dict[int, deque] = dict()
+        self.realized_positions: Dict[int, deque] = defaultdict(lambda: deque())
 
         # maintain reference to pair_id
         self.pair_id: str = pair_id
@@ -52,7 +52,6 @@ class ScanBlockBase:
             end_block_events = message[BlockResponse.RESULT][BlockResponse.DATA][BlockResponse.VALUE][
                 BlockResponse.RESULT_END_BLOCK][BlockResponse.EVENTS]
 
-            self.realized_positions[block_height] = deque()
             self.process_end_block(end_block_events, block_height)
             self.process_best_bid_ask(block_height, True)
             self.process_cumulative_realized_pnl(block_height)
@@ -410,72 +409,51 @@ class ScanBlock(ScanBlockBase):
             trade.owner = sql_order.owner if sql_order else order.owner
         self.crud.insert(trade)
 
+    def update_position(self, event: Dict, block_height: int):
+        event_type: str = event[BlockResponse.TYPE]
+
+        # Get Position object from attributes
+        position = self.get_position(
+            attributes = event[BlockResponse.Attributes],
+            is_new_position = event_type == EventTypes.New_position,
+        )
+        position_status = PositionStatus.Open
+
+        # Assign event-specific attributes (open_height, last_order_fill_height, close_height, status)
+        if event_type == EventTypes.New_position:
+            position.open_height = block_height
+        elif event_type == EventTypes.Part_close_position:
+            position.last_order_fill_height = block_height
+        elif event_type == EventTypes.Full_close_position:
+            position.last_order_fill_height = block_height
+            position.close_height = block_height
+            position_status = PositionStatus.Close
+
+        position.block_height = block_height
+        position.status = position_status
+
+        # Update in database if exists, else create
+        sql_position = self.crud.filterone(
+            Position,
+            Position.position_id == position.position_id, Position.pair_id == self.pair_id
+        )
+
+        if sql_position is None:
+            self.crud.insert(position)
+        else:
+            self.__update_position(position, sql_position)
+
+        # Mark positions to be considered for realized P&L logging
+        if event_type in [EventTypes.Part_close_position, EventTypes.Full_close_position]:
+            self.realized_positions[block_height].append(position)
+
+        return position
+
     def process_end_block(self, events: str, block_height: int):
         """process fxdex chain EndBlock events"""
         for event in events:
-            if event[BlockResponse.TYPE] == EventTypes.New_position:
-                position = self.get_position(event[BlockResponse.Attributes], is_new_position=True)
-                position.status = PositionStatus.Open
-                position.block_height = block_height
-                position.open_height = block_height
-
-                sql_position = self.crud.filterone(
-                    Position,
-                    Position.position_id == position.position_id, Position.pair_id == self.pair_id
-                )
-
-                if sql_position is None:
-                    self.crud.insert(position)
-                else:
-                    self.__update_position(position, sql_position)
-
-            elif event[BlockResponse.TYPE] == EventTypes.Add_position:
-                position = self.get_position(event[BlockResponse.Attributes])
-                position.status = PositionStatus.Open
-                position.block_height = block_height
-
-                sql_position = self.crud.filterone(
-                    Position,
-                    Position.position_id == position.position_id, Position.pair_id == self.pair_id
-                )
-                if sql_position is None:
-                    self.crud.insert(position)
-                else:
-                    self.__update_position(position, sql_position)
-
-            elif event[BlockResponse.TYPE] == EventTypes.Full_close_position:
-                position = self.get_position(event[BlockResponse.Attributes])
-                position.status = PositionStatus.Close
-                position.block_height = block_height
-                position.close_height = block_height
-
-                sql_position = self.crud.filterone(
-                    Position,
-                    Position.position_id == position.position_id, Position.pair_id == self.pair_id
-                )
-                if sql_position is None:
-                    self.crud.insert(position)
-                else:
-                    self.__update_position(position, sql_position)
-
-                self.realized_positions[block_height].append(position)
-
-            elif event[BlockResponse.TYPE] == EventTypes.Part_close_position:
-                position = self.get_position(event[BlockResponse.Attributes])
-                position.status = PositionStatus.Open
-                position.block_height = block_height
-                position.last_order_fill_height = block_height
-
-                sql_position = self.crud.filterone(
-                    Position,
-                    Position.position_id == position.position_id, Position.pair_id == self.pair_id
-                )
-                if sql_position is None:
-                    self.crud.insert(position)
-                else:
-                    self.__update_position(position, sql_position)
-
-                self.realized_positions[block_height].append(position)
+            if event[BlockResponse.TYPE] in EventTypes.Position_events:
+                self.update_position(event, block_height)
 
             elif event[BlockResponse.TYPE] == EventTypes.Cancel_order_expire:
                 """update order status to expiration"""
@@ -698,6 +676,9 @@ class ScanBlock(ScanBlockBase):
                         self.crud.insert(oracle_price)
                     except IntegrityError:  # duplicate
                         pass
+
+                elif event[BlockResponse.TYPE] in EventTypes.Position_events:
+                    self.update_position(event, block_height)
 
         block = Block(height=block_height, tx_events_processed=True, pair_id=self.pair_id)
         self.process_block_height(block)
@@ -962,5 +943,3 @@ class TradingScanBlock(ScanBlockBase):
                         order.status = 'ORDER_PARTIAL_FILLED'
 
                 self.on_order_fill(order, trade, block_height)
-
-
