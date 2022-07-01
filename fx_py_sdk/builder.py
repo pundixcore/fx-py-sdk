@@ -22,7 +22,7 @@ class TxBuilder:
                  private_key: FxPrivateKey = b'',
                  chain_id: str = '',
                  account_number: int = -1,
-                 gas_price: Coin = Coin(amount='600', denom=DEFAULT_DENOM)):
+                 gas_price: Coin = Coin(amount='60', denom=DEFAULT_DENOM)):
         self.chain_id = chain_id
         self.account_number = account_number
         if gas_price.denom == '':

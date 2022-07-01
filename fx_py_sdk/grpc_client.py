@@ -46,7 +46,7 @@ from fx_py_sdk.model.model import HedgingOrder, HedgingTrade, Order as CrudOrder
 from fx_py_sdk.codec.cosmos.gov.v1beta1.query_pb2_grpc import QueryStub as GovQuery
 from fx_py_sdk.codec.cosmos.gov.v1beta1.query_pb2 import *
 
-DEFAULT_DEX_GAS = 10000000
+DEFAULT_DEX_GAS = 50000000
 DEFAULT_GRPC_NONE = "Not found"
 DEFAULT_DEC = 1000000
 DEFAULT_DEC_FX = 1000000000000000000
