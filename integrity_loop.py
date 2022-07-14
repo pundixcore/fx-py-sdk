@@ -19,7 +19,8 @@ from fx_py_sdk.notify_service import send_mail
 BLOCK_TIME = 3
 REFRESH_INTERVAL = int(os.environ.get("INTEGRITY_REFRESH_INTERVAL", "300"))
 INCOMPLETE_THRESHOLD = int(os.environ.get("INCOMPLETE_THRESHOLD", "100"))
-BLOCK_HEIGHT_DIFF_THRESOLD = REFRESH_INTERVAL // (BLOCK_TIME + 3)
+# BLOCK_HEIGHT_DIFF_THRESOLD = REFRESH_INTERVAL // (BLOCK_TIME + 3)
+BLOCK_HEIGHT_DIFF_THRESOLD = int(os.environ.get("BLOCK_HEIGHT_DIFF_THRESHOLD", "50"))
 
 
 if __name__ == "__main__":

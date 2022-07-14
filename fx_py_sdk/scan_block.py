@@ -428,6 +428,9 @@ class ScanBlock(ScanBlockBase):
             position.last_order_fill_height = block_height
             position.close_height = block_height
             position_status = PositionStatus.Close
+        elif event_type == EventTypes.Forced_liquidation_position:
+            position.close_height = block_height
+            position_status = PositionStatus.Liquidated
 
         position.block_height = block_height
         position.status = position_status
@@ -760,6 +763,7 @@ class ScanBlock(ScanBlockBase):
                     Position.status=='open', Position.pair_id==self.pair_id
                 )
                 mark_prices = { res[0]: res[1] for res in self.crud.query_mark_prices() }
+                order_margin_by_owner = { res[0]: res[1] for res in self.crud.query_open_order_margin(self.pair_id) }
 
                 for position in open_positions:
                     is_long = position.direction=='LONG'
@@ -768,10 +772,11 @@ class ScanBlock(ScanBlockBase):
                     unrealized_pnl = position.base_quantity * (1 if is_long else -1) * (best_price - position.entry_price)
 
                     # is_batch_update = True
+                    order_margin = order_margin_by_owner.get(position.owner, Decimal("0"))
                     positioning = Positioning(owner=position.owner, pair_id=position.pair_id, 
                                               entry_price=position.entry_price, mark_price=best_price,
                                               base_quantity=position.base_quantity, realized_pnl=position.realized_pnl,
-                                              unrealized_pnl=unrealized_pnl, margin=position.margin,
+                                              unrealized_pnl=unrealized_pnl, margin=position.margin, order_margin=order_margin,
                                               direction=position.direction, position_id=position.position_id,
                                               block_height=block_height, is_batch_update=True)
                     

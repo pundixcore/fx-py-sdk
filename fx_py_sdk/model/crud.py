@@ -233,6 +233,19 @@ class Crud:
 
         return query.all()
 
+    def query_open_order_margin(self, pair_id: str):
+        # Order Margin = Entry Price * Base Quantity / Leverage
+        query = """
+        SELECT owner, SUM(price * base_quantity / leverage) FROM orders
+        WHERE status IN ('ORDER_PENDING', 'ORDER_PARTIAL_FILLED')
+        AND order_type = 'ORDER_TYPE_OPEN_POSITION'
+        AND pair_id = :pair_id
+        GROUP BY 1
+        """
+
+        result = self.session.execute(query, params={"pair_id": pair_id}).fetchall()
+        return result
+
     def count(self, object):
         return self.session.query(object).count()
 
