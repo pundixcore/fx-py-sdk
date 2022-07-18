@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 import datetime
 from decimal import Decimal
 from typing import Dict, Iterable, List, Optional, Union, TypeVar
@@ -22,29 +23,46 @@ class Crud:
         self.DBSession = sessionmaker(bind=sql.engine, autocommit=False)
         self.session: Session = self.DBSession()
 
+    @contextmanager
+    def auto_session(self):
+        session = self.DBSession()
+        try:
+            yield session
+        except:
+            logging.warning("DB Exception: {ex}. Rolling back...")
+            session.rollback()
+        finally:
+            session.close()
+
     def insert(self, object):
-        self.session.add(object)
-        self.session.commit()
+        with self.auto_session() as session:
+            session.add(object)
+            session.commit()
 
     def insert_many(self, objectlist):
-        self.session.add_all(objectlist)
-        self.session.commit()
+        with self.auto_session() as session:
+            session.add_all(objectlist)
+            session.commit()
 
     def filterone(self, object: T, *filter) -> T:
-        return self.session.query(object).filter(*filter).first()
+        with self.auto_session() as session:
+            return session.query(object).filter(*filter).first()
 
     def filter_many(self, object, *filter) -> Query:
-        return self.session.query(object).filter(*filter)
+        with self.auto_session() as session:
+            return session.query(object).filter(*filter)
 
     def update(self, object, filter, updic):
-        if not isinstance(filter, Iterable):
-            filter = [filter]
-        self.session.query(object).filter(*filter).update(updic)
-        self.session.commit()
+        with self.auto_session() as session:
+            if not isinstance(filter, Iterable):
+                filter = [filter]
+            session.query(object).filter(*filter).update(updic)
+            session.commit()
 
     def delete(self, object):
-        self.session.delete(object)
-        self.session.commit()
+        with self.auto_session() as session:
+            session.delete(object)
+            session.commit()
 
     def get_funding_transfer(self, address: str):
         return self.session.query(FundingTransfer).filter(FundingTransfer.owner == address)
@@ -206,12 +224,13 @@ class Crud:
                              .filter(*conditions))
         return query
 
-    def query_mark_prices(self):
-        query = (self.session.query(Position.pair_id, Position.mark_price)
-                             .filter(and_(Position.mark_price!=0, Position.mark_price!=None))
-                             .order_by(Position.pair_id, Position.block_height.desc())
-                             .distinct(Position.pair_id))
-        return query.all()
+    def query_mark_prices(self, session=None):
+        with (session or self.auto_session()) as session:
+            query = (self.session.query(Position.pair_id, Position.mark_price)
+                                .filter(and_(Position.mark_price!=0, Position.mark_price!=None))
+                                .order_by(Position.pair_id, Position.block_height.desc())
+                                .distinct(Position.pair_id))
+            return query.all()
 
     def query_best_bid_ask(self, block_height):
         bid_query = self.__query_best_price(block_height, 'BUY').subquery()
@@ -234,7 +253,8 @@ class Crud:
         return query.all()
 
     def count(self, object):
-        return self.session.query(object).count()
+        with self.auto_session() as session:
+            return session.query(object).count()
 
     # Exposure
     def __get_exposure(self,
@@ -272,20 +292,21 @@ class Crud:
                 conditions.append(Position.pair_id.in_(pair_ids))
 
         # Retrieve from DB
-        result = (self.session.query(Position.pair_id, func.sum(Position.base_quantity * case([(Position.direction=='LONG', 1)], else_=-1)))
-                              .filter(*conditions)
-                              .group_by(Position.pair_id)
-                              .all())
-        result_dict = { trade_pair: exposure for trade_pair, exposure in result }
+        with self.auto_session() as session:
+            result = (session.query(Position.pair_id, func.sum(Position.base_quantity * case([(Position.direction=='LONG', 1)], else_=-1)))
+                             .filter(*conditions)
+                             .group_by(Position.pair_id)
+                             .all())
+            result_dict = { trade_pair: exposure for trade_pair, exposure in result }
 
-        # Mark quantities to latest mark prices
-        if as_dollar_value and result_dict:
-            mark_prices = self.query_mark_prices()  # latest mark prices
-            for trade_pair, exposure in result_dict.items():
-                for mark_pair, mark_price in mark_prices:
-                    if trade_pair==mark_pair:
-                        result_dict[trade_pair] = exposure * mark_price
-                        break
+            # Mark quantities to latest mark prices
+            if as_dollar_value and result_dict:
+                mark_prices = self.query_mark_prices()  # latest mark prices
+                for trade_pair, exposure in result_dict.items():
+                    for mark_pair, mark_price in mark_prices:
+                        if trade_pair==mark_pair:
+                            result_dict[trade_pair] = exposure * mark_price
+                            break
 
         if isinstance(pair_ids, str):
             return result_dict.get(pair_ids, Decimal('0'))
