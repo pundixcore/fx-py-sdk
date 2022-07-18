@@ -53,6 +53,9 @@ class EventTypes:
     Add_margin = 'dex.add_margin'
     Oracle_updated_price = 'oracle_updated_price'
 
+    """Collections"""
+    Position_events = { Add_position, New_position, Part_close_position, Full_close_position, Forced_liquidation_position }
+
 class EventKeys:
     """orders"""
     order_id = "order_id"

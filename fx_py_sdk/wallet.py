@@ -9,7 +9,7 @@ from fx_py_sdk.codec.cosmos.crypto.secp256k1.keys_pb2 import PubKey
 from google.protobuf.any_pb2 import Any
 
 DEFAULT_DERIVATION_PATH = "m/44'/118'/0'/0/0"
-DEFAULT_BECH32_HRP = "fx"
+DEFAULT_BECH32_HRP = "px"
 
 class Address:
     def __init__(self, addr):

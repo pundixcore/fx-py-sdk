@@ -252,6 +252,19 @@ class Crud:
 
         return query.all()
 
+    def query_open_order_margin(self, pair_id: str):
+        # Order Margin = Entry Price * Base Quantity / Leverage
+        query = """
+        SELECT owner, SUM(price * base_quantity / leverage) FROM orders
+        WHERE status IN ('ORDER_PENDING', 'ORDER_PARTIAL_FILLED')
+        AND order_type = 'ORDER_TYPE_OPEN_POSITION'
+        AND pair_id = :pair_id
+        GROUP BY 1
+        """
+
+        result = self.session.execute(query, params={"pair_id": pair_id}).fetchall()
+        return result
+
     def count(self, object):
         with self.auto_session() as session:
             return session.query(object).count()
@@ -472,11 +485,21 @@ class Crud:
                     .filter(and_(Block.tx_events_processed==True, Block.block_processed==True))
                     .scalar())
 
-    def query_lowest_incomplete_height(self):
+    def query_lowest_incomplete_height(self, pair_id: str=None):
         """Query lowest block height where either `block_processed` or `tx_events_processed` is false (i.e. block processing is incomplete)"""
-        return (self.session.query(func.min(Block.height))
-                            .filter(or_(Block.block_processed==False, Block.tx_events_processed==False))
-                            .scalar())
+        if pair_id:
+            return (self.session.query(func.min(Block.height))
+                                .filter(
+                                    and_(
+                                        Block.pair_id==pair_id,
+                                        or_(Block.block_processed==False, Block.tx_events_processed==False)
+                                    )                                
+                                ).scalar())
+        else:
+            return (self.session.query(func.min(Block.height))
+                                .filter(or_(Block.block_processed==False, Block.tx_events_processed==False))
+                                .scalar())
+
 
     def delete_data_from_lowest_incomplete_height(self,
                                                   pair_id: str = None,

@@ -112,8 +112,7 @@ class MyTestCase(unittest.TestCase):
         print('account number:', account_info.account_number,
               'sequence:', account_info.sequence)
 
-        tx_builder = TxBuilder(account, None, chain_id, account_info.account_number, Coin(
-            amount='600', denom='USDT'))
+        tx_builder = TxBuilder(account, None, chain_id, account_info.account_number)
 
         tx_response = client.create_order(tx_builder, 'BTC:USDT', "SELL", decimal.Decimal(
             40000.1), decimal.Decimal(1.2), 5, account_info.sequence, mode=BROADCAST_MODE_BLOCK)
@@ -130,8 +129,7 @@ class MyTestCase(unittest.TestCase):
         print('account number:', account_info.account_number,
               'sequence:', account_info.sequence)
 
-        tx_builder = TxBuilder(account, None, chain_id, account_info.account_number, Coin(
-            amount='600', denom='USDT'))
+        tx_builder = TxBuilder(account, None, chain_id, account_info.account_number)
 
         create_tx_response = client.create_order(tx_builder, 'BTC:USDT', BUY, decimal.Decimal(
             1.1), decimal.Decimal(1.2), 5, account_info.sequence, mode=BROADCAST_MODE_BLOCK)
@@ -169,8 +167,7 @@ class MyTestCase(unittest.TestCase):
             print("please build position first")
         self.assertNotEqual(len(positions), 0)
 
-        tx_builder = TxBuilder(account, None, chain_id, account_info.account_number, Coin(
-            amount='600', denom='USDT'))
+        tx_builder = TxBuilder(account, None, chain_id, account_info.account_number)
 
         tx_response = client.close_position(tx_builder, pair_id, positions[0].Id, positions[0].MarkPrice, decimal.Decimal(
             0.1), True, account_info.sequence, mode=BROADCAST_MODE_BLOCK)
@@ -194,8 +191,7 @@ class MyTestCase(unittest.TestCase):
             print("please build position first")
         self.assertNotEqual(len(positions), 0)
 
-        tx_builder = TxBuilder(account, None, chain_id, account_info.account_number, Coin(
-            amount='600', denom='USDT'))
+        tx_builder = TxBuilder(account, None, chain_id, account_info.account_number)
 
         tx_response = client.add_margin(tx_builder, pair_id, positions[0].Id, decimal.Decimal(0.1),
                                         account_info.sequence, mode=BROADCAST_MODE_BLOCK)
