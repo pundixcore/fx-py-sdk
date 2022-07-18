@@ -595,6 +595,7 @@ class ScanBlock(ScanBlockBase):
 
                 if transfer:
                     transfer.block_height = block_height
+                    transfer.pair_id = self.pair_id
                     self.crud.insert(transfer)
 
         return
@@ -682,6 +683,14 @@ class ScanBlock(ScanBlockBase):
 
                 elif event[BlockResponse.TYPE] in EventTypes.Position_events:
                     self.update_position(event, block_height)
+
+                elif event[BlockResponse.TYPE] == EventTypes.Transfer:
+                    transfer = self.get_transfer(event[BlockResponse.Attributes])
+
+                    if transfer:
+                        transfer.block_height = block_height
+                        transfer.pair_id = self.pair_id
+                        self.crud.insert(transfer)
 
         block = Block(height=block_height, tx_events_processed=True, pair_id=self.pair_id)
         self.process_block_height(block)

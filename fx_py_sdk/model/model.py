@@ -357,7 +357,9 @@ class Sql:
         url = 'postgresql://{}:{}@{}:{}/{}'
         url = url.format(self.user, self.password, self.host, self.port, db)
         print(url)
-        self.engine = sqlalchemy.create_engine(url, client_encoding='utf8')
+        self.engine = sqlalchemy.create_engine(url, client_encoding='utf8',
+                                               pool_pre_ping=True,
+                                               pool_recycle=3600)
         self.meta = sqlalchemy.MetaData(bind=self.engine)
         self.session = sessionmaker(bind=self.engine)
 
