@@ -20,9 +20,9 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='fx/dex/v1/proposal.proto',
   package='fx.dex.v1',
   syntax='proto3',
-  serialized_options=b'Z\'github.com/functionx/fx-dex/x/dex/types',
+  serialized_options=b'Z(github.com/marginxio/marginx/x/dex/types',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x18\x66x/dex/v1/proposal.proto\x12\tfx.dex.v1\x1a\x14gogoproto/gogo.proto\x1a\x17\x66x/dex/v1/funding.proto\x1a\x16\x66x/dex/v1/margin.proto\"z\n\x18ResetFundingTimeProposal\x12\r\n\x05title\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12,\n\x0c\x66unding_time\x18\x03 \x01(\x0b\x32\x16.fx.dex.v1.FundingTime:\x0c\xe8\xa0\x1f\x00\x88\xa0\x1f\x00\x98\xa0\x1f\x00\"z\n\x1aResetFundingParamsProposal\x12\r\n\x05title\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12*\n\x0e\x66unding_params\x18\x03 \x01(\x0b\x32\x12.fx.dex.v1.Funding:\x0c\xe8\xa0\x1f\x00\x88\xa0\x1f\x00\x98\xa0\x1f\x00\"\xaa\x01\n\x15ResetMMATableProposal\x12\r\n\x05title\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12*\n\x0bmargin_rate\x18\x03 \x03(\x0b\x32\x15.fx.dex.v1.MarginRate\x12\x33\n\x10init_margin_rate\x18\x04 \x03(\x0b\x32\x19.fx.dex.v1.InitMarginRate:\x0c\xe8\xa0\x1f\x00\x88\xa0\x1f\x00\x98\xa0\x1f\x00\"e\n\x12\x43reatePairProposal\x12\r\n\x05title\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12\x1d\n\x04pair\x18\x03 \x01(\x0b\x32\x0f.fx.dex.v1.Pair:\x0c\xe8\xa0\x1f\x00\x88\xa0\x1f\x00\x98\xa0\x1f\x00\"\x99\x01\n\x04Pair\x12\x12\n\nbase_asset\x18\x01 \x01(\t\x12\x13\n\x0bquote_asset\x18\x02 \x01(\t\x12\x0e\n\x06\x61\x63tive\x18\x03 \x01(\x08\x12\x15\n\rprice_decimal\x18\x04 \x01(\x03\x12\x18\n\x10position_decimal\x18\x05 \x01(\x03\x12\x12\n\ninit_price\x18\x06 \x01(\t\x12\x13\n\x0bmarket_type\x18\x07 \x01(\t\"\x8c\x01\n\x1fResetPremiumIndexConfigProposal\x12\r\n\x05title\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12\x37\n\x12premium_index_conf\x18\x03 \x01(\x0b\x32\x1b.fx.dex.v1.PremiumIndexConf:\x0c\xe8\xa0\x1f\x00\x88\xa0\x1f\x00\x98\xa0\x1f\x00\x42)Z\'github.com/functionx/fx-dex/x/dex/typesb\x06proto3'
+  serialized_pb=b'\n\x18\x66x/dex/v1/proposal.proto\x12\tfx.dex.v1\x1a\x14gogoproto/gogo.proto\x1a\x17\x66x/dex/v1/funding.proto\x1a\x16\x66x/dex/v1/margin.proto\"z\n\x18ResetFundingTimeProposal\x12\r\n\x05title\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12,\n\x0c\x66unding_time\x18\x03 \x01(\x0b\x32\x16.fx.dex.v1.FundingTime:\x0c\xe8\xa0\x1f\x00\x88\xa0\x1f\x00\x98\xa0\x1f\x00\"z\n\x1aResetFundingParamsProposal\x12\r\n\x05title\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12*\n\x0e\x66unding_params\x18\x03 \x01(\x0b\x32\x12.fx.dex.v1.Funding:\x0c\xe8\xa0\x1f\x00\x88\xa0\x1f\x00\x98\xa0\x1f\x00\"\xaa\x01\n\x15ResetMMATableProposal\x12\r\n\x05title\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12*\n\x0bmargin_rate\x18\x03 \x03(\x0b\x32\x15.fx.dex.v1.MarginRate\x12\x33\n\x10init_margin_rate\x18\x04 \x03(\x0b\x32\x19.fx.dex.v1.InitMarginRate:\x0c\xe8\xa0\x1f\x00\x88\xa0\x1f\x00\x98\xa0\x1f\x00\"e\n\x12\x43reatePairProposal\x12\r\n\x05title\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12\x1d\n\x04pair\x18\x03 \x01(\x0b\x32\x0f.fx.dex.v1.Pair:\x0c\xe8\xa0\x1f\x00\x88\xa0\x1f\x00\x98\xa0\x1f\x00\"\x99\x01\n\x04Pair\x12\x12\n\nbase_asset\x18\x01 \x01(\t\x12\x13\n\x0bquote_asset\x18\x02 \x01(\t\x12\x0e\n\x06\x61\x63tive\x18\x03 \x01(\x08\x12\x15\n\rprice_decimal\x18\x04 \x01(\x03\x12\x18\n\x10position_decimal\x18\x05 \x01(\x03\x12\x12\n\ninit_price\x18\x06 \x01(\t\x12\x13\n\x0bmarket_type\x18\x07 \x01(\t\"\x8c\x01\n\x1fResetPremiumIndexConfigProposal\x12\r\n\x05title\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12\x37\n\x12premium_index_conf\x18\x03 \x01(\x0b\x32\x1b.fx.dex.v1.PremiumIndexConf:\x0c\xe8\xa0\x1f\x00\x88\xa0\x1f\x00\x98\xa0\x1f\x00\"k\n\x12ShareSplitProposal\x12\r\n\x05title\x18\x01 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x02 \x01(\t\x12\x12\n\nmultiplier\x18\x03 \x01(\t\x12\x0f\n\x07pair_id\x18\x04 \x01(\t:\x0c\xe8\xa0\x1f\x00\x88\xa0\x1f\x00\x98\xa0\x1f\x00\x42*Z(github.com/marginxio/marginx/x/dex/typesb\x06proto3'
   ,
   dependencies=[gogoproto_dot_gogo__pb2.DESCRIPTOR,fx_dot_dex_dot_v1_dot_funding__pb2.DESCRIPTOR,fx_dot_dex_dot_v1_dot_margin__pb2.DESCRIPTOR,])
 
@@ -339,6 +339,59 @@ _RESETPREMIUMINDEXCONFIGPROPOSAL = _descriptor.Descriptor(
   serialized_end=931,
 )
 
+
+_SHARESPLITPROPOSAL = _descriptor.Descriptor(
+  name='ShareSplitProposal',
+  full_name='fx.dex.v1.ShareSplitProposal',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='title', full_name='fx.dex.v1.ShareSplitProposal.title', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='description', full_name='fx.dex.v1.ShareSplitProposal.description', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='multiplier', full_name='fx.dex.v1.ShareSplitProposal.multiplier', index=2,
+      number=3, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='pair_id', full_name='fx.dex.v1.ShareSplitProposal.pair_id', index=3,
+      number=4, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=b'\350\240\037\000\210\240\037\000\230\240\037\000',
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=933,
+  serialized_end=1040,
+)
+
 _RESETFUNDINGTIMEPROPOSAL.fields_by_name['funding_time'].message_type = fx_dot_dex_dot_v1_dot_funding__pb2._FUNDINGTIME
 _RESETFUNDINGPARAMSPROPOSAL.fields_by_name['funding_params'].message_type = fx_dot_dex_dot_v1_dot_funding__pb2._FUNDING
 _RESETMMATABLEPROPOSAL.fields_by_name['margin_rate'].message_type = fx_dot_dex_dot_v1_dot_margin__pb2._MARGINRATE
@@ -351,6 +404,7 @@ DESCRIPTOR.message_types_by_name['ResetMMATableProposal'] = _RESETMMATABLEPROPOS
 DESCRIPTOR.message_types_by_name['CreatePairProposal'] = _CREATEPAIRPROPOSAL
 DESCRIPTOR.message_types_by_name['Pair'] = _PAIR
 DESCRIPTOR.message_types_by_name['ResetPremiumIndexConfigProposal'] = _RESETPREMIUMINDEXCONFIGPROPOSAL
+DESCRIPTOR.message_types_by_name['ShareSplitProposal'] = _SHARESPLITPROPOSAL
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 ResetFundingTimeProposal = _reflection.GeneratedProtocolMessageType('ResetFundingTimeProposal', (_message.Message,), {
@@ -395,6 +449,13 @@ ResetPremiumIndexConfigProposal = _reflection.GeneratedProtocolMessageType('Rese
   })
 _sym_db.RegisterMessage(ResetPremiumIndexConfigProposal)
 
+ShareSplitProposal = _reflection.GeneratedProtocolMessageType('ShareSplitProposal', (_message.Message,), {
+  'DESCRIPTOR' : _SHARESPLITPROPOSAL,
+  '__module__' : 'fx.dex.v1.proposal_pb2'
+  # @@protoc_insertion_point(class_scope:fx.dex.v1.ShareSplitProposal)
+  })
+_sym_db.RegisterMessage(ShareSplitProposal)
+
 
 DESCRIPTOR._options = None
 _RESETFUNDINGTIMEPROPOSAL._options = None
@@ -402,4 +463,5 @@ _RESETFUNDINGPARAMSPROPOSAL._options = None
 _RESETMMATABLEPROPOSAL._options = None
 _CREATEPAIRPROPOSAL._options = None
 _RESETPREMIUMINDEXCONFIGPROPOSAL._options = None
+_SHARESPLITPROPOSAL._options = None
 # @@protoc_insertion_point(module_scope)

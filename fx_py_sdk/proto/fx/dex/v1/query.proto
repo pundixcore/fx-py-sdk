@@ -9,7 +9,7 @@ import "fx/dex/v1/params.proto";
 import "fx/dex/v1/funding.proto";
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/functionx/fx-dex/x/dex/types";
+option go_package = "github.com/marginxio/marginx/x/dex/types";
 
 // Query defines the gRPC querier service.
 service Query {
@@ -100,6 +100,20 @@ service Query {
     rpc QueryAccountNumber(QueryAccountNumberReq) returns (QueryAccountNumberResp) {
       option (google.api.http).get = "/dex/account_number";
     }
+
+    rpc QueryReserve(QueryReserveReq) returns (QueryReserveResp) {
+      option (google.api.http).get = "/dex/reserve";
+    }
+
+    rpc QueryChainStatistics(QueryChainStatisticsReq) returns (QueryChainStatisticsResp) {
+      option (google.api.http).get = "/dex/statistics";
+    }
+}
+
+message QueryReserveReq {}
+
+message QueryReserveResp {
+    Reserve reserve = 1;
 }
 
 message QueryIsFundingReq {}
@@ -360,4 +374,84 @@ message QueryAccountNumberReq {
 
 message QueryAccountNumberResp {
   uint64 value = 1;
+}
+
+message QueryChainStatisticsReq {
+
+}
+
+message QueryChainStatisticsResp {
+  int64 height = 1;
+
+  string usdt_supply = 2 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  string user_acc_balance = 3 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  string dex_module_acc_balance = 4 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  string fee_module_acc_balance = 5 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  string long_quantity = 6 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  string short_quantity = 7 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  string long_position_margin_amount = 8 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  string short_position_margin_amount = 9 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  string pending_order_buy_amount = 10 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  string pending_order_sell_amount = 11 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  string locked_funds_balance = 12 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  string accumulative_fee_balance = 13 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  string pending_liquidation_order_buy_quantity = 14 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+
+  string pending_liquidation_order_sell_quantity = 15 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+  int64 holding_position_number = 16;
+  int64 pending_order_number = 17;
 }

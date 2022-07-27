@@ -1,6 +1,8 @@
 import decimal
+import string
 import time
 import datetime
+import re
 from urllib.parse import urlparse
 
 import eth_utils
@@ -127,8 +129,7 @@ class GRPCClient:
                 example:
                     {'FX': 100.0}
         """
-        response = BankQuery(self.channel).Balance(
-            QueryBalanceRequest(address=address, denom=denom))
+        response = BankQuery(self.channel).Balance(QueryBalanceRequest(address=address, denom=denom))
         balance = decimal.Decimal(response.balance.amount)
         balance = balance / decimal.Decimal(DEFAULT_DEC)
         coin = dict()
@@ -336,8 +337,7 @@ class GRPCClient:
                     Order(Id='ID-706-1', Owner='dex1ggz598a4506llaglzsmhp3r23hfke6nw29wans', PairId='tsla:usdc', Direction=0, Price=1000.4, BaseQuantity=0.5, QuoteQuantity=50.02, FilledQuantity=0.0, FilledAvgPrice=0.0, RemainLocked=500.2, Leverage=10, Status=0, OrderType=0, CostFee=0.0, LockedFee=0.20008)
         """
         if not use_db:
-            response = DexQuery(self.channel).QueryOrder(
-                QueryOrderRequest(order_id=order_id))
+            response = DexQuery(self.channel).QueryOrder(QueryOrderRequest(order_id=order_id))
             order = response.order
             price = decimal.Decimal(order.price)
             price = price / decimal.Decimal(DEFAULT_DEC)
@@ -357,11 +357,15 @@ class GRPCClient:
             remain_locked = decimal.Decimal(order.remain_locked)
             remain_locked = remain_locked / decimal.Decimal(DEFAULT_DEC)
 
-            cost_fee = decimal.Decimal(order.cost_fee)
-            cost_fee = cost_fee / decimal.Decimal(DEFAULT_DEC)
+            locked_fee_amount = ''.join(re.split(r'[^0-9]', order.locked_fee))
+            cost_fee_amount = ''.join(re.split(r'[^0-9]', order.cost_fee))
 
-            locked_fee = decimal.Decimal(order.locked_fee)
-            locked_fee = locked_fee / decimal.Decimal(DEFAULT_DEC)
+            fee_denom = ''.join(re.split(r'[^A-Za-z]', order.locked_fee))
+            if fee_denom == '':
+                fee_denom = ''.join(re.split(r'[^A-Za-z]', order.cost_fee))
+
+            cost_fee = decimal.Decimal(cost_fee_amount) / decimal.Decimal(DEFAULT_DEC)
+            locked_fee = decimal.Decimal(locked_fee_amount) / decimal.Decimal(DEFAULT_DEC)
             checksumAddr = eth_utils.to_checksum_address(Address_Prefix + order.owner.hex())
 
             new_order = Order(
@@ -381,6 +385,7 @@ class GRPCClient:
                 order.order_type,
                 cost_fee,
                 locked_fee,
+                fee_denom,
                 # order.created_at.ToSeconds()
             )
 
@@ -409,6 +414,7 @@ class GRPCClient:
                 order.order_type,
                 order.cost_fee,
                 order.locked_fee,
+                order.fee_denom,
                 # order.created_at,
                 order.last_filled_quantity,
                 response.time,
@@ -478,11 +484,15 @@ class GRPCClient:
                 remain_locked = decimal.Decimal(order.remain_locked)
                 remain_locked = remain_locked / decimal.Decimal(DEFAULT_DEC)
 
-                cost_fee = decimal.Decimal(order.cost_fee)
-                cost_fee = cost_fee / decimal.Decimal(DEFAULT_DEC)
+                locked_fee_amount = ''.join(re.split(r'[^0-9]', order.locked_fee))
+                cost_fee_amount = ''.join(re.split(r'[^0-9]', order.cost_fee))
 
-                locked_fee = decimal.Decimal(order.locked_fee)
-                locked_fee = locked_fee / decimal.Decimal(DEFAULT_DEC)
+                fee_denom = ''.join(re.split(r'[^A-Za-z]', order.locked_fee))
+                if fee_denom == '':
+                    fee_denom = ''.join(re.split(r'[^A-Za-z]', order.cost_fee))
+
+                cost_fee = decimal.Decimal(cost_fee_amount) / decimal.Decimal(DEFAULT_DEC)
+                locked_fee = decimal.Decimal(locked_fee_amount) / decimal.Decimal(DEFAULT_DEC)
                 checksumAddr = eth_utils.to_checksum_address(Address_Prefix + order.owner.hex())
 
                 new_order = Order(
@@ -502,9 +512,9 @@ class GRPCClient:
                     order.order_type,
                     cost_fee,
                     locked_fee,
+                    fee_denom,
                     # MessageToJson(order.created_at),
                 )
-
                 orders.append(new_order)
 
         else:
@@ -542,19 +552,19 @@ class GRPCClient:
                     order.owner,
                     order.pair_id,
                     order.direction,
-                    order.price,
-                    order.base_quantity,
-                    order.quote_quantity,
-                    order.filled_quantity,
-                    order.filled_avg_price,
-                    order.remain_locked,
+                    decimal.Decimal(order.price),
+                    decimal.Decimal(order.base_quantity),
+                    decimal.Decimal(order.quote_quantity),
+                    decimal.Decimal(order.filled_quantity),
+                    decimal.Decimal(order.filled_avg_price),
+                    decimal.Decimal(order.remain_locked),
                     order.leverage,
                     order.status,
                     order.order_type,
-                    order.cost_fee,
-                    order.locked_fee,
-                    # order.created_at,
-                    order.last_filled_quantity,
+                    decimal.Decimal(order.cost_fee),
+                    decimal.Decimal(order.locked_fee),
+                    order.fee_denom,
+                    decimal.Decimal(order.last_filled_quantity),
                     response.time,
                     order_trades[order.order_id] if include_trades else None
                 )
@@ -740,6 +750,7 @@ class GRPCClient:
 
     def cancel_order(self, tx_builder: TxBuilder, order_id: str,
                      acc_seq: int, mode: BroadcastMode = BROADCAST_MODE_BLOCK):
+
         """取消订单"""
         msg = MsgCancelOrder(owner=tx_builder.account.address, order_id=order_id)
         msg_any = Any(type_url='/fx.dex.v1.MsgCancelOrder',
@@ -749,7 +760,7 @@ class GRPCClient:
         return self.broadcast_tx(tx, mode)
 
     def close_position(self, tx_builder: TxBuilder, pair_id: str, position_id: str, price: Decimal, base_quantity: Decimal,
-                       full_close: bool, acc_seq: int, market_close = False, mode: BroadcastMode = BROADCAST_MODE_BLOCK):
+                       full_close: bool, acc_seq: int, market_close=False, mode: BroadcastMode = BROADCAST_MODE_BLOCK):
 
         price = price * decimal.Decimal(DEFAULT_DEC)
         price = str(price)

@@ -120,6 +120,16 @@ class QueryStub(object):
                 request_serializer=fx_dot_dex_dot_v1_dot_query__pb2.QueryAccountNumberReq.SerializeToString,
                 response_deserializer=fx_dot_dex_dot_v1_dot_query__pb2.QueryAccountNumberResp.FromString,
                 )
+        self.QueryReserve = channel.unary_unary(
+                '/fx.dex.v1.Query/QueryReserve',
+                request_serializer=fx_dot_dex_dot_v1_dot_query__pb2.QueryReserveReq.SerializeToString,
+                response_deserializer=fx_dot_dex_dot_v1_dot_query__pb2.QueryReserveResp.FromString,
+                )
+        self.QueryChainStatistics = channel.unary_unary(
+                '/fx.dex.v1.Query/QueryChainStatistics',
+                request_serializer=fx_dot_dex_dot_v1_dot_query__pb2.QueryChainStatisticsReq.SerializeToString,
+                response_deserializer=fx_dot_dex_dot_v1_dot_query__pb2.QueryChainStatisticsResp.FromString,
+                )
 
 
 class QueryServicer(object):
@@ -256,6 +266,18 @@ class QueryServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def QueryReserve(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def QueryChainStatistics(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_QueryServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -363,6 +385,16 @@ def add_QueryServicer_to_server(servicer, server):
                     servicer.QueryAccountNumber,
                     request_deserializer=fx_dot_dex_dot_v1_dot_query__pb2.QueryAccountNumberReq.FromString,
                     response_serializer=fx_dot_dex_dot_v1_dot_query__pb2.QueryAccountNumberResp.SerializeToString,
+            ),
+            'QueryReserve': grpc.unary_unary_rpc_method_handler(
+                    servicer.QueryReserve,
+                    request_deserializer=fx_dot_dex_dot_v1_dot_query__pb2.QueryReserveReq.FromString,
+                    response_serializer=fx_dot_dex_dot_v1_dot_query__pb2.QueryReserveResp.SerializeToString,
+            ),
+            'QueryChainStatistics': grpc.unary_unary_rpc_method_handler(
+                    servicer.QueryChainStatistics,
+                    request_deserializer=fx_dot_dex_dot_v1_dot_query__pb2.QueryChainStatisticsReq.FromString,
+                    response_serializer=fx_dot_dex_dot_v1_dot_query__pb2.QueryChainStatisticsResp.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -729,5 +761,39 @@ class Query(object):
         return grpc.experimental.unary_unary(request, target, '/fx.dex.v1.Query/QueryAccountNumber',
             fx_dot_dex_dot_v1_dot_query__pb2.QueryAccountNumberReq.SerializeToString,
             fx_dot_dex_dot_v1_dot_query__pb2.QueryAccountNumberResp.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def QueryReserve(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/fx.dex.v1.Query/QueryReserve',
+            fx_dot_dex_dot_v1_dot_query__pb2.QueryReserveReq.SerializeToString,
+            fx_dot_dex_dot_v1_dot_query__pb2.QueryReserveResp.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def QueryChainStatistics(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/fx.dex.v1.Query/QueryChainStatistics',
+            fx_dot_dex_dot_v1_dot_query__pb2.QueryChainStatisticsReq.SerializeToString,
+            fx_dot_dex_dot_v1_dot_query__pb2.QueryChainStatisticsResp.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

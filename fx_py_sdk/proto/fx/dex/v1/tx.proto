@@ -5,7 +5,7 @@ import "gogoproto/gogo.proto";
 import "fx/dex/v1/order.proto";
 import "cosmos/base/v1beta1/coin.proto";
 
-option go_package = "github.com/functionx/fx-dex/x/dex/types";
+option go_package = "github.com/marginxio/marginx/x/dex/types";
 
 service Msg {
     rpc CreateOrder(MsgCreateOrder) returns (MsgCreateOrderResponse);
@@ -34,6 +34,7 @@ message MsgCreateOrder {
 }
 
 message MsgCreateOrderResponse {
+    string order_id = 1;
 }
 
 message MsgCancelOrder {
@@ -96,6 +97,7 @@ message MsgClosePosition {
 }
 
 message MsgClosePositionResp {
+    string order_id = 1;
 }
 
 message MsgLiquidationPosition {

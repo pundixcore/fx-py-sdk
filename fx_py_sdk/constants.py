@@ -97,6 +97,7 @@ class Order(NamedTuple):
     OrderType: str
     CostFee: Decimal
     LockedFee: Decimal
+    FeeDenom: str
     LastFilledQuantity: Decimal = None
     LastUpdated: datetime.datetime = None
     Trades: Iterable = None

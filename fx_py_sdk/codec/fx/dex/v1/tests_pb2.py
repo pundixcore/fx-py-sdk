@@ -19,9 +19,9 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='fx/dex/v1/tests.proto',
   package='fx.dex.v1',
   syntax='proto3',
-  serialized_options=b'Z\'github.com/functionx/fx-dex/x/dex/types',
+  serialized_options=b'Z(github.com/marginxio/marginx/x/dex/types',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x15\x66x/dex/v1/tests.proto\x12\tfx.dex.v1\x1a\x14gogoproto/gogo.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xaf\x01\n\x06OrderA\x12\x0f\n\x07tx_hash\x18\x01 \x01(\t\x12\n\n\x02id\x18\x02 \x01(\t\x12\x0f\n\x07pair_id\x18\x03 \x01(\t\x12\x38\n\ncreated_at\x18\x04 \x01(\x0b\x32\x1a.google.protobuf.TimestampB\x08\xc8\xde\x1f\x00\x90\xdf\x1f\x01\x12=\n\x05price\x18\x05 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"6\n\x06OrderB\x12\x0f\n\x07tx_hash\x18\x01 \x01(\t\x12\n\n\x02id\x18\x02 \x01(\t\x12\x0f\n\x07pair_id\x18\x03 \x01(\tB)Z\'github.com/functionx/fx-dex/x/dex/typesb\x06proto3'
+  serialized_pb=b'\n\x15\x66x/dex/v1/tests.proto\x12\tfx.dex.v1\x1a\x14gogoproto/gogo.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xaf\x01\n\x06OrderA\x12\x0f\n\x07tx_hash\x18\x01 \x01(\t\x12\n\n\x02id\x18\x02 \x01(\t\x12\x0f\n\x07pair_id\x18\x03 \x01(\t\x12\x38\n\ncreated_at\x18\x04 \x01(\x0b\x32\x1a.google.protobuf.TimestampB\x08\xc8\xde\x1f\x00\x90\xdf\x1f\x01\x12=\n\x05price\x18\x05 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"6\n\x06OrderB\x12\x0f\n\x07tx_hash\x18\x01 \x01(\t\x12\n\n\x02id\x18\x02 \x01(\t\x12\x0f\n\x07pair_id\x18\x03 \x01(\tB*Z(github.com/marginxio/marginx/x/dex/typesb\x06proto3'
   ,
   dependencies=[gogoproto_dot_gogo__pb2.DESCRIPTOR,google_dot_protobuf_dot_timestamp__pb2.DESCRIPTOR,])
 
