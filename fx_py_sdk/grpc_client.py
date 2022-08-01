@@ -737,7 +737,10 @@ class GRPCClient:
         base_quantity = str(base_quantity)
         base_quantity_split = base_quantity.split('.', 1)
 
-        msg = MsgCreateOrder(owner=tx_builder.account.address, pair_id=pair_id, direction=direction, price=price_split[0],
+        msg = MsgCreateOrder(owner=tx_builder.account.address,
+                             pair_id=pair_id,
+                             direction=direction,
+                             price=price_split[0],
                              base_quantity=base_quantity_split[0],
                              leverage=leverage)
 
@@ -769,8 +772,13 @@ class GRPCClient:
         base_quantity = str(base_quantity)
         base_quantity_split = base_quantity.split('.', 1)
 
-        msg = MsgClosePosition(owner=tx_builder.account.address, pair_id=pair_id, position_id=position_id, price=price_split[0],
-                               base_quantity=base_quantity_split[0], full_close=full_close, market_close=market_close)
+        msg = MsgClosePosition(owner=tx_builder.account.address,
+                               pair_id=pair_id,
+                               position_id=position_id,
+                               price=price_split[0],
+                               base_quantity=base_quantity_split[0],
+                               full_close=full_close,
+                               market_close=market_close)
 
         msg_any = Any(type_url='/fx.dex.v1.MsgClosePosition',
                       value=msg.SerializeToString())
