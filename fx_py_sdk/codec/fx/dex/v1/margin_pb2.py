@@ -18,9 +18,9 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='fx/dex/v1/margin.proto',
   package='fx.dex.v1',
   syntax='proto3',
-  serialized_options=b'Z\'github.com/functionx/fx-dex/x/dex/types',
+  serialized_options=b'Z(github.com/marginxio/marginx/x/dex/types',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x16\x66x/dex/v1/margin.proto\x12\tfx.dex.v1\x1a\x14gogoproto/gogo.proto\"\x8a\x02\n\nMarginRate\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12\x10\n\x08leverage\x18\x02 \x01(\x04\x12H\n\x10nominal_position\x18\x03 \x03(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12I\n\x11maint_margin_rate\x18\x04 \x03(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x44\n\x0cmaint_amount\x18\x05 \x03(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"\xd1\x01\n\x0eInitMarginRate\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12\x14\n\x0cmax_leverage\x18\x02 \x01(\x04\x12H\n\x10nominal_position\x18\x03 \x03(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x10\n\x08Leverage\x18\x04 \x03(\r\x12<\n\x04Rate\x18\x05 \x03(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x42)Z\'github.com/functionx/fx-dex/x/dex/typesb\x06proto3'
+  serialized_pb=b'\n\x16\x66x/dex/v1/margin.proto\x12\tfx.dex.v1\x1a\x14gogoproto/gogo.proto\"\x8a\x02\n\nMarginRate\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12\x10\n\x08leverage\x18\x02 \x01(\x04\x12H\n\x10nominal_position\x18\x03 \x03(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12I\n\x11maint_margin_rate\x18\x04 \x03(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x44\n\x0cmaint_amount\x18\x05 \x03(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"\xd1\x01\n\x0eInitMarginRate\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12\x14\n\x0cmax_leverage\x18\x02 \x01(\x04\x12H\n\x10nominal_position\x18\x03 \x03(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x10\n\x08Leverage\x18\x04 \x03(\r\x12<\n\x04Rate\x18\x05 \x03(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x42*Z(github.com/marginxio/marginx/x/dex/typesb\x06proto3'
   ,
   dependencies=[gogoproto_dot_gogo__pb2.DESCRIPTOR,])
 

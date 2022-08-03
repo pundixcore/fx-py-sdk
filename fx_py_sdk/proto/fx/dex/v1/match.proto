@@ -4,7 +4,7 @@ package fx.dex.v1;
 import "gogoproto/gogo.proto";
 import "fx/dex/v1/order.proto";
 
-option go_package = "github.com/functionx/fx-dex/x/dex/types";
+option go_package = "github.com/marginxio/marginx/x/dex/types";
 
 message OrderFill {
   Order order = 1 [(gogoproto.nullable) = false];
@@ -157,9 +157,10 @@ message Deal {
     (gogoproto.nullable) = false
   ];
   string fee = 5 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin",
     (gogoproto.nullable) = false
   ];
+  string position_id = 6;
 }
 
 message MatchRes {

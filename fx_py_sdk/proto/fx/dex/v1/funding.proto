@@ -3,7 +3,7 @@ package fx.dex.v1;
 
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/functionx/fx-dex/x/dex/types";
+option go_package = "github.com/marginxio/marginx/x/dex/types";
 
 //cumulative funding rates
 message PairFundingRate {
@@ -43,7 +43,6 @@ message SettleFunding {
   string market_type = 3 [(gogoproto.nullable) = true];
 }
 
-// 溢价指数配置信息
 message PremiumIndexConf {
   int64 update_period = 1;
   int64 next_update_time = 2;
@@ -62,15 +61,12 @@ message PremiumIndexConf {
 message PremiumIndex {
   string pair_id = 1;
 
-  // 每回合（8小时）开始时间戳
   int64 round_timestamp = 2;
 
-  // 每回合所包含的所有ticks
   repeated Tick ticks = 3 [
     (gogoproto.nullable) = false
   ];
 
-  // 每分钟的tick
   message Tick {
     string value = 1 [
       (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",

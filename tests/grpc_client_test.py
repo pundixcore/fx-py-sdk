@@ -11,12 +11,14 @@ import decimal
 from fx_py_sdk.codec.cosmos.tx.v1beta1.service_pb2 import BROADCAST_MODE_BLOCK, BROADCAST_MODE_SYNC
 from google.protobuf.json_format import MessageToJson
 import json
+from fx_py_sdk.codec.cosmos.base.v1beta1.coin_pb2 import Coin
 
 from fx_py_sdk.ibc_transfer import ConfigsKeys, Ibc_transfer
 
 # client = GRPCClient('https://testnet-tsla-grpc.marginx.io:9090')
 client = GRPCClient('127.0.0.1:9090')
 pair_id = "BTC:USDT"
+mnemonic = "language hazard giraffe bonus lock over bleak absorb senior depth guard entire end creek monster type whip purchase explain merge acid depth air reveal"
 
 class MyTestCase(unittest.TestCase):
 
@@ -56,8 +58,6 @@ class MyTestCase(unittest.TestCase):
         print(resp.accounts)
         print(len(resp.accounts))
 
-
-
     def test_query_oracle_price(self):
         oracle_price = client.query_oracle_price(pair_id="BTC:USDT")
         print(oracle_price)
@@ -70,7 +70,7 @@ class MyTestCase(unittest.TestCase):
         # print(owner.to_string())
 
     def test_query_order(self):
-        resp = client.query_order(order_id='ID-5878-1')
+        resp = client.query_order(order_id='ID-5-1')
         print(resp)
 
     def test_query_orders(self):
@@ -101,8 +101,7 @@ class MyTestCase(unittest.TestCase):
 
     def test_create_order(self):
         Account.enable_unaudited_hdwallet_features()
-        account = Account.from_mnemonic(
-        "dune antenna hood magic kit blouse film video another pioneer dilemma hobby message rug sail gas culture upgrade twin flag joke people general aunt")
+        account = Account.from_mnemonic(mnemonic)
         print(account.address)
 
         chain_id = client.query_chain_id()
@@ -112,10 +111,9 @@ class MyTestCase(unittest.TestCase):
         print('account number:', account_info.account_number,
               'sequence:', account_info.sequence)
 
-        tx_builder = TxBuilder(account, None, chain_id, account_info.account_number)
+        tx_builder = TxBuilder(account, None, chain_id, account_info.account_number, Coin(amount='60', denom="FX"))
 
-        tx_response = client.create_order(tx_builder, 'BTC:USDT', "SELL", decimal.Decimal(
-            40000.1), decimal.Decimal(1.2), 5, account_info.sequence, mode=BROADCAST_MODE_BLOCK)
+        tx_response = client.create_order(tx_builder, 'TSLA:USDT', "BUY", decimal.Decimal(800), decimal.Decimal(10), 5, account_info.sequence, mode=BROADCAST_MODE_BLOCK)
         print(MessageToJson(tx_response))
 
     def test_cancel_order(self):
@@ -151,8 +149,7 @@ class MyTestCase(unittest.TestCase):
 
     def test_close_position(self):
         Account.enable_unaudited_hdwallet_features()
-        account = Account.from_mnemonic(
-            "dune antenna hood magic kit blouse film video another pioneer dilemma hobby message rug sail gas culture upgrade twin flag joke people general aunt")
+        account = Account.from_mnemonic(mnemonic)
 
         chain_id = client.query_chain_id()
         print('chain_id:', chain_id)
@@ -169,8 +166,8 @@ class MyTestCase(unittest.TestCase):
 
         tx_builder = TxBuilder(account, None, chain_id, account_info.account_number)
 
-        tx_response = client.close_position(tx_builder, pair_id, positions[0].Id, positions[0].MarkPrice, decimal.Decimal(
-            0.1), True, account_info.sequence, mode=BROADCAST_MODE_BLOCK)
+        tx_response = client.close_position(tx_builder, pair_id, positions[0].Id, decimal.Decimal(0), decimal.Decimal(
+            0.1), True, account_info.sequence, True, mode=BROADCAST_MODE_BLOCK)
         print(tx_response)
 
     def test_add_margin(self):

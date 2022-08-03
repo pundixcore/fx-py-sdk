@@ -3,7 +3,7 @@ package fx.dex.v1;
 
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/functionx/fx-dex/x/dex/types";
+option go_package = "github.com/marginxio/marginx/x/dex/types";
 
 //cumulative funding rates
 //keys: pairID + leverage --> NominalPosition + MantMarginRate

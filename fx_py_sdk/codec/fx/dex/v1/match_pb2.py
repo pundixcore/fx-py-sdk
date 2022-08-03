@@ -19,9 +19,9 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='fx/dex/v1/match.proto',
   package='fx.dex.v1',
   syntax='proto3',
-  serialized_options=b'Z\'github.com/functionx/fx-dex/x/dex/types',
+  serialized_options=b'Z(github.com/marginxio/marginx/x/dex/types',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x15\x66x/dex/v1/match.proto\x12\tfx.dex.v1\x1a\x14gogoproto/gogo.proto\x1a\x15\x66x/dex/v1/order.proto\"\x8a\x02\n\tOrderFill\x12%\n\x05order\x18\x01 \x01(\x0b\x32\x10.fx.dex.v1.OrderB\x04\xc8\xde\x1f\x00\x12\x42\n\ndeal_price\x18\x02 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12G\n\x0fquantity_filled\x18\x03 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12I\n\x11quantity_unfilled\x18\x04 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"<\n\nOrderFills\x12.\n\norder_fill\x18\x01 \x03(\x0b\x32\x14.fx.dex.v1.OrderFillB\x04\xc8\xde\x1f\x00\"F\n\x05Price\x12=\n\x05price\x18\x01 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"\x8d\x01\n\nOrderDepth\x12=\n\x05price\x18\x01 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12@\n\x08quantity\x18\x02 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"@\n\x0bOrderDepths\x12\x31\n\x0corder_depths\x18\x01 \x03(\x0b\x32\x15.fx.dex.v1.OrderDepthB\x04\xc8\xde\x1f\x00\"W\n\tOrderBook\x12$\n\x03\x62id\x18\x01 \x01(\x0b\x32\x11.fx.dex.v1.OrdersB\x04\xc8\xde\x1f\x00\x12$\n\x03\x61sk\x18\x02 \x01(\x0b\x32\x11.fx.dex.v1.OrdersB\x04\xc8\xde\x1f\x00\"\xdb\x01\n\rDepthBookItem\x12=\n\x05price\x18\x01 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x44\n\x0c\x62uy_quantity\x18\x02 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x45\n\rsell_quantity\x18\x03 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\":\n\tDepthBook\x12-\n\x05items\x18\x01 \x03(\x0b\x32\x18.fx.dex.v1.DepthBookItemB\x04\xc8\xde\x1f\x00\"\xc7\x01\n\x07Matcher\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12.\n\norder_book\x18\x02 \x01(\x0b\x32\x14.fx.dex.v1.OrderBookB\x04\xc8\xde\x1f\x00\x12G\n\x0flast_deal_price\x18\x03 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x32\n\x0c\x64\x65pth_curves\x18\x04 \x01(\x0b\x32\x16.fx.dex.v1.DepthCurvesB\x04\xc8\xde\x1f\x00\"\xe2\x03\n\x0bMatchResult\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12\x11\n\tbid_count\x18\x02 \x01(\x03\x12\x11\n\task_count\x18\x03 \x01(\x03\x12\x42\n\ndeal_price\x18\x04 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12J\n\x12matched_bid_volume\x18\x05 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12J\n\x12matched_ask_volume\x18\x06 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x46\n\x0emax_bid_volume\x18\x07 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x46\n\x0emax_ask_volume\x18\x08 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x30\n\x0border_fills\x18\t \x01(\x0b\x32\x15.fx.dex.v1.OrderFillsB\x04\xc8\xde\x1f\x00\"B\n\x0cMatchResults\x12\x32\n\x0cmatch_result\x18\x01 \x03(\x0b\x32\x16.fx.dex.v1.MatchResultB\x04\xc8\xde\x1f\x00\"`\n\tDealPrice\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12\x42\n\ndeal_price\x18\x02 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"\xdc\x01\n\x0e\x44\x65pthCurveItem\x12=\n\x05price\x18\x01 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x45\n\rsell_quantity\x18\x02 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x44\n\x0c\x62uy_quantity\x18\x03 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"=\n\x0b\x44\x65pthCurves\x12.\n\x05items\x18\x01 \x03(\x0b\x32\x19.fx.dex.v1.DepthCurveItemB\x04\xc8\xde\x1f\x00\"\xe9\x01\n\x04\x44\x65\x61l\x12\x10\n\x08order_id\x18\x01 \x01(\t\x12\x11\n\tdirection\x18\x02 \x01(\t\x12@\n\x08quantity\x18\x03 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12=\n\x05price\x18\x04 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12;\n\x03\x66\x65\x65\x18\x05 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"\xc7\x01\n\x08MatchRes\x12\x14\n\x0c\x62lock_height\x18\x01 \x01(\x03\x12=\n\x05price\x18\x02 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12@\n\x08quantity\x18\x03 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12$\n\x05\x64\x65\x61ls\x18\x04 \x03(\x0b\x32\x0f.fx.dex.v1.DealB\x04\xc8\xde\x1f\x00\"\xb1\x02\n\x0bProductLock\x12\x14\n\x0c\x62lock_height\x18\x01 \x01(\x03\x12=\n\x05price\x18\x02 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12@\n\x08quantity\x18\x03 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x44\n\x0c\x62uy_executed\x18\x04 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x45\n\rsell_executed\x18\x05 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"\x18\n\x07IntList\x12\r\n\x05items\x18\x01 \x03(\x03\"\x14\n\x03Int\x12\r\n\x05items\x18\x01 \x01(\x03\x42)Z\'github.com/functionx/fx-dex/x/dex/typesb\x06proto3'
+  serialized_pb=b'\n\x15\x66x/dex/v1/match.proto\x12\tfx.dex.v1\x1a\x14gogoproto/gogo.proto\x1a\x15\x66x/dex/v1/order.proto\"\x8a\x02\n\tOrderFill\x12%\n\x05order\x18\x01 \x01(\x0b\x32\x10.fx.dex.v1.OrderB\x04\xc8\xde\x1f\x00\x12\x42\n\ndeal_price\x18\x02 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12G\n\x0fquantity_filled\x18\x03 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12I\n\x11quantity_unfilled\x18\x04 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"<\n\nOrderFills\x12.\n\norder_fill\x18\x01 \x03(\x0b\x32\x14.fx.dex.v1.OrderFillB\x04\xc8\xde\x1f\x00\"F\n\x05Price\x12=\n\x05price\x18\x01 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"\x8d\x01\n\nOrderDepth\x12=\n\x05price\x18\x01 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12@\n\x08quantity\x18\x02 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"@\n\x0bOrderDepths\x12\x31\n\x0corder_depths\x18\x01 \x03(\x0b\x32\x15.fx.dex.v1.OrderDepthB\x04\xc8\xde\x1f\x00\"W\n\tOrderBook\x12$\n\x03\x62id\x18\x01 \x01(\x0b\x32\x11.fx.dex.v1.OrdersB\x04\xc8\xde\x1f\x00\x12$\n\x03\x61sk\x18\x02 \x01(\x0b\x32\x11.fx.dex.v1.OrdersB\x04\xc8\xde\x1f\x00\"\xdb\x01\n\rDepthBookItem\x12=\n\x05price\x18\x01 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x44\n\x0c\x62uy_quantity\x18\x02 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x45\n\rsell_quantity\x18\x03 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\":\n\tDepthBook\x12-\n\x05items\x18\x01 \x03(\x0b\x32\x18.fx.dex.v1.DepthBookItemB\x04\xc8\xde\x1f\x00\"\xc7\x01\n\x07Matcher\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12.\n\norder_book\x18\x02 \x01(\x0b\x32\x14.fx.dex.v1.OrderBookB\x04\xc8\xde\x1f\x00\x12G\n\x0flast_deal_price\x18\x03 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x32\n\x0c\x64\x65pth_curves\x18\x04 \x01(\x0b\x32\x16.fx.dex.v1.DepthCurvesB\x04\xc8\xde\x1f\x00\"\xe2\x03\n\x0bMatchResult\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12\x11\n\tbid_count\x18\x02 \x01(\x03\x12\x11\n\task_count\x18\x03 \x01(\x03\x12\x42\n\ndeal_price\x18\x04 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12J\n\x12matched_bid_volume\x18\x05 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12J\n\x12matched_ask_volume\x18\x06 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x46\n\x0emax_bid_volume\x18\x07 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x46\n\x0emax_ask_volume\x18\x08 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x30\n\x0border_fills\x18\t \x01(\x0b\x32\x15.fx.dex.v1.OrderFillsB\x04\xc8\xde\x1f\x00\"B\n\x0cMatchResults\x12\x32\n\x0cmatch_result\x18\x01 \x03(\x0b\x32\x16.fx.dex.v1.MatchResultB\x04\xc8\xde\x1f\x00\"`\n\tDealPrice\x12\x0f\n\x07pair_id\x18\x01 \x01(\t\x12\x42\n\ndeal_price\x18\x02 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"\xdc\x01\n\x0e\x44\x65pthCurveItem\x12=\n\x05price\x18\x01 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x45\n\rsell_quantity\x18\x02 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x44\n\x0c\x62uy_quantity\x18\x03 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"=\n\x0b\x44\x65pthCurves\x12.\n\x05items\x18\x01 \x03(\x0b\x32\x19.fx.dex.v1.DepthCurveItemB\x04\xc8\xde\x1f\x00\"\xff\x01\n\x04\x44\x65\x61l\x12\x10\n\x08order_id\x18\x01 \x01(\t\x12\x11\n\tdirection\x18\x02 \x01(\t\x12@\n\x08quantity\x18\x03 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12=\n\x05price\x18\x04 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12<\n\x03\x66\x65\x65\x18\x05 \x01(\tB/\xda\xde\x1f\'github.com/cosmos/cosmos-sdk/types.Coin\xc8\xde\x1f\x00\x12\x13\n\x0bposition_id\x18\x06 \x01(\t\"\xc7\x01\n\x08MatchRes\x12\x14\n\x0c\x62lock_height\x18\x01 \x01(\x03\x12=\n\x05price\x18\x02 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12@\n\x08quantity\x18\x03 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12$\n\x05\x64\x65\x61ls\x18\x04 \x03(\x0b\x32\x0f.fx.dex.v1.DealB\x04\xc8\xde\x1f\x00\"\xb1\x02\n\x0bProductLock\x12\x14\n\x0c\x62lock_height\x18\x01 \x01(\x03\x12=\n\x05price\x18\x02 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12@\n\x08quantity\x18\x03 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x44\n\x0c\x62uy_executed\x18\x04 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x45\n\rsell_executed\x18\x05 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"\x18\n\x07IntList\x12\r\n\x05items\x18\x01 \x03(\x03\"\x14\n\x03Int\x12\r\n\x05items\x18\x01 \x01(\x03\x42*Z(github.com/marginxio/marginx/x/dex/typesb\x06proto3'
   ,
   dependencies=[gogoproto_dot_gogo__pb2.DESCRIPTOR,fx_dot_dex_dot_v1_dot_order__pb2.DESCRIPTOR,])
 
@@ -665,7 +665,14 @@ _DEAL = _descriptor.Descriptor(
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=b'\332\336\037&github.com/cosmos/cosmos-sdk/types.Dec\310\336\037\000', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+      serialized_options=b'\332\336\037\'github.com/cosmos/cosmos-sdk/types.Coin\310\336\037\000', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='position_id', full_name='fx.dex.v1.Deal.position_id', index=5,
+      number=6, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -679,7 +686,7 @@ _DEAL = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=2205,
-  serialized_end=2438,
+  serialized_end=2460,
 )
 
 
@@ -731,8 +738,8 @@ _MATCHRES = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2441,
-  serialized_end=2640,
+  serialized_start=2463,
+  serialized_end=2662,
 )
 
 
@@ -791,8 +798,8 @@ _PRODUCTLOCK = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2643,
-  serialized_end=2948,
+  serialized_start=2665,
+  serialized_end=2970,
 )
 
 
@@ -823,8 +830,8 @@ _INTLIST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2950,
-  serialized_end=2974,
+  serialized_start=2972,
+  serialized_end=2996,
 )
 
 
@@ -855,8 +862,8 @@ _INT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2976,
-  serialized_end=2996,
+  serialized_start=2998,
+  serialized_end=3018,
 )
 
 _ORDERFILL.fields_by_name['order'].message_type = fx_dot_dex_dot_v1_dot_order__pb2._ORDER

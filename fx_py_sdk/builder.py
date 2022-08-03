@@ -18,7 +18,8 @@ from fx_py_sdk.wallet import PrivateKey as FxPrivateKey
 DEFAULT_DENOM = "USDT"
 
 class TxBuilder:
-    def __init__(self, account: Account,
+    def __init__(self,
+                 account: Account,
                  private_key: FxPrivateKey = b'',
                  chain_id: str = '',
                  account_number: int = -1,

@@ -12,17 +12,18 @@ _sym_db = _symbol_database.Default()
 
 
 from fx_py_sdk.codec.gogoproto import gogo_pb2 as gogoproto_dot_gogo__pb2
+from fx_py_sdk.codec.cosmos.base.v1beta1 import coin_pb2 as cosmos_dot_base_dot_v1beta1_dot_coin__pb2
 
 
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='fx/dex/v1/params.proto',
   package='fx.dex.v1',
   syntax='proto3',
-  serialized_options=b'Z\'github.com/functionx/fx-dex/x/dex/types',
+  serialized_options=b'Z(github.com/marginxio/marginx/x/dex/types',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x16\x66x/dex/v1/params.proto\x12\tfx.dex.v1\x1a\x14gogoproto/gogo.proto\"\xf5\x01\n\x06Params\x12@\n\x08\x66\x65\x65_rate\x18\x01 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12/\n\'force_liquidation_margin_rate_threshold\x18\x02 \x01(\x03\x12\x1b\n\x13order_expire_blocks\x18\x03 \x01(\x03\x12\x1b\n\x13max_deals_per_block\x18\x04 \x01(\x03\x12\x1e\n\x16max_orders_per_account\x18\x05 \x01(\x03\x12\x1e\n\x16permitted_max_leverage\x18\x06 \x01(\x03\"\xdf\x01\n\x07Reserve\x12H\n\x10\x61\x63\x63umulative_fee\x18\x01 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x44\n\x0crisk_reserve\x18\x02 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x44\n\x0clocked_funds\x18\x03 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x42)Z\'github.com/functionx/fx-dex/x/dex/typesb\x06proto3'
+  serialized_pb=b'\n\x16\x66x/dex/v1/params.proto\x12\tfx.dex.v1\x1a\x14gogoproto/gogo.proto\x1a\x1e\x63osmos/base/v1beta1/coin.proto\"\xbf\x02\n\x06Params\x12@\n\x08\x66\x65\x65_rate\x18\x01 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12/\n\'force_liquidation_margin_rate_threshold\x18\x02 \x01(\x03\x12\x1b\n\x13order_expire_blocks\x18\x03 \x01(\x03\x12\x1b\n\x13max_deals_per_block\x18\x04 \x01(\x03\x12\x1e\n\x16max_orders_per_account\x18\x05 \x01(\x03\x12\x1e\n\x16permitted_max_leverage\x18\x06 \x01(\x03\x12H\n\x10lock_coin_factor\x18\x07 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\"\xac\x03\n\x07Reserve\x12\x65\n\x10\x61\x63\x63umulative_fee\x18\x01 \x03(\x0b\x32\x19.cosmos.base.v1beta1.CoinB0\xaa\xdf\x1f(github.com/cosmos/cosmos-sdk/types.Coins\xc8\xde\x1f\x00\x12\x44\n\x0crisk_reserve\x18\x02 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x61\n\x0clocked_funds\x18\x03 \x03(\x0b\x32\x19.cosmos.base.v1beta1.CoinB0\xaa\xdf\x1f(github.com/cosmos/cosmos-sdk/types.Coins\xc8\xde\x1f\x00\x12H\n\x10short_pay_margin\x18\x04 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12G\n\x0flong_pay_margin\x18\x05 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x42*Z(github.com/marginxio/marginx/x/dex/typesb\x06proto3'
   ,
-  dependencies=[gogoproto_dot_gogo__pb2.DESCRIPTOR,])
+  dependencies=[gogoproto_dot_gogo__pb2.DESCRIPTOR,cosmos_dot_base_dot_v1beta1_dot_coin__pb2.DESCRIPTOR,])
 
 
 
@@ -77,6 +78,13 @@ _PARAMS = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='lock_coin_factor', full_name='fx.dex.v1.Params.lock_coin_factor', index=6,
+      number=7, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=b'\332\336\037&github.com/cosmos/cosmos-sdk/types.Dec\310\336\037\000', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
   ],
   extensions=[
   ],
@@ -89,8 +97,8 @@ _PARAMS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=60,
-  serialized_end=305,
+  serialized_start=92,
+  serialized_end=411,
 )
 
 
@@ -104,11 +112,11 @@ _RESERVE = _descriptor.Descriptor(
   fields=[
     _descriptor.FieldDescriptor(
       name='accumulative_fee', full_name='fx.dex.v1.Reserve.accumulative_fee', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
+      number=1, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=b'\332\336\037&github.com/cosmos/cosmos-sdk/types.Dec\310\336\037\000', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+      serialized_options=b'\252\337\037(github.com/cosmos/cosmos-sdk/types.Coins\310\336\037\000', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
       name='risk_reserve', full_name='fx.dex.v1.Reserve.risk_reserve', index=1,
       number=2, type=9, cpp_type=9, label=1,
@@ -118,7 +126,21 @@ _RESERVE = _descriptor.Descriptor(
       serialized_options=b'\332\336\037&github.com/cosmos/cosmos-sdk/types.Dec\310\336\037\000', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
       name='locked_funds', full_name='fx.dex.v1.Reserve.locked_funds', index=2,
-      number=3, type=9, cpp_type=9, label=1,
+      number=3, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=b'\252\337\037(github.com/cosmos/cosmos-sdk/types.Coins\310\336\037\000', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='short_pay_margin', full_name='fx.dex.v1.Reserve.short_pay_margin', index=3,
+      number=4, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=b'\332\336\037&github.com/cosmos/cosmos-sdk/types.Dec\310\336\037\000', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='long_pay_margin', full_name='fx.dex.v1.Reserve.long_pay_margin', index=4,
+      number=5, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -135,10 +157,12 @@ _RESERVE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=308,
-  serialized_end=531,
+  serialized_start=414,
+  serialized_end=842,
 )
 
+_RESERVE.fields_by_name['accumulative_fee'].message_type = cosmos_dot_base_dot_v1beta1_dot_coin__pb2._COIN
+_RESERVE.fields_by_name['locked_funds'].message_type = cosmos_dot_base_dot_v1beta1_dot_coin__pb2._COIN
 DESCRIPTOR.message_types_by_name['Params'] = _PARAMS
 DESCRIPTOR.message_types_by_name['Reserve'] = _RESERVE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
@@ -160,7 +184,10 @@ _sym_db.RegisterMessage(Reserve)
 
 DESCRIPTOR._options = None
 _PARAMS.fields_by_name['fee_rate']._options = None
+_PARAMS.fields_by_name['lock_coin_factor']._options = None
 _RESERVE.fields_by_name['accumulative_fee']._options = None
 _RESERVE.fields_by_name['risk_reserve']._options = None
 _RESERVE.fields_by_name['locked_funds']._options = None
+_RESERVE.fields_by_name['short_pay_margin']._options = None
+_RESERVE.fields_by_name['long_pay_margin']._options = None
 # @@protoc_insertion_point(module_scope)

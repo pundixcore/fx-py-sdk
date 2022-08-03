@@ -3,7 +3,7 @@ package fx.dex.v1;
 
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/functionx/fx-dex/x/dex/types";
+option go_package = "github.com/marginxio/marginx/x/dex/types";
 
 message TotalPositionSize {
   string size = 1 [
@@ -33,7 +33,7 @@ enum PosDirection {
 }
 
 // fundingfee (+: trader paid, -: trader received)
-// lastUpdateCumuFundingRate： calculating funding payment, record when trader open/reduce/close position
+// lastUpdateCumuFundingRate: calculating funding payment, record when trader open/reduce/close position
 message Position {
   string id = 1 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint",

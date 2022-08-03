@@ -2,8 +2,9 @@ syntax = "proto3";
 package fx.dex.v1;
 
 import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
 
-option go_package = "github.com/functionx/fx-dex/x/dex/types";
+option go_package = "github.com/marginxio/marginx/x/dex/types";
 
 //BOTH for query
 enum Direction {
@@ -28,6 +29,8 @@ enum OrderStatus {
     ORDER_PARTIAL_FILLED_CANCELLED  = 4 [(gogoproto.enumvalue_customname) = "ORDER_PARTIAL_FILLED_CANCELLED"];
     ORDER_PARTIAL_FILLED_EXPIRED  = 5 [(gogoproto.enumvalue_customname) = "ORDER_PARTIAL_FILLED_EXPIRED"];
     ORDER_EXPIRED  = 6 [(gogoproto.enumvalue_customname) = "ORDER_EXPIRED"];
+    ORDER_GASOUT = 7 [(gogoproto.enumvalue_customname) = "ORDER_GASOUT"];
+    ORDER_PRICE_LIMIT  = 8 [(gogoproto.enumvalue_customname) = "ORDER_PRICE_LIMIT"];
 }
 
 enum OrderType {
@@ -76,11 +79,11 @@ message Order {
     OrderStatus status = 12;
     OrderType order_type = 13;
     string cost_fee = 14 [
-        (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+        (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin",
         (gogoproto.nullable) = false
     ];
     string locked_fee = 15 [
-        (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+        (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin",
         (gogoproto.nullable) = false
     ];
 }
