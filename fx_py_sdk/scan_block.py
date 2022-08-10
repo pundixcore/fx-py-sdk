@@ -151,8 +151,6 @@ class ScanBlockBase:
                 order.filled_quantity = Decimal(value)
             elif key == EventKeys.filled_avg_price:
                 order.filled_avg_price = Decimal(value)
-            elif key == EventKeys.remain_locked:
-                order.remain_locked = Decimal(value)
             elif key == EventKeys.created_at:
                 if value.__contains__('T') and value.__contains__('Z'):
                     timestamp = Timestamp()
@@ -366,7 +364,7 @@ class ScanBlock(ScanBlockBase):
                 del update_dict['owner']    # we don't want to overwrite owner
         else:
             update_dict = {}
-            for attr in ['open_block_height', 'remain_locked']:
+            for attr in ['open_block_height']:
                 attr_val = getattr(order, attr)
                 if attr_val is not None and getattr(sql_order, attr) is None:
                     update_dict[attr] = attr_val
@@ -640,7 +638,7 @@ class ScanBlock(ScanBlockBase):
                     if sql_order is None:
                         self.__insert_order(order)
                     else:
-                        self.__update_order(order, sql_order)  # updates open_block_height, created_at, remain_locked
+                        self.__update_order(order, sql_order)  # updates open_block_height, created_at
 
                     self.process_orderbook(order, True, block_height)
 

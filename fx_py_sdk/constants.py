@@ -91,7 +91,6 @@ class Order(NamedTuple):
     QuoteQuantity: Decimal
     FilledQuantity: Decimal
     FilledAvgPrice: Decimal
-    RemainLocked: Decimal
     Leverage: int
     Status: str
     OrderType: str

@@ -67,7 +67,6 @@ class EventKeys:
     quote_quantity = "quote_quantity"
     filled_quantity = "filled_quantity"
     filled_avg_price = "filled_avg_price"
-    remain_locked = "remain_locked"
     created_at = "created_at"
     leverage = "leverage"
     status = "status"

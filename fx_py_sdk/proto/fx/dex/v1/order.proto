@@ -71,18 +71,14 @@ message Order {
         (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
         (gogoproto.nullable) = false
     ];
-    string remain_locked = 10 [
-        (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
-        (gogoproto.nullable) = false
-    ];
-    int64 leverage = 11;
-    OrderStatus status = 12;
-    OrderType order_type = 13;
-    string cost_fee = 14 [
+    int64 leverage = 10;
+    OrderStatus status = 11;
+    OrderType order_type = 12;
+    string cost_fee = 13 [
         (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin",
         (gogoproto.nullable) = false
     ];
-    string locked_fee = 15 [
+    string locked_fee = 14 [
         (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin",
         (gogoproto.nullable) = false
     ];

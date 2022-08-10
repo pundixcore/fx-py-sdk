@@ -22,7 +22,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=b'Z(github.com/marginxio/marginx/x/dex/types',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x15\x66x/dex/v1/order.proto\x12\tfx.dex.v1\x1a\x14gogoproto/gogo.proto\x1a\x1e\x63osmos/base/v1beta1/coin.proto\"\x17\n\x08OrderIDs\x12\x0b\n\x03ids\x18\x01 \x03(\t\"\xa3\x06\n\x05Order\x12\n\n\x02id\x18\x01 \x01(\t\x12@\n\x05owner\x18\x02 \x01(\x0c\x42\x31\xfa\xde\x1f-github.com/cosmos/cosmos-sdk/types.AccAddress\x12\x0f\n\x07pair_id\x18\x03 \x01(\t\x12\'\n\tdirection\x18\x04 \x01(\x0e\x32\x14.fx.dex.v1.Direction\x12=\n\x05price\x18\x05 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x45\n\rbase_quantity\x18\x06 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x46\n\x0equote_quantity\x18\x07 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12G\n\x0f\x66illed_quantity\x18\x08 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12H\n\x10\x66illed_avg_price\x18\t \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x45\n\rremain_locked\x18\n \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x10\n\x08leverage\x18\x0b \x01(\x03\x12&\n\x06status\x18\x0c \x01(\x0e\x32\x16.fx.dex.v1.OrderStatus\x12(\n\norder_type\x18\r \x01(\x0e\x32\x14.fx.dex.v1.OrderType\x12\x41\n\x08\x63ost_fee\x18\x0e \x01(\tB/\xda\xde\x1f\'github.com/cosmos/cosmos-sdk/types.Coin\xc8\xde\x1f\x00\x12\x43\n\nlocked_fee\x18\x0f \x01(\tB/\xda\xde\x1f\'github.com/cosmos/cosmos-sdk/types.Coin\xc8\xde\x1f\x00\"0\n\x06Orders\x12&\n\x06orders\x18\x01 \x03(\x0b\x32\x10.fx.dex.v1.OrderB\x04\xc8\xde\x1f\x00*\x8d\x01\n\tDirection\x12\x12\n\x04\x42OTH\x10\x00\x1a\x08\x8a\x9d \x04\x42OTH\x12\x10\n\x03\x42UY\x10\x01\x1a\x07\x8a\x9d \x03\x42UY\x12\x12\n\x04SELL\x10\x02\x1a\x08\x8a\x9d \x04SELL\x12\x1c\n\tMarketBuy\x10\x03\x1a\r\x8a\x9d \tMarketBuy\x12\x1e\n\nMarketSell\x10\x04\x1a\x0e\x8a\x9d \nMarketSell\x1a\x08\xa8\xa4\x1e\x01\x88\xa3\x1e\x00*\xc3\x03\n\x0bOrderStatus\x12$\n\rORDER_PENDING\x10\x00\x1a\x11\x8a\x9d \rORDER_PENDING\x12\"\n\x0cORDER_FILLED\x10\x01\x1a\x10\x8a\x9d \x0cORDER_FILLED\x12\x32\n\x14ORDER_PARTIAL_FILLED\x10\x02\x1a\x18\x8a\x9d \x14ORDER_PARTIAL_FILLED\x12(\n\x0fORDER_CANCELLED\x10\x03\x1a\x13\x8a\x9d \x0fORDER_CANCELLED\x12\x46\n\x1eORDER_PARTIAL_FILLED_CANCELLED\x10\x04\x1a\"\x8a\x9d \x1eORDER_PARTIAL_FILLED_CANCELLED\x12\x42\n\x1cORDER_PARTIAL_FILLED_EXPIRED\x10\x05\x1a \x8a\x9d \x1cORDER_PARTIAL_FILLED_EXPIRED\x12$\n\rORDER_EXPIRED\x10\x06\x1a\x11\x8a\x9d \rORDER_EXPIRED\x12\"\n\x0cORDER_GASOUT\x10\x07\x1a\x10\x8a\x9d \x0cORDER_GASOUT\x12,\n\x11ORDER_PRICE_LIMIT\x10\x08\x1a\x15\x8a\x9d \x11ORDER_PRICE_LIMIT\x1a\x08\xa8\xa4\x1e\x01\x88\xa3\x1e\x00*\xc7\x01\n\tOrderType\x12:\n\x18ORDER_TYPE_OPEN_POSITION\x10\x00\x1a\x1c\x8a\x9d \x18ORDER_TYPE_OPEN_POSITION\x12<\n\x19ORDER_TYPE_CLOSE_POSITION\x10\x01\x1a\x1d\x8a\x9d \x19ORDER_TYPE_CLOSE_POSITION\x12\x36\n\x16ORDER_TYPE_LIQUIDATION\x10\x02\x1a\x1a\x8a\x9d \x16ORDER_TYPE_LIQUIDATION\x1a\x08\xa8\xa4\x1e\x01\x88\xa3\x1e\x00\x42*Z(github.com/marginxio/marginx/x/dex/typesb\x06proto3'
+  serialized_pb=b'\n\x15\x66x/dex/v1/order.proto\x12\tfx.dex.v1\x1a\x14gogoproto/gogo.proto\x1a\x1e\x63osmos/base/v1beta1/coin.proto\"\x17\n\x08OrderIDs\x12\x0b\n\x03ids\x18\x01 \x03(\t\"\xdc\x05\n\x05Order\x12\n\n\x02id\x18\x01 \x01(\t\x12@\n\x05owner\x18\x02 \x01(\x0c\x42\x31\xfa\xde\x1f-github.com/cosmos/cosmos-sdk/types.AccAddress\x12\x0f\n\x07pair_id\x18\x03 \x01(\t\x12\'\n\tdirection\x18\x04 \x01(\x0e\x32\x14.fx.dex.v1.Direction\x12=\n\x05price\x18\x05 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x45\n\rbase_quantity\x18\x06 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x46\n\x0equote_quantity\x18\x07 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12G\n\x0f\x66illed_quantity\x18\x08 \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12H\n\x10\x66illed_avg_price\x18\t \x01(\tB.\xda\xde\x1f&github.com/cosmos/cosmos-sdk/types.Dec\xc8\xde\x1f\x00\x12\x10\n\x08leverage\x18\n \x01(\x03\x12&\n\x06status\x18\x0b \x01(\x0e\x32\x16.fx.dex.v1.OrderStatus\x12(\n\norder_type\x18\x0c \x01(\x0e\x32\x14.fx.dex.v1.OrderType\x12\x41\n\x08\x63ost_fee\x18\r \x01(\tB/\xda\xde\x1f\'github.com/cosmos/cosmos-sdk/types.Coin\xc8\xde\x1f\x00\x12\x43\n\nlocked_fee\x18\x0e \x01(\tB/\xda\xde\x1f\'github.com/cosmos/cosmos-sdk/types.Coin\xc8\xde\x1f\x00\"0\n\x06Orders\x12&\n\x06orders\x18\x01 \x03(\x0b\x32\x10.fx.dex.v1.OrderB\x04\xc8\xde\x1f\x00*\x8d\x01\n\tDirection\x12\x12\n\x04\x42OTH\x10\x00\x1a\x08\x8a\x9d \x04\x42OTH\x12\x10\n\x03\x42UY\x10\x01\x1a\x07\x8a\x9d \x03\x42UY\x12\x12\n\x04SELL\x10\x02\x1a\x08\x8a\x9d \x04SELL\x12\x1c\n\tMarketBuy\x10\x03\x1a\r\x8a\x9d \tMarketBuy\x12\x1e\n\nMarketSell\x10\x04\x1a\x0e\x8a\x9d \nMarketSell\x1a\x08\xa8\xa4\x1e\x01\x88\xa3\x1e\x00*\xc3\x03\n\x0bOrderStatus\x12$\n\rORDER_PENDING\x10\x00\x1a\x11\x8a\x9d \rORDER_PENDING\x12\"\n\x0cORDER_FILLED\x10\x01\x1a\x10\x8a\x9d \x0cORDER_FILLED\x12\x32\n\x14ORDER_PARTIAL_FILLED\x10\x02\x1a\x18\x8a\x9d \x14ORDER_PARTIAL_FILLED\x12(\n\x0fORDER_CANCELLED\x10\x03\x1a\x13\x8a\x9d \x0fORDER_CANCELLED\x12\x46\n\x1eORDER_PARTIAL_FILLED_CANCELLED\x10\x04\x1a\"\x8a\x9d \x1eORDER_PARTIAL_FILLED_CANCELLED\x12\x42\n\x1cORDER_PARTIAL_FILLED_EXPIRED\x10\x05\x1a \x8a\x9d \x1cORDER_PARTIAL_FILLED_EXPIRED\x12$\n\rORDER_EXPIRED\x10\x06\x1a\x11\x8a\x9d \rORDER_EXPIRED\x12\"\n\x0cORDER_GASOUT\x10\x07\x1a\x10\x8a\x9d \x0cORDER_GASOUT\x12,\n\x11ORDER_PRICE_LIMIT\x10\x08\x1a\x15\x8a\x9d \x11ORDER_PRICE_LIMIT\x1a\x08\xa8\xa4\x1e\x01\x88\xa3\x1e\x00*\xc7\x01\n\tOrderType\x12:\n\x18ORDER_TYPE_OPEN_POSITION\x10\x00\x1a\x1c\x8a\x9d \x18ORDER_TYPE_OPEN_POSITION\x12<\n\x19ORDER_TYPE_CLOSE_POSITION\x10\x01\x1a\x1d\x8a\x9d \x19ORDER_TYPE_CLOSE_POSITION\x12\x36\n\x16ORDER_TYPE_LIQUIDATION\x10\x02\x1a\x1a\x8a\x9d \x16ORDER_TYPE_LIQUIDATION\x1a\x08\xa8\xa4\x1e\x01\x88\xa3\x1e\x00\x42*Z(github.com/marginxio/marginx/x/dex/typesb\x06proto3'
   ,
   dependencies=[gogoproto_dot_gogo__pb2.DESCRIPTOR,cosmos_dot_base_dot_v1beta1_dot_coin__pb2.DESCRIPTOR,])
 
@@ -61,8 +61,8 @@ _DIRECTION = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=b'\250\244\036\001\210\243\036\000',
-  serialized_start=972,
-  serialized_end=1113,
+  serialized_start=901,
+  serialized_end=1042,
 )
 _sym_db.RegisterEnumDescriptor(_DIRECTION)
 
@@ -122,8 +122,8 @@ _ORDERSTATUS = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=b'\250\244\036\001\210\243\036\000',
-  serialized_start=1116,
-  serialized_end=1567,
+  serialized_start=1045,
+  serialized_end=1496,
 )
 _sym_db.RegisterEnumDescriptor(_ORDERSTATUS)
 
@@ -153,8 +153,8 @@ _ORDERTYPE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=b'\250\244\036\001\210\243\036\000',
-  serialized_start=1570,
-  serialized_end=1769,
+  serialized_start=1499,
+  serialized_end=1698,
 )
 _sym_db.RegisterEnumDescriptor(_ORDERTYPE)
 
@@ -283,43 +283,36 @@ _ORDER = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       serialized_options=b'\332\336\037&github.com/cosmos/cosmos-sdk/types.Dec\310\336\037\000', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='remain_locked', full_name='fx.dex.v1.Order.remain_locked', index=9,
-      number=10, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=b'\332\336\037&github.com/cosmos/cosmos-sdk/types.Dec\310\336\037\000', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='leverage', full_name='fx.dex.v1.Order.leverage', index=10,
-      number=11, type=3, cpp_type=2, label=1,
+      name='leverage', full_name='fx.dex.v1.Order.leverage', index=9,
+      number=10, type=3, cpp_type=2, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='status', full_name='fx.dex.v1.Order.status', index=11,
+      name='status', full_name='fx.dex.v1.Order.status', index=10,
+      number=11, type=14, cpp_type=8, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='order_type', full_name='fx.dex.v1.Order.order_type', index=11,
       number=12, type=14, cpp_type=8, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='order_type', full_name='fx.dex.v1.Order.order_type', index=12,
-      number=13, type=14, cpp_type=8, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-    _descriptor.FieldDescriptor(
-      name='cost_fee', full_name='fx.dex.v1.Order.cost_fee', index=13,
-      number=14, type=9, cpp_type=9, label=1,
+      name='cost_fee', full_name='fx.dex.v1.Order.cost_fee', index=12,
+      number=13, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=b'\332\336\037\'github.com/cosmos/cosmos-sdk/types.Coin\310\336\037\000', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='locked_fee', full_name='fx.dex.v1.Order.locked_fee', index=14,
-      number=15, type=9, cpp_type=9, label=1,
+      name='locked_fee', full_name='fx.dex.v1.Order.locked_fee', index=13,
+      number=14, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -337,7 +330,7 @@ _ORDER = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=116,
-  serialized_end=919,
+  serialized_end=848,
 )
 
 
@@ -368,8 +361,8 @@ _ORDERS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=921,
-  serialized_end=969,
+  serialized_start=850,
+  serialized_end=898,
 )
 
 _ORDER.fields_by_name['direction'].enum_type = _DIRECTION
@@ -433,7 +426,6 @@ _ORDER.fields_by_name['base_quantity']._options = None
 _ORDER.fields_by_name['quote_quantity']._options = None
 _ORDER.fields_by_name['filled_quantity']._options = None
 _ORDER.fields_by_name['filled_avg_price']._options = None
-_ORDER.fields_by_name['remain_locked']._options = None
 _ORDER.fields_by_name['cost_fee']._options = None
 _ORDER.fields_by_name['locked_fee']._options = None
 _ORDERS.fields_by_name['orders']._options = None

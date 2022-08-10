@@ -126,17 +126,20 @@ message QueryStoreStatisticReq {}
 
 message QueryStoreStatisticResp {
     int64 store_order_num = 1;
-    repeated DepthBookNum depth_book_nums = 2 [(gogoproto.nullable) = false];
-    repeated BookOrderIDsNum book_order_ids_nums = 3 [(gogoproto.nullable) = false];
+    int64 orderbook_size = 2;
+    int64 orderbook_length = 3;
 
-    message DepthBookNum {
-        string pair_id = 1;
-        int64 value =2;
-    }
-    message BookOrderIDsNum {
-        string order_ids_key = 1;
-        int64 value =2;
-    }
+  //    repeated DepthBookNum depth_book_nums = 2 [(gogoproto.nullable) = false];
+//    repeated BookOrderIDsNum book_order_ids_nums = 3 [(gogoproto.nullable) = false];
+
+//    message DepthBookNum {
+//        string pair_id = 1;
+//        int64 value =2;
+//    }
+//    message BookOrderIDsNum {
+//        string order_ids_key = 1;
+//        int64 value =2;
+//    }
 }
 
 message QueryMAReq {
@@ -208,14 +211,9 @@ message QueryOrderbookReq {
     string  pair_id = 1;
 }
 
-message  BookResItem {
-    string price = 1;
-    string quantity = 2;
-}
-
 message QueryOrderbookResp {
-    repeated BookResItem Asks = 1 [(gogoproto.nullable) = false];
-    repeated BookResItem Bids = 2 [(gogoproto.nullable) = false];
+    repeated OrderDepth Asks = 1 [(gogoproto.nullable) = false];
+    repeated OrderDepth Bids = 2 [(gogoproto.nullable) = false];
 }
 
 ///////////////////// positions query ///////////////////////////

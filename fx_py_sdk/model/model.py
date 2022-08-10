@@ -43,7 +43,6 @@ class Order(Base):
     filled_quantity = Column(Numeric)
     last_filled_quantity = Column(Numeric)
     filled_avg_price = Column(Numeric)
-    remain_locked = Column(Numeric)
     leverage = Column(Integer)
     status = Column(String(50), index=True)
     order_type = Column(String(50), index=True)

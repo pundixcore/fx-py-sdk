@@ -176,7 +176,6 @@ class GRPCClient:
                 quote_quantity = decimal.Decimal(order['quoteQuantity'])
                 filled_quantity = decimal.Decimal(order['filledQuantity'])
                 filled_avg_price = decimal.Decimal(order['filledAvgPrice'])
-                remain_locked = decimal.Decimal(order['remainLocked'])
                 cost_fee = decimal.Decimal(order['costFee'])
                 locked_fee = decimal.Decimal(order['lockedFee'])
 
@@ -190,12 +189,11 @@ class GRPCClient:
                     quote_quantity,
                     filled_quantity,
                     filled_avg_price,
-                    remain_locked,
                     order['leverage'],
                     order['statusName'],
                     order['orderTypeName'],
                     cost_fee,
-                    locked_fee,)
+                    locked_fee)
 
                 orders.append(new_order)
 
@@ -325,7 +323,6 @@ class GRPCClient:
                 quote_quantity	string	开单占用保证金数量	
                 filled_quantity	string	订单已成交数量	
                 filled_avg_price	string	订单已成交均价	
-                remain_locked	string	订单剩余未成交数量
                 created_at	string	创建时间
                 leverage	int64	杠杆
                 status	OrderStatus	订单状态
@@ -334,7 +331,7 @@ class GRPCClient:
                 locked_fee	string｜ 锁定费用
 
                 example:
-                    Order(Id='ID-706-1', Owner='dex1ggz598a4506llaglzsmhp3r23hfke6nw29wans', PairId='tsla:usdc', Direction=0, Price=1000.4, BaseQuantity=0.5, QuoteQuantity=50.02, FilledQuantity=0.0, FilledAvgPrice=0.0, RemainLocked=500.2, Leverage=10, Status=0, OrderType=0, CostFee=0.0, LockedFee=0.20008)
+                    Order(Id='ID-706-1', Owner='dex1ggz598a4506llaglzsmhp3r23hfke6nw29wans', PairId='tsla:usdc', Direction=0, Price=1000.4, BaseQuantity=0.5, QuoteQuantity=50.02, FilledQuantity=0.0, FilledAvgPrice=0.0, Leverage=10, Status=0, OrderType=0, CostFee=0.0, LockedFee=0.20008)
         """
         if not use_db:
             response = DexQuery(self.channel).QueryOrder(QueryOrderRequest(order_id=order_id))
@@ -354,9 +351,6 @@ class GRPCClient:
             filled_avg_price = decimal.Decimal(order.filled_avg_price)
             filled_avg_price = filled_avg_price / decimal.Decimal(DEFAULT_DEC)
 
-            remain_locked = decimal.Decimal(order.remain_locked)
-            remain_locked = remain_locked / decimal.Decimal(DEFAULT_DEC)
-
             locked_fee_amount = ''.join(re.split(r'[^0-9]', order.locked_fee))
             cost_fee_amount = ''.join(re.split(r'[^0-9]', order.cost_fee))
 
@@ -369,7 +363,6 @@ class GRPCClient:
             checksumAddr = eth_utils.to_checksum_address(Address_Prefix + order.owner.hex())
 
             new_order = Order(
-                # order.tx_hash,
                 order.id,
                 checksumAddr,
                 order.pair_id,
@@ -379,14 +372,12 @@ class GRPCClient:
                 quote_quantity,
                 filled_quantity,
                 filled_avg_price,
-                remain_locked,
                 order.leverage,
                 order.status,
                 order.order_type,
                 cost_fee,
                 locked_fee,
                 fee_denom,
-                # order.created_at.ToSeconds()
             )
 
         else:
@@ -398,7 +389,6 @@ class GRPCClient:
 
             order = response.Order
             new_order = Order(
-                # order.tx_hash,
                 order.order_id,
                 order.owner,
                 order.pair_id,
@@ -408,14 +398,12 @@ class GRPCClient:
                 order.quote_quantity,
                 order.filled_quantity,
                 order.filled_avg_price,
-                order.remain_locked,
                 order.leverage,
                 order.status,
                 order.order_type,
                 order.cost_fee,
                 order.locked_fee,
                 order.fee_denom,
-                # order.created_at,
                 order.last_filled_quantity,
                 response.time,
                 trades
@@ -453,8 +441,8 @@ class GRPCClient:
             Returns:
                 orders	Orders	订单列表
                 example:
-            [Order(Id='ID-5-1', Owner='dex1ggz598a4506llaglzsmhp3r23hfke6nw29wans', PairId='tsla:usdc', Direction=0, Price=1000.4, BaseQuantity=0.5, QuoteQuantity=50.02, FilledQuantity=0.0, FilledAvgPrice=0.0, RemainLocked=500.2, Leverage=10, Status=0, OrderType=0, CostFee=0.0, LockedFee=0.20008),
-            Order(Id='ID-7-1', Owner='dex1ggz598a4506llaglzsmhp3r23hfke6nw29wans', PairId='tsla:usdc', Direction=0, Price=1000.4, BaseQuantity=0.5, QuoteQuantity=50.02, FilledQuantity=0.0, FilledAvgPrice=0.0, RemainLocked=500.2, Leverage=10, Status=0, OrderType=0, CostFee=0.0, LockedFee=0.20008)]
+            [Order(Id='ID-5-1', Owner='dex1ggz598a4506llaglzsmhp3r23hfke6nw29wans', PairId='tsla:usdc', Direction=0, Price=1000.4, BaseQuantity=0.5, QuoteQuantity=50.02, FilledQuantity=0.0, FilledAvgPrice=0.0, Leverage=10, Status=0, OrderType=0, CostFee=0.0, LockedFee=0.20008),
+            Order(Id='ID-7-1', Owner='dex1ggz598a4506llaglzsmhp3r23hfke6nw29wans', PairId='tsla:usdc', Direction=0, Price=1000.4, BaseQuantity=0.5, QuoteQuantity=50.02, FilledQuantity=0.0, FilledAvgPrice=0.0, Leverage=10, Status=0, OrderType=0, CostFee=0.0, LockedFee=0.20008)]
         """
 
         orders = []
@@ -481,9 +469,6 @@ class GRPCClient:
                 filled_avg_price = filled_avg_price / \
                     decimal.Decimal(DEFAULT_DEC)
 
-                remain_locked = decimal.Decimal(order.remain_locked)
-                remain_locked = remain_locked / decimal.Decimal(DEFAULT_DEC)
-
                 locked_fee_amount = ''.join(re.split(r'[^0-9]', order.locked_fee))
                 cost_fee_amount = ''.join(re.split(r'[^0-9]', order.cost_fee))
 
@@ -496,8 +481,7 @@ class GRPCClient:
                 checksumAddr = eth_utils.to_checksum_address(Address_Prefix + order.owner.hex())
 
                 new_order = Order(
-                    # order.tx_hash,
-                    order.id,
+                    order.order_id,
                     checksumAddr,
                     order.pair_id,
                     order.direction,
@@ -506,14 +490,12 @@ class GRPCClient:
                     quote_quantity,
                     filled_quantity,
                     filled_avg_price,
-                    remain_locked,
                     order.leverage,
                     order.status,
                     order.order_type,
                     cost_fee,
                     locked_fee,
                     fee_denom,
-                    # MessageToJson(order.created_at),
                 )
                 orders.append(new_order)
 
@@ -557,7 +539,6 @@ class GRPCClient:
                     decimal.Decimal(order.quote_quantity),
                     decimal.Decimal(order.filled_quantity),
                     decimal.Decimal(order.filled_avg_price),
-                    decimal.Decimal(order.remain_locked),
                     order.leverage,
                     order.status,
                     order.order_type,
