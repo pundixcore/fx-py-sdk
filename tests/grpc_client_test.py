@@ -16,7 +16,7 @@ from fx_py_sdk.codec.cosmos.base.v1beta1.coin_pb2 import Coin
 from fx_py_sdk.ibc_transfer import ConfigsKeys, Ibc_transfer
 
 # client = GRPCClient('https://testnet-tsla-grpc.marginx.io:9090')
-client = GRPCClient('127.0.0.1:9090')
+client = GRPCClient('192.168.21.121:9090')
 pair_id = "BTC:USDT"
 mnemonic = "language hazard giraffe bonus lock over bleak absorb senior depth guard entire end creek monster type whip purchase explain merge acid depth air reveal"
 
@@ -70,7 +70,7 @@ class MyTestCase(unittest.TestCase):
         # print(owner.to_string())
 
     def test_query_order(self):
-        resp = client.query_order(order_id='ID-5-1')
+        resp = client.query_order(order_id='ID-10-1')
         print(resp)
 
     def test_query_orders(self):
