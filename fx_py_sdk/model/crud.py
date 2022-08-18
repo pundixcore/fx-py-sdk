@@ -28,8 +28,8 @@ class Crud:
         session = self.DBSession()
         try:
             yield session
-        except:
-            logging.warning("DB Exception: {ex}. Rolling back...")
+        except Exception as ex:
+            logging.error(f"DB Exception: {ex}. Rolling back...", exc_info=True)
             session.rollback()
         finally:
             session.close()
@@ -70,8 +70,17 @@ class Crud:
     def get_positions(self, address: str):
         return self.session.query(Position).filter(Position.owner == address)
 
-    def get_orders_by_owner(self, owner: str) -> List[Order]:
-        return self.session.query(Order).filter(Order.owner == owner)
+    def get_orders_by_owner(self, owner: str, pair_id: str = None) -> List[Order]:
+        filter_conditions = [Order.owner == owner]
+        if pair_id:
+            filter_conditions.append(Order.pair_id == pair_id)
+        return self.session.query(Order).filter(*filter_conditions)
+
+    def get_orders_by_txhash(self, tx_hashes: List[str], pair_id: str = None) -> List[Order]:
+        filter_conditions = [Order.pair_id == pair_id]
+        if pair_id:
+            filter_conditions.append(Order.tx_hash.in_(tx_hashes))
+        return self.session.query(Order).filter(*filter_conditions)
 
     def get_latest_orderbook_record(self, price, pair_id, direction):
         return (self.session.query(Orderbook)

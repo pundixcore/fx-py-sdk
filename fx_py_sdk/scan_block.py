@@ -2,6 +2,7 @@ import base64
 from collections import defaultdict, deque
 import datetime as dt
 from sqlite3 import IntegrityError
+from typing import Tuple
 from fx_py_sdk.model.block import *
 from fx_py_sdk.model.crud import *
 from fx_py_sdk.fx_rpc.rpc import *
@@ -126,6 +127,13 @@ class ScanBlockBase:
                 position.pending_order_quantity = Decimal(value)
         return position
 
+    def _get_fee(self, value: str) -> Tuple[Decimal, str]:
+        """Given a fee string (e.g. '2000USDT'), returns a tuple of (fee_amount, fee_denom) (e.g. Decimal('2000'), 'USDT')"""
+        amount = re.search(r'^[0-9]*', value).group()
+        fee_amount = Decimal(amount) if amount else Decimal("0")
+        fee_denom = re.search(r'[A-Za-z]+', value).group()
+        return fee_amount, fee_denom
+
     def get_order(self, attributes: []) -> Order:
         """decode order data"""
         order = Order()
@@ -173,15 +181,21 @@ class ScanBlockBase:
             elif key == EventKeys.order_type:
                 order.order_type = value
             elif key == EventKeys.cost_fee:
-                order.cost_fee = Decimal(value)
+                order.cost_fee, order.fee_denom = self._get_fee(value)
             elif key == EventKeys.locked_fee:
-                order.locked_fee = Decimal(value)
+                order.locked_fee, order.fee_denom = self._get_fee(value)
             elif key == EventKeys.cancel_time:  # only cancel order or expire order have cancel_time
                 timestamp = Timestamp()
                 timestamp.FromJsonString(value),
                 block_datetime = dt.datetime.utcfromtimestamp(
                     timestamp.ToSeconds())
                 order.cancel_time = block_datetime
+            elif key == EventKeys.position_id:
+                order.position_id = int(value)
+            elif key == EventKeys.deal_fee:
+                order.deal_fee, order.fee_denom = self._get_fee(value)
+            elif key == EventKeys.maker:
+                order.maker = value == "true"
 
         return order
 
@@ -218,7 +232,16 @@ class ScanBlockBase:
             elif key == EventKeys.order_type:
                 trade.order_type = value
             elif key == EventKeys.cost_fee:
-                trade.cost_fee = Decimal(value)
+                trade.cost_fee, trade.fee_denom = self._get_fee(value)
+            elif key == EventKeys.locked_fee:
+                trade.locked_fee, trade.fee_denom = self._get_fee(value)
+            elif key == EventKeys.position_id:
+                trade.position_id = int(value)
+            elif key == EventKeys.deal_fee:
+                trade.deal_fee, trade.fee_denom = self._get_fee(value)
+            elif key == EventKeys.maker:
+                trade.maker = value == "true"
+
         return trade
 
     def get_funding_rate(self, attributes: []) -> FundingRate:
@@ -352,10 +375,10 @@ class ScanBlock(ScanBlockBase):
     _order_statuses_to_ignore = set(['ORDER_FILLED', 'ORDER_CANCELLED', 'ORDER_PARTIAL_FILLED_CANCELLED', 'ORDER_PARTIAL_FILLED_EXPIRED', 'ORDER_EXPIRED'])
     def __update_order(self, order: Order, sql_order: Order):
         # we want to keep only latest order in database
-        if sql_order.status in self._order_statuses_to_ignore:
+        if sql_order.status in self._order_statuses_to_ignore and sql_order.maker is not None:
             return
+        
         order.id = sql_order.id
-
         if order.block_height >= sql_order.block_height:
             if order.status=='ORDER_FILLED':
                 order.base_quantity = order.quote_quantity = Decimal('0')
@@ -394,6 +417,12 @@ class ScanBlock(ScanBlockBase):
             else:
                 order.status = 'ORDER_PARTIAL_FILLED'
 
+        trade.block_height = block_height
+        if order.order_type=='ORDER_TYPE_LIQUIDATION':
+            trade.liquidation_owner = trade.owner
+            trade.owner = sql_order.owner if sql_order else order.owner
+
+        # Insert order
         if sql_order is None:
             order.open_block_height = block_height  # could be incorrect
             order.initial_base_quantity = order.base_quantity
@@ -401,10 +430,7 @@ class ScanBlock(ScanBlockBase):
         else:
             self.__update_order(order, sql_order)
 
-        trade.block_height = block_height
-        if order.order_type=='ORDER_TYPE_LIQUIDATION':
-            trade.liquidation_owner = trade.owner
-            trade.owner = sql_order.owner if sql_order else order.owner
+        # Then trade
         self.crud.insert(trade)
 
     def update_position(self, event: Dict, block_height: int):
@@ -528,7 +554,11 @@ class ScanBlock(ScanBlockBase):
                 order = self.get_order(event[BlockResponse.Attributes])
                 order.open_block_height = block_height
                 order.block_height = block_height
-                order.initial_base_quantity = order.base_quantity
+                if order.base_quantity:     # remaining open quantity > 0
+                    order.initial_base_quantity = order.base_quantity
+                else:                       # filled on open
+                    order.initial_base_quantity = order.filled_quantity
+                    order.filled_block_height = block_height
 
                 # owner of liquidation order is DEX wallet
                 # overwrite with position owner
@@ -629,7 +659,11 @@ class ScanBlock(ScanBlockBase):
                     order.tx_hash = tx_hash
                     order.open_block_height = block_height
                     order.block_height = block_height
-                    order.initial_base_quantity = order.base_quantity
+                    if order.base_quantity:     # remaining open quantity > 0
+                        order.initial_base_quantity = order.base_quantity
+                    else:                       # filled on open
+                        order.initial_base_quantity = order.filled_quantity
+                        order.filled_block_height = block_height
 
                     sql_order = self.crud.filterone(
                         Order,

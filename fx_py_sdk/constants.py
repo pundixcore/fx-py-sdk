@@ -142,3 +142,4 @@ PAIR_IDS = [
 BASE_URL = "https://trade.testnet.marginx.io/dex/common/"
 ORDERBOOK_ENDPOINT = "queryOrderBook"
 PRICING_ENDPOINT = "queryPair"
+FUNDING_ENDPOINT = "getFundingRateRealTime"

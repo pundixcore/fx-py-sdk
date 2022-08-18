@@ -26,6 +26,7 @@ BLOCK_HEIGHT_DIFF_THRESOLD = int(os.environ.get("BLOCK_HEIGHT_DIFF_THRESHOLD", "
 if __name__ == "__main__":
     logging.getLogger().setLevel(logging.INFO)
     logging.info("Started integrity checking loop...")
+    time.sleep(10)
 
     crud = Crud()
     engine = crud.session.get_bind()

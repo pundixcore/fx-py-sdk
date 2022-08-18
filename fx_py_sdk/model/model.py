@@ -48,10 +48,14 @@ class Order(Base):
     order_type = Column(String(50), index=True)
     cost_fee = Column(Numeric)
     locked_fee = Column(Numeric)
+    fee_denom = Column(String(10))
     open_block_height = Column(Integer, index=True)
     cancel_block_height = Column(Integer)
     filled_block_height = Column(Integer)
     cancel_time = Column(DateTime)
+    position_id = Column(Integer)
+    deal_fee = Column(Numeric)
+    maker = Column(Boolean)
     block_height = Column(Integer, index=True)
     initial_base_quantity = Column(Numeric)
 
@@ -109,6 +113,10 @@ class Trade(Base):
     order_type = Column(String(50))
     cost_fee = Column(Numeric)
     locked_fee = Column(Numeric)
+    fee_denom = Column(String(10))
+    deal_fee = Column(Numeric)
+    maker = Column(Boolean)
+    position_id = Column(Integer)
     block_height = Column(Integer, index=True)
 
 class FundingTransfer(Base):
@@ -211,11 +219,14 @@ class Pricing(Base):
 
 class FundingRate(Base):
     __tablename__ = 'funding_rate'
+    __table_args__ = (
+        UniqueConstraint('pair_id', 'block_height'),
+    )
 
     id = Column('id', Integer, primary_key=True, autoincrement=True)
     pair_id = Column(String(20), index=True)
     rate = Column(Numeric)
-    funding_times = Column(Integer)
+    # funding_times = Column(Integer)
     block_height = Column(Integer, index=True)
 
 class Wallet(Base):

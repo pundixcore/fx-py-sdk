@@ -416,23 +416,30 @@ class PricingScan:
         self._update_interval_seconds = update_interval_seconds
         self.crud = Crud()
         self._pricing_dict: Dict[str, Pricing] = None
+        self._funding_dict: Dict[str, FundingRate] = None
 
         base_url = base_url or constants.BASE_URL
         self._orderbook_url = base_url + constants.ORDERBOOK_ENDPOINT
         self._pricing_url = base_url + constants.PRICING_ENDPOINT
+        self._funding_url = base_url + constants.FUNDING_ENDPOINT
 
     def _orderbook_callback(self, data: Dict):
         pair_id: str = data["pair"]
+        block_height = int(data["blockHeight"])
         bids = data["bidOrderBookList"]
         asks = data["askOrderBookList"]
 
         pricing = self._pricing_dict[pair_id]
         pricing.pair_id = pair_id
-        pricing.block_height = int(data["blockHeight"])
+        pricing.block_height = block_height
         if bids:
             pricing.best_bid = Decimal(bids[0]["price"])
         if asks:
             pricing.best_ask = Decimal(asks[0]["price"])
+
+        funding_rate = self._funding_dict[pair_id]
+        funding_rate.pair_id = pair_id
+        funding_rate.block_height = block_height
 
     def _pricing_callback(self, data: Dict):
         for pair_data in data:
@@ -441,6 +448,11 @@ class PricingScan:
             pricing = self._pricing_dict[pair_id]
             pricing.oracle_price = Decimal(pair_data["oraclePrice"])
             pricing.mark_price = Decimal(pair_data["markPrice"])
+
+    def _funding_callback(self, data: Dict):
+        pair_id: str = data["pair"]
+        funding_rate: FundingRate = self._funding_dict[pair_id]
+        funding_rate.rate = Decimal(data["latestFundingRate"])
 
     def response_with_callback(
         self,
@@ -459,35 +471,46 @@ class PricingScan:
                 data = response.json()["data"]
                 response_callback(data)
             else:
-                logging.error(f"Error response from OrderBook endpoint: {response.json()}")
+                logging.error(f"Error response from {rest_url}: {response.json()}")
         except Exception as ex:
-            logging.error(f"Error updating bid/ask and oracle/mark prices from web endpoints: {ex}")
+            logging.error(f"Error updating from {rest_url}: {ex}")
         finally:
             time.sleep(1)
 
 
     def update_pricings(self):
         self._pricing_dict = defaultdict(lambda: Pricing())
+        self._funding_dict = defaultdict(lambda: FundingRate())
         thread_list: List[threading.Thread] = []
 
-        # Orderbook queries
+        """Orderbook queries"""
         for pair_id in constants.PAIR_IDS:
             thread_list.append(threading.Thread(
                 target=self.response_with_callback,
                 args=(self._orderbook_url, { "pair": pair_id }, self._orderbook_callback),
             ))
 
-        # Oracle + mark price query
+        """Oracle + mark price queries"""
         thread_list.append(threading.Thread(
             target=self.response_with_callback,
             args=(self._pricing_url, {}, self._pricing_callback),
         ))
 
+        """Funding rate queries"""
+        for pair_id in constants.PAIR_IDS:
+            thread_list.append(threading.Thread(
+                target=self.response_with_callback,
+                args=(self._funding_url, { "pair": pair_id }, self._funding_callback),
+            ))
+
+        """Make requests asynchronously"""
         for t in thread_list:
             t.start()
         for t in thread_list:
             t.join()
 
+        """Save records to database"""
+        # Pricing (bid, ask, oracle, mark)
         for pricing in self._pricing_dict.values():
             sql_pricing = self.crud.filterone(
                 Pricing,
@@ -496,6 +519,15 @@ class PricingScan:
 
             if not sql_pricing:
                 self.crud.insert(pricing)
+
+        # Funding rate
+        for funding in self._funding_dict.values():
+            sql_funding = self.crud.filterone(
+                FundingRate,
+                FundingRate.pair_id == funding.pair_id, FundingRate.block_height == funding.block_height
+            )
+            if not sql_funding:
+                self.crud.insert(funding)
 
     def update_pricings_looped(self):
         while True:

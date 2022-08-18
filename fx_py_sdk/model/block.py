@@ -73,7 +73,9 @@ class EventKeys:
     order_type = "order_type"
     cost_fee = "cost_fee"
     locked_fee = "locked_fee"
+    deal_fee = "deal_fee"
     cancel_time = "cancel_time"
+    maker = "maker"
 
     """positions"""
     id = "id"

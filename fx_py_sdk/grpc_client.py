@@ -481,7 +481,7 @@ class GRPCClient:
                 checksumAddr = eth_utils.to_checksum_address(Address_Prefix + order.owner.hex())
 
                 new_order = Order(
-                    order.order_id,
+                    order.id,
                     checksumAddr,
                     order.pair_id,
                     order.direction,
