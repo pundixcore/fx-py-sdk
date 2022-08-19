@@ -1,36 +1,36 @@
 IBC_CHANNELS:
   AAPL_FXCore: "channel-0"
-  FXCore_AAPL: "channel-38"
+  FXCore_AAPL: "channel-49"
 
   AMZ_FXCore: "channel-0"
-  FXCore_AMZ: "channel-39"
+  FXCore_AMZ: "channel-50"
 
   BTC_FXCore: "channel-0"
-  FXCore_BTC: "channel-40"
+  FXCore_BTC: "channel-51"
 
   FB_FXCore: "channel-0"
-  FXCore_FB: "channel-41"
+  FXCore_FB: "channel-52"
 
   FX_FXCore: "channel-0"
-  FXCore_FX: "channel-42"
+  FXCore_FX: "channel-53"
 
   GOOG_FXCore: "channel-0"
-  FXCore_GOOG: "channel-43"
+  FXCore_GOOG: "channel-54"
 
   IWM_FXCore: "channel-0"
-  FXCore_IWM: "channel-44"
+  FXCore_IWM: "channel-55"
 
   NFLX_FXCore: "channel-0"
-  FXCore_NFLX: "channel-45"
+  FXCore_NFLX: "channel-56"
 
   SPY_FXCore: "channel-0"
-  FXCore_SPY: "channel-46"
+  FXCore_SPY: "channel-57"
 
   TQQQ_FXCore: "channel-0"
-  FXCore_TQQQ: "channel-47"
+  FXCore_TQQQ: "channel-58"
 
   TSLA_FXCore: "channel-0"
-  FXCore_TSLA: "channel-48"
+  FXCore_TSLA: "channel-59"
 
 GRPC:
   TSLA: "https://testnet-tsla-grpc.marginx.io:9090"
