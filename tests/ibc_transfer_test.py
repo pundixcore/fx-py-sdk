@@ -30,7 +30,7 @@ class MyTestCase(unittest.TestCase):
                                None,
                                header.chain_id,
                                account_info.account_number,
-                               Coin(amount='600', denom='USDT'))
+                               Coin(amount='6', denom='USDT'))
         ibc_conf = Ibc_transfer()
 
         priv_key = wallet.seed_to_privkey(
@@ -69,7 +69,7 @@ class MyTestCase(unittest.TestCase):
                                        None,
                                        header.chain_id,
                                        account_info.account_number,
-                                       Coin(amount='600', denom='USDT'))
+                                       Coin(amount='6', denom='USDT'))
 
                 priv_key = wallet.seed_to_privkey(
                     "forum welcome cute hen dance winner bubble ski actor neutral usage cherry bullet play collect shift peasant step private grow arrive fade early alarm")

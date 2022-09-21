@@ -81,7 +81,7 @@ class Ibc_transfer:
 
                 print('-------------{}-------------\nchain_url: {}\naccount number: {}\naddress: {}'.format(chain, url, account_info.account_number, account_info.address))
                 balance = client.query_balance(account_info.address, denom)
-                gapPrice = Coin(amount='600', denom='USDT')
+                gapPrice = Coin(amount='6', denom='USDT')
                 tx_builder = TxBuilder(account,
                                        None,
                                        header.chain_id,
