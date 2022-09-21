@@ -54,7 +54,7 @@ class TxBuilder:
             pub_key_any = self._private_key.to_public_key().to_secp256k1_any()
         else:
             privkey = PrivateKey(self.account.privateKey)
-            pubkey = PubKey(key=privkey.backend.compress_public_key_bytes(privkey.public_key)).SerializeToString()
+            pubkey = PubKey(key=privkey.backend.compress_public_key_bytes(privkey.public_key.to_bytes())).SerializeToString()
             pub_key_any = Any(type_url='/ethermint.crypto.v1.ethsecp256k1.PubKey', value=pubkey)
 
         signer_info = SignerInfo(

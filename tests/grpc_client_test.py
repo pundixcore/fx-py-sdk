@@ -16,7 +16,8 @@ from fx_py_sdk.codec.cosmos.base.v1beta1.coin_pb2 import Coin
 from fx_py_sdk.ibc_transfer import ConfigsKeys, Ibc_transfer
 
 # client = GRPCClient('https://testnet-tsla-grpc.marginx.io:9090')
-client = GRPCClient('192.168.21.121:9090')
+
+client = GRPCClient('127.0.0.1:9090')
 pair_id = "BTC:USDT"
 mnemonic = "language hazard giraffe bonus lock over bleak absorb senior depth guard entire end creek monster type whip purchase explain merge acid depth air reveal"
 
@@ -111,7 +112,7 @@ class MyTestCase(unittest.TestCase):
         print('account number:', account_info.account_number,
               'sequence:', account_info.sequence)
 
-        tx_builder = TxBuilder(account, None, chain_id, account_info.account_number, Coin(amount='60', denom="FX"))
+        tx_builder = TxBuilder(account, None, chain_id, account_info.account_number, Coin(amount='40', denom="FX"))
 
         tx_response = client.create_order(tx_builder, 'TSLA:USDT', "BUY", decimal.Decimal(800), decimal.Decimal(10), 5, account_info.sequence, mode=BROADCAST_MODE_BLOCK)
         print(MessageToJson(tx_response))
